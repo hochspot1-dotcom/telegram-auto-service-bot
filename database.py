@@ -19,22 +19,36 @@ def init_db():
                 car_model TEXT NOT NULL,
                 slot TEXT NOT NULL,
                 phone TEXT NOT NULL,
-                status TEXT DEFAULT 'Активна',
+                status TEXT DEFAULT 'На рассмотрении',
+                comment TEXT DEFAULT '',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
+        try:
+            cursor.execute("ALTER TABLE bookings ADD COLUMN comment TEXT DEFAULT ''")
+        except Exception:
+            pass
         conn.commit()
 
 def add_booking(user_id: int, user_name: str, problem: str, car_model: str, slot: str, phone: str) -> int:
-    """Добавление новой записи на ТО"""
+    """Добавление новой записи на ТО со статусом 'На рассмотрении'"""
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO bookings (user_id, user_name, problem, car_model, slot, phone)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO bookings (user_id, user_name, problem, car_model, slot, phone, status)
+            VALUES (?, ?, ?, ?, ?, ?, 'На рассмотрении')
         """, (user_id, user_name, problem, car_model, slot, phone))
         conn.commit()
         return cursor.lastrowid
+
+def get_booking_by_id(booking_id: int) -> dict | None:
+    """Получение подробной информации о конкретной записи по ID"""
+    with get_connection() as conn:
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM bookings WHERE id = ?", (booking_id,))
+        row = cursor.fetchone()
+        return dict(row) if row else None
 
 def get_user_bookings(user_id: int, status_filter: str = None) -> list:
     """Получение всех или фильтрованных записей конкретного пользователя"""
@@ -43,14 +57,14 @@ def get_user_bookings(user_id: int, status_filter: str = None) -> list:
         cursor = conn.cursor()
         if status_filter:
             cursor.execute("""
-                SELECT id, problem, car_model, slot, phone, status, created_at
+                SELECT id, problem, car_model, slot, phone, status, comment, created_at
                 FROM bookings
                 WHERE user_id = ? AND status = ?
                 ORDER BY id DESC
             """, (user_id, status_filter))
         else:
             cursor.execute("""
-                SELECT id, problem, car_model, slot, phone, status, created_at
+                SELECT id, problem, car_model, slot, phone, status, comment, created_at
                 FROM bookings
                 WHERE user_id = ?
                 ORDER BY id DESC
@@ -66,10 +80,10 @@ def get_user_stats(user_id: int) -> dict:
         cursor.execute("SELECT COUNT(*) as cnt FROM bookings WHERE user_id = ?", (user_id,))
         total = cursor.fetchone()["cnt"]
         
-        cursor.execute("SELECT COUNT(*) as cnt FROM bookings WHERE user_id = ? AND status = 'Активна'", (user_id,))
+        cursor.execute("SELECT COUNT(*) as cnt FROM bookings WHERE user_id = ? AND status IN ('На рассмотрении', 'Одобрена', 'Активна')", (user_id,))
         active = cursor.fetchone()["cnt"]
         
-        cursor.execute("SELECT COUNT(*) as cnt FROM bookings WHERE user_id = ? AND status = 'Отменена'", (user_id,))
+        cursor.execute("SELECT COUNT(*) as cnt FROM bookings WHERE user_id = ? AND status = 'Отклонена'", (user_id,))
         cancelled = cursor.fetchone()["cnt"]
         
         cursor.execute("SELECT phone, car_model FROM bookings WHERE user_id = ? ORDER BY id DESC LIMIT 1", (user_id,))
@@ -89,8 +103,8 @@ def cancel_booking_by_id(booking_id: int, user_id: int) -> bool:
         cursor = conn.cursor()
         cursor.execute("""
             UPDATE bookings
-            SET status = 'Отменена'
-            WHERE id = ? AND user_id = ? AND status = 'Активна'
+            SET status = 'Отменена пользователем'
+            WHERE id = ? AND user_id = ? AND status IN ('На рассмотрении', 'Одобрена', 'Активна')
         """, (booking_id, user_id))
         conn.commit()
         return cursor.rowcount > 0
@@ -104,28 +118,28 @@ def get_all_bookings(status_filter: str = None) -> list:
         cursor = conn.cursor()
         if status_filter:
             cursor.execute("""
-                SELECT id, user_id, user_name, problem, car_model, slot, phone, status, created_at
+                SELECT id, user_id, user_name, problem, car_model, slot, phone, status, comment, created_at
                 FROM bookings
                 WHERE status = ?
                 ORDER BY id DESC
             """, (status_filter,))
         else:
             cursor.execute("""
-                SELECT id, user_id, user_name, problem, car_model, slot, phone, status, created_at
+                SELECT id, user_id, user_name, problem, car_model, slot, phone, status, comment, created_at
                 FROM bookings
                 ORDER BY id DESC
             """)
         return cursor.fetchall()
 
-def update_booking_status(booking_id: int, new_status: str) -> bool:
-    """Изменение статуса записи администратором"""
+def update_booking_status(booking_id: int, new_status: str, comment: str = "") -> bool:
+    """Изменение статуса записи и добавление комментария модератора"""
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
             UPDATE bookings
-            SET status = ?
+            SET status = ?, comment = ?
             WHERE id = ?
-        """, (new_status, booking_id))
+        """, (new_status, comment, booking_id))
         conn.commit()
         return cursor.rowcount > 0
 
@@ -138,18 +152,18 @@ def get_admin_stats() -> dict:
         cursor.execute("SELECT COUNT(*) as cnt FROM bookings")
         total = cursor.fetchone()["cnt"]
         
-        cursor.execute("SELECT COUNT(*) as cnt FROM bookings WHERE status = 'Активна'")
-        active = cursor.fetchone()["cnt"]
+        cursor.execute("SELECT COUNT(*) as cnt FROM bookings WHERE status = 'На рассмотрении'")
+        pending = cursor.fetchone()["cnt"]
         
-        cursor.execute("SELECT COUNT(*) as cnt FROM bookings WHERE status = 'Выполнена'")
-        completed = cursor.fetchone()["cnt"]
+        cursor.execute("SELECT COUNT(*) as cnt FROM bookings WHERE status = 'Одобрена'")
+        approved = cursor.fetchone()["cnt"]
         
-        cursor.execute("SELECT COUNT(*) as cnt FROM bookings WHERE status = 'Отменена'")
-        cancelled = cursor.fetchone()["cnt"]
+        cursor.execute("SELECT COUNT(*) as cnt FROM bookings WHERE status = 'Отклонена'")
+        rejected = cursor.fetchone()["cnt"]
         
         return {
             "total": total,
-            "active": active,
-            "completed": completed,
-            "cancelled": cancelled
+            "pending": pending,
+            "approved": approved,
+            "rejected": rejected
         }

@@ -25,24 +25,31 @@ from database import (
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
-# Словарь марок автомобилей (Русский -> Английский)
+# Расширенный словарь марок автомобилей (Русский -> Английский)
 BRANDS_MAP = {
     "бмв": "BMW", "bmw": "BMW", "опель": "Opel", "opel": "Opel",
     "мерседес-бенц": "Mercedes-Benz", "мерседес бенц": "Mercedes-Benz",
-    "мерседес": "Mercedes-Benz", "мерс": "Mercedes-Benz", "тойота": "Toyota",
-    "хендай": "Hyundai", "хёндэ": "Hyundai", "хенде": "Hyundai", "хюндай": "Hyundai",
-    "киа": "Kia", "фольксваген": "Volkswagen", "фольц": "Volkswagen", "фолькс": "Volkswagen",
-    "ауди": "Audi", "ниссан": "Nissan", "лада": "Lada", "ваз": "Lada (ВАЗ)",
-    "жигули": "Lada", "шкода": "Skoda", "форд": "Ford", "мазда": "Mazda",
-    "субару": "Subaru", "рено": "Renault", "пежо": "Peugeot", "ситроен": "Citroen",
-    "шевроле": "Chevrolet", "шеви": "Chevrolet", "митсубиси": "Mitsubishi",
-    "мицубиси": "Mitsubishi", "мицубиши": "Mitsubishi", "хонда": "Honda",
-    "лексус": "Lexus", "инфинити": "Infiniti", "порше": "Porsche", "порш": "Porsche",
-    "вольво": "Volvo", "сузуки": "Suzuki", "уаз": "UAZ", "газ": "GAZ",
-    "чери": "Chery", "хавал": "Haval", "хавейл": "Haval", "джили": "Geely",
-    "эксид": "Exeed", "омода": "Omoda", "чанган": "Changan", "ягуар": "Jaguar",
-    "ленд ровер": "Land Rover", "лэнд ровер": "Land Rover", "рейндж ровер": "Range Rover",
-    "ранж ровер": "Range Rover", "тесла": "Tesla",
+    "мерседес": "Mercedes-Benz", "мерс": "Mercedes-Benz", "тойота": "Toyota", "toyota": "Toyota",
+    "хендай": "Hyundai", "хёндэ": "Hyundai", "хенде": "Hyundai", "хюндай": "Hyundai", "hyundai": "Hyundai",
+    "киа": "Kia", "kia": "Kia", "фольксваген": "Volkswagen", "фольц": "Volkswagen", "фолькс": "Volkswagen", "volkswagen": "Volkswagen", "vw": "Volkswagen",
+    "ауди": "Audi", "audi": "Audi", "ниссан": "Nissan", "nissan": "Nissan", "лада": "Lada", "lada": "Lada", "ваз": "Lada (ВАЗ)",
+    "жигули": "Lada", "шкода": "Skoda", "skoda": "Skoda", "форд": "Ford", "ford": "Ford", "мазда": "Mazda", "mazda": "Mazda",
+    "субару": "Subaru", "subaru": "Subaru", "рено": "Renault", "renault": "Renault", "пежо": "Peugeot", "peugeot": "Peugeot",
+    "ситроен": "Citroen", "citroen": "Citroen", "шевроле": "Chevrolet", "chevrolet": "Chevrolet", "шеви": "Chevrolet",
+    "митсубиси": "Mitsubishi", "мицубиси": "Mitsubishi", "мицубиши": "Mitsubishi", "mitsubishi": "Mitsubishi",
+    "хонда": "Honda", "honda": "Honda", "лексус": "Lexus", "lexus": "Lexus", "инфинити": "Infiniti", "infiniti": "Infiniti",
+    "порше": "Porsche", "порш": "Porsche", "porsche": "Porsche", "вольво": "Volvo", "volvo": "Volvo",
+    "сузуки": "Suzuki", "suzuki": "Suzuki", "уаз": "UAZ", "uaz": "UAZ", "газ": "GAZ", "gaz": "GAZ", "москвич": "Moskvich",
+    "чери": "Chery", "chery": "Chery", "хавал": "Haval", "хавейл": "Haval", "haval": "Haval", "джили": "Geely", "geely": "Geely",
+    "эксид": "Exeed", "exeed": "Exeed", "омода": "Omoda", "omoda": "Omoda", "чанган": "Changan", "changan": "Changan",
+    "ягуар": "Jaguar", "jaguar": "Jaguar", "ленд ровер": "Land Rover", "лэнд ровер": "Land Rover", "land rover": "Land Rover",
+    "рейндж ровер": "Range Rover", "ранж ровер": "Range Rover", "range rover": "Range Rover", "тесла": "Tesla", "tesla": "Tesla",
+    "джип": "Jeep", "jeep": "Jeep", "додж": "Dodge", "dodge": "Dodge", "крайслер": "Chrysler", "chrysler": "Chrysler",
+    "кадиллак": "Cadillac", "cadillac": "Cadillac", "линкольн": "Lincoln", "lincoln": "Lincoln", "фиат": "Fiat", "fiat": "Fiat",
+    "альфа ромео": "Alfa Romeo", "alfa romeo": "Alfa Romeo", "сеат": "Seat", "seat": "Seat", "танк": "Tank", "tank": "Tank",
+    "зикр": "Zeekr", "zeekr": "Zeekr", "ли авто": "Li Auto", "ликсианг": "Lixiang", "li auto": "Li Auto", "lixiang": "Lixiang",
+    "воях": "Voyah", "voyah": "Voyah", "джек": "JAC", "jac": "JAC", "фав": "FAW", "faw": "FAW", "лифан": "Lifan", "lifan": "Lifan",
+    "грейт вол": "Great Wall", "great wall": "Great Wall", "лифан": "Lifan",
 }
 
 # Словарь известных моделей (Русский -> Английский)
@@ -85,6 +92,18 @@ CYRILLIC_TO_LATIN = {
     'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
 }
 
+# Список ключевых авто-терминов для проверки описания проблемы
+AUTO_KEYWORDS = [
+    "ремонт", "замена", "стуч", "скрип", "шум", "масл", "колодк", "двигател", "мотор", 
+    "коробк", "тормоз", "подвеск", "стоек", "колес", "диагност", "фильтр", "свечи", 
+    "аккумул", "электрик", "кондиционер", "климат", "печк", "фара", "бампер", "кузов", 
+    "рул", "рейк", "глушител", "то", "течь", "гори", "чек", "не работ", "проблем", 
+    "сломал", "течет", "греет", "кипит", "вибрир", "завод", "глохнет", "троит", 
+    "тяга", "турбин", "шин", "диск", "покраск", "полировк", "чистк", "заправк", 
+    "промывк", "регулировк", "сход", "развал", "патрубок", "жидкост", "антифриз", 
+    "тосол", "гур", "помпа", "стартер", "генератор", "сцеплен", "акпп", "мкпп", "вариатор"
+]
+
 def transliterate_word(word: str) -> str:
     res = []
     for char in word:
@@ -99,7 +118,7 @@ def transliterate_word(word: str) -> str:
     return "".join(res).capitalize()
 
 def validate_custom_problem(text: str) -> bool:
-    """Строгая валидация пользовательского описания проблемы"""
+    """Ультра-строгая валидация описания проблемы от спама и бессмыслицы"""
     clean_text = text.strip()
     if len(clean_text) < 4 or len(clean_text) > 120:
         return False
@@ -108,27 +127,45 @@ def validate_custom_problem(text: str) -> bool:
     if re.search(r"http[s]?://|www\.|t\.me/", clean_text.lower()):
         return False
         
-    # Должно быть не менее 3 букв (русских или латинских)
+    # Блокировка клавиатурных последовательностей (йцукен, фывапрол, qwerty, asdfgh)
+    kb_patterns = [r"qwerty", r"asdfgh", r"zxcvbn", r"йцукен", r"фывапр", r"ячсмит"]
+    for pat in kb_patterns:
+        if re.search(pat, clean_text.lower()):
+            return False
+            
+    # Должно быть не менее 4 букв
     letters = re.findall(r"[a-zA-Zа-яА-ЯёЁ]", clean_text)
-    if len(letters) < 3:
+    if len(letters) < 4:
         return False
         
-    # Доля букв от общей длины не менее 40% (отсекает 12345, !!!???)
-    if len(letters) / len(clean_text) < 0.4:
+    # Доля букв от общей длины не менее 50%
+    if len(letters) / len(clean_text) < 0.5:
         return False
         
-    # Блокировка повторяющихся букв (например "аааааа" или "hhhhhh")
-    if re.search(r"([a-zA-Zа-яА-ЯёЁ])\1{3,}", clean_text.lower()):
+    # Блокировка повторяющихся букв (аааааа)
+    if re.search(r"([a-zA-Zа-яА-ЯёЁ])\1{2,}", clean_text.lower()):
         return False
         
-    # Блокировка бессмысленного набора согласных (например "фвпрлджкнг")
-    if re.search(r"[бвгджзклмнпрстфхцчшщbcdfghjklmnpqrstvwxyz]{6,}", clean_text.lower()):
+    # Блокировка набора согласных (фвпрлджкнг)
+    if re.search(r"[бвгджзклмнпрстфхцчшщbcdfghjklmnpqrstvwxyz]{5,}", clean_text.lower()):
+        return False
+
+    # Проверка доли гласных букв (в реальных словах доля гласных составляет от 20% до 65%)
+    vowels = re.findall(r"[аеёиоуыэюяaeiouy]", clean_text.lower())
+    if len(vowels) / len(letters) < 0.18 or len(vowels) / len(letters) > 0.70:
+        return False
+
+    # ПРОВЕРКА: Содержит ли текст хотя бы одно авто-слово ИЛИ осмысленную фразу (из 2+ слов с гласными)
+    has_auto_keyword = any(kw in clean_text.lower() for kw in AUTO_KEYWORDS)
+    words = [w for w in clean_text.split() if len(w) >= 2]
+    
+    if not has_auto_keyword and len(words) < 2:
         return False
 
     return True
 
 def validate_and_format_car(text: str) -> str | None:
-    """Строгая валидация и форматирование марки и модели авто"""
+    """Максимально строгая валидация марки и модели авто с обязательной проверкой по авто-базе"""
     clean_text = text.strip()
     if len(clean_text) < 2 or len(clean_text) > 40:
         return None
@@ -142,42 +179,60 @@ def validate_and_format_car(text: str) -> str | None:
     if len(letters) < 2:
         return None
         
-    # Доля букв от общей длины не менее 50% (отсекает чистые цифры 123456 и спецсимволы)
+    # Доля букв от общей длины не менее 50%
     if len(letters) / len(clean_text) < 0.5:
         return None
         
-    # Блокировка повторяющихся букв (ааааа, ббббб)
+    # Блокировка клавиатурных заборчиков
+    kb_patterns = [r"qwerty", r"asdfgh", r"zxcvbn", r"йцукен", r"фывапр", r"ячсмит"]
+    for pat in kb_patterns:
+        if re.search(pat, clean_text.lower()):
+            return None
+
+    # Блокировка повторяющихся букв (ааааа)
     if re.search(r"([a-zA-Zа-яА-ЯёЁ])\1{2,}", clean_text.lower()):
         return None
         
-    # Блокировка хаотичного набора согласных (например "фвпрлджк")
-    if re.search(r"[бвгджзклмнпрстфхцчшщbcdfghjklmnpqrstvwxyz]{5,}", clean_text.lower()):
+    # Блокировка хаотичного набора согласных
+    if re.search(r"[бвгджзклмнпрстфхцчшщbcdfghjklmnpqrstvwxyz]{4,}", clean_text.lower()):
         return None
 
     words = clean_text.split()
     formatted_words = []
+    has_known_car_entity = False
+    
     i = 0
     while i < len(words):
+        word_lower = words[i].lower()
         if i + 1 < len(words):
-            two_words = f"{words[i].lower()} {words[i+1].lower()}"
+            two_words = f"{word_lower} {words[i+1].lower()}"
             if two_words in BRANDS_MAP:
                 formatted_words.append(BRANDS_MAP[two_words])
+                has_known_car_entity = True
                 i += 2
                 continue
             if two_words in MODELS_MAP:
                 formatted_words.append(MODELS_MAP[two_words])
+                has_known_car_entity = True
                 i += 2
                 continue
-        word_lower = words[i].lower()
+                
         if word_lower in BRANDS_MAP:
             formatted_words.append(BRANDS_MAP[word_lower])
+            has_known_car_entity = True
         elif word_lower in MODELS_MAP:
             formatted_words.append(MODELS_MAP[word_lower])
+            has_known_car_entity = True
         elif re.search(r"[а-яА-ЯёЁ]", words[i]):
             formatted_words.append(transliterate_word(words[i]))
         else:
             formatted_words.append(words[i].capitalize() if words[i].isalpha() else words[i])
         i += 1
+        
+    # ЖЕСТКАЯ ПРОВЕРКА: В тексте обязательно должна быть распознана известная марка или модель авто из базы!
+    if not has_known_car_entity:
+        return None
+
     return " ".join(formatted_words)
 
 # Состояния FSM для записи на ТО

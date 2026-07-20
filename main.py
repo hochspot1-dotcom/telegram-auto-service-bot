@@ -205,16 +205,27 @@ MAIN_WELCOME_TEXT = (
 
 # Функция отсылки или обновления главного меню
 async def show_main_menu(bot: Bot, chat_id: int, user_first_name: str, state: FSMContext, callback: types.CallbackQuery = None):
+    data = await state.get_data()
+    old_card_id = data.get("card_msg_id")
     await state.clear()
+    
     text = f"Здравствуйте, {user_first_name}!\n\n" + MAIN_WELCOME_TEXT
     
     if callback:
         try:
             await callback.message.edit_text(text, parse_mode="HTML", reply_markup=get_main_inline_keyboard())
+            await state.update_data(card_msg_id=callback.message.message_id)
             return
         except Exception:
             pass
             
+    # Удаляем предыдущую карточку меню, если она осталась в чате
+    if old_card_id:
+        try:
+            await bot.delete_message(chat_id, old_card_id)
+        except Exception:
+            pass
+
     msg = await bot.send_message(chat_id, text, parse_mode="HTML", reply_markup=get_main_inline_keyboard())
     await state.update_data(card_msg_id=msg.message_id)
 
@@ -239,7 +250,7 @@ async def cmd_start(message: types.Message, state: FSMContext, bot: Bot):
 # Возврат в главное меню через Inline Callback
 @dp.callback_query(F.data == "nav_main")
 async def nav_main_handler(callback: types.CallbackQuery, state: FSMContext, bot: Bot):
-    await callback.answer()
+    await callback.answer("Меню обновлено! 🔄")
     await show_main_menu(bot, callback.message.chat.id, callback.from_user.first_name, state, callback)
 
 # --- Раздел: 🛠 Услуги и цены ---

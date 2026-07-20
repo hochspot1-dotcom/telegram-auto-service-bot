@@ -98,15 +98,62 @@ def transliterate_word(word: str) -> str:
             res.append(char)
     return "".join(res).capitalize()
 
-def validate_and_format_car(text: str) -> str | None:
+def validate_custom_problem(text: str) -> bool:
+    """Строгая валидация пользовательского описания проблемы"""
     clean_text = text.strip()
-    if len(clean_text) < 2 or len(clean_text) > 50:
-        return None
-    if not re.search(r"[a-zA-Zа-яА-ЯёЁ]", clean_text):
-        return None
-    if re.search(r"(.)\1{4,}", clean_text.lower()):
+    if len(clean_text) < 4 or len(clean_text) > 120:
+        return False
+        
+    # Блокировка ссылок и спама
+    if re.search(r"http[s]?://|www\.|t\.me/", clean_text.lower()):
+        return False
+        
+    # Должно быть не менее 3 букв (русских или латинских)
+    letters = re.findall(r"[a-zA-Zа-яА-ЯёЁ]", clean_text)
+    if len(letters) < 3:
+        return False
+        
+    # Доля букв от общей длины не менее 40% (отсекает 12345, !!!???)
+    if len(letters) / len(clean_text) < 0.4:
+        return False
+        
+    # Блокировка повторяющихся букв (например "аааааа" или "hhhhhh")
+    if re.search(r"([a-zA-Zа-яА-ЯёЁ])\1{3,}", clean_text.lower()):
+        return False
+        
+    # Блокировка бессмысленного набора согласных (например "фвпрлджкнг")
+    if re.search(r"[бвгджзклмнпрстфхцчшщbcdfghjklmnpqrstvwxyz]{6,}", clean_text.lower()):
+        return False
+
+    return True
+
+def validate_and_format_car(text: str) -> str | None:
+    """Строгая валидация и форматирование марки и модели авто"""
+    clean_text = text.strip()
+    if len(clean_text) < 2 or len(clean_text) > 40:
         return None
         
+    # Ссылки и спам заблокированы
+    if re.search(r"http[s]?://|www\.|t\.me/", clean_text.lower()):
+        return None
+        
+    # Обязательно наличие букв
+    letters = re.findall(r"[a-zA-Zа-яА-ЯёЁ]", clean_text)
+    if len(letters) < 2:
+        return None
+        
+    # Доля букв от общей длины не менее 50% (отсекает чистые цифры 123456 и спецсимволы)
+    if len(letters) / len(clean_text) < 0.5:
+        return None
+        
+    # Блокировка повторяющихся букв (ааааа, ббббб)
+    if re.search(r"([a-zA-Zа-яА-ЯёЁ])\1{2,}", clean_text.lower()):
+        return None
+        
+    # Блокировка хаотичного набора согласных (например "фвпрлджк")
+    if re.search(r"[бвгджзклмнпрстфхцчшщbcdfghjklmnpqrstvwxyz]{5,}", clean_text.lower()):
+        return None
+
     words = clean_text.split()
     formatted_words = []
     i = 0
@@ -494,13 +541,14 @@ async def custom_problem_entered_inline(message: types.Message, state: FSMContex
     data = await state.get_data()
     card_msg_id = data.get("card_msg_id")
     
-    if len(text_val) < 3:
+    if not validate_custom_problem(text_val):
         if card_msg_id:
             builder = InlineKeyboardBuilder()
             builder.button(text="🔙 Отмена и назад", callback_data="nav_main")
             await bot.edit_message_text(
-                "⚠️ <b>Слишком короткое описание.</b>\n"
-                "Пожалуйста, напишите подробнее (не менее 3 символов):",
+                "⚠️ <b>Некорректно описана проблема!</b>\n\n"
+                "Пожалуйста, введите понятное описание поломки или услуги текстом (без чистых цифр, спецсимволов, хаотичных букв и спама).\n"
+                "<i>Примеры: Замена передних колодок, Стучит подвеска справа, ТО масло и фильтры</i>",
                 chat_id=message.chat.id,
                 message_id=card_msg_id,
                 parse_mode="HTML",
@@ -541,9 +589,9 @@ async def car_model_entered_inline(message: types.Message, state: FSMContext, bo
     if not formatted_car:
         if card_msg_id:
             await bot.edit_message_text(
-                "⚠️ <b>Некорректное название автомобиля.</b>\n\n"
-                "Пожалуйста, введите марку и модель автомобиля правильным текстом.\n"
-                "<i>Примеры: Опель астра, BMW X5, Тойота Камри, Kia Rio</i>",
+                "⚠️ <b>Некорректное название автомобиля!</b>\n\n"
+                "Пожалуйста, введите настоящую марку и модель автомобиля правильным текстом (без чистых цифр, символов, спама и наборных букв).\n"
+                "<i>Примеры: Опель астра, BMW X5, Тойота Камри, Kia Rio, Хендай Солярис</i>",
                 chat_id=message.chat.id,
                 message_id=card_msg_id,
                 parse_mode="HTML",

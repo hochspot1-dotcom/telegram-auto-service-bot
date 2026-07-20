@@ -195,6 +195,8 @@ def get_confirm_keyboard():
 
 dp = Dispatcher(storage=MemoryStorage())
 
+from aiogram.types import ReplyKeyboardRemove
+
 MAIN_WELCOME_TEXT = (
     "🚗 <b>Автосервис «Интерактивный Бот»</b>\n\n"
     "Добро пожаловать! Все разделы работают прямо в одном сообщении.\n"
@@ -219,12 +221,19 @@ async def show_main_menu(bot: Bot, chat_id: int, user_first_name: str, state: FS
 # --- Навигация по /start, /restart ---
 @dp.message(Command("start"))
 @dp.message(Command("restart"))
-@dp.message(F.text.in_({"🔄 Обновить", "🔄 Обновить меню", "🛠 Услуги", "📅 Записаться", "👤 Кабинет", "📍 Контакты"}))
 async def cmd_start(message: types.Message, state: FSMContext, bot: Bot):
     try:
         await message.delete()
     except Exception:
         pass
+        
+    # Удаляем старую нижнюю клавиатуру из интерфейса Telegram
+    rm_msg = await bot.send_message(message.chat.id, "🔄 Обновление интерфейса...", reply_markup=ReplyKeyboardRemove())
+    try:
+        await rm_msg.delete()
+    except Exception:
+        pass
+        
     await show_main_menu(bot, message.chat.id, message.from_user.first_name, state)
 
 # Возврат в главное меню через Inline Callback

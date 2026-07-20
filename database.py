@@ -84,7 +84,7 @@ def get_user_stats(user_id: int) -> dict:
         }
 
 def cancel_booking_by_id(booking_id: int, user_id: int) -> bool:
-    """Отмена записи по ID"""
+    """Отмена записи по ID пользователем"""
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
@@ -94,3 +94,62 @@ def cancel_booking_by_id(booking_id: int, user_id: int) -> bool:
         """, (booking_id, user_id))
         conn.commit()
         return cursor.rowcount > 0
+
+# --- Функции администратора / модератора ---
+
+def get_all_bookings(status_filter: str = None) -> list:
+    """Получение всех записей сервиса для администратора"""
+    with get_connection() as conn:
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        if status_filter:
+            cursor.execute("""
+                SELECT id, user_id, user_name, problem, car_model, slot, phone, status, created_at
+                FROM bookings
+                WHERE status = ?
+                ORDER BY id DESC
+            """, (status_filter,))
+        else:
+            cursor.execute("""
+                SELECT id, user_id, user_name, problem, car_model, slot, phone, status, created_at
+                FROM bookings
+                ORDER BY id DESC
+            """)
+        return cursor.fetchall()
+
+def update_booking_status(booking_id: int, new_status: str) -> bool:
+    """Изменение статуса записи администратором"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE bookings
+            SET status = ?
+            WHERE id = ?
+        """, (new_status, booking_id))
+        conn.commit()
+        return cursor.rowcount > 0
+
+def get_admin_stats() -> dict:
+    """Общая статистика автосервиса для модератора"""
+    with get_connection() as conn:
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        cursor.execute("SELECT COUNT(*) as cnt FROM bookings")
+        total = cursor.fetchone()["cnt"]
+        
+        cursor.execute("SELECT COUNT(*) as cnt FROM bookings WHERE status = 'Активна'")
+        active = cursor.fetchone()["cnt"]
+        
+        cursor.execute("SELECT COUNT(*) as cnt FROM bookings WHERE status = 'Выполнена'")
+        completed = cursor.fetchone()["cnt"]
+        
+        cursor.execute("SELECT COUNT(*) as cnt FROM bookings WHERE status = 'Отменена'")
+        cancelled = cursor.fetchone()["cnt"]
+        
+        return {
+            "total": total,
+            "active": active,
+            "completed": completed,
+            "cancelled": cancelled
+        }

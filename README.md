@@ -17,6 +17,7 @@ A modern, interactive Telegram bot for an Auto Repair Service built with Python 
   3. **Exact Date & Time Slots:** Real calendar dates and weekdays generated dynamically for booking.
   4. **Contact Sharing:** Easy one-click phone number submission via Telegram contact button or manual text.
   5. **Booking Confirmation:** Final confirmation card before submitting.
+- 👤 **Personal Cabinet & Booking History (SQLite DB)** — Dedicated personal space for clients to view profile details, phone number, active bookings, full history of visits, and cancel bookings if needed.
 - 📍 **Contacts & Address** — Location, working hours, and phone details.
 - ℹ️ **About Us** — Overview of company experience and guarantees.
 
@@ -26,6 +27,7 @@ A modern, interactive Telegram bot for an Auto Repair Service built with Python 
 
 - **Language:** Python 3.10+
 - **Framework:** `aiogram 3.x` (Async Telegram Bot API framework)
+- **Database:** SQLite 3 (`service_bot.db`)
 - **Environment Management:** `python-dotenv`
 - **State Management:** `aiogram` FSM (Finite State Machine)
 
@@ -68,6 +70,8 @@ A modern, interactive Telegram bot for an Auto Repair Service built with Python 
 ```
 .
 ├── main.py              # Main bot entry point & FSM handlers
+├── database.py          # SQLite database connection & queries
+├── service_bot.db       # SQLite database storage file (auto-generated)
 ├── requirements.txt     # Python dependencies (aiogram, python-dotenv)
 ├── .env.example         # Example environment variables file
 ├── .gitignore           # Git ignore file (excludes .env)

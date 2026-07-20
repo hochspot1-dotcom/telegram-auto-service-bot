@@ -16,10 +16,13 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
+from database import init_db, add_booking, get_user_bookings, get_user_stats, cancel_booking_by_id
+
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 # Словарь марок автомобилей (Русский -> Английский)
 BRANDS_MAP = {
+
     "бмв": "BMW",
     "bmw": "BMW",
     "опель": "Opel",
@@ -261,14 +264,15 @@ class BookingState(StatesGroup):
     enter_phone = State()           # Передача/ввод телефона
     confirm = State()               # Подтверждение записи
 
-# Главное меню бота (4 основные кнопки)
+# Главное меню бота (5 основных кнопок)
 def get_main_keyboard():
     builder = ReplyKeyboardBuilder()
     builder.button(text="🛠 Услуги и цены")
     builder.button(text="📅 Записаться на ТО")
+    builder.button(text="👤 Личный кабинет")
     builder.button(text="📍 Контакты и адрес")
     builder.button(text="ℹ️ О нас")
-    builder.adjust(2)
+    builder.adjust(2, 1, 2)
     return builder.as_markup(resize_keyboard=True)
 
 # Инлайн-клавиатура выбора категорий проблем
@@ -383,6 +387,128 @@ async def about_handler(message: types.Message):
         "Гарантия на работы, современное оборудование и квалифицированные мастера."
     )
     await message.answer(about_text, parse_mode="HTML")
+
+# --- 👤 Личный кабинет ---
+@dp.message(F.text == "👤 Личный кабинет")
+@dp.message(Command("profile"))
+@dp.message(Command("my_bookings"))
+async def profile_handler(message: types.Message):
+    user_id = message.from_user.id
+    stats = get_user_stats(user_id)
+    user_name = message.from_user.full_name or message.from_user.first_name
+    username_str = f" (@{message.from_user.username})" if message.from_user.username else ""
+    
+    profile_text = (
+        f"<b>👤 Личный кабинет клиента</b>\n\n"
+        f"• <b>Клиент:</b> {user_name}{username_str}\n"
+        f"• <b>Телефон:</b> {stats['phone']}\n"
+        f"• <b>Последнее авто:</b> {stats['car_model']}\n\n"
+        f"<b>📊 Ваша статистика записей:</b>\n"
+        f"• 🟢 Активных записей: <b>{stats['active']}</b>\n"
+        f"• 📁 Всего заявок: <b>{stats['total']}</b>\n"
+        f"• 🔴 Отмененных: <b>{stats['cancelled']}</b>\n\n"
+        "Выберите нужное действие ниже:"
+    )
+    
+    builder = InlineKeyboardBuilder()
+    builder.button(text=f"📋 Активные записи ({stats['active']})", callback_data="view_active_bookings")
+    builder.button(text="📜 Вся история визитов", callback_data="view_all_bookings")
+    builder.button(text="📅 Записаться на ТО", callback_data="start_booking_from_profile")
+    builder.adjust(1)
+    
+    await message.answer(profile_text, parse_mode="HTML", reply_markup=builder.as_markup())
+
+# Показ активных записей
+@dp.callback_query(F.data == "view_active_bookings")
+async def view_active_bookings_handler(callback: types.CallbackQuery):
+    await callback.answer()
+    user_id = callback.from_user.id
+    bookings = get_user_bookings(user_id, status_filter="Активна")
+    
+    if not bookings:
+        await callback.message.answer(
+            "<b>🟢 У вас нет активных записей на данный момент.</b>\n\n"
+            "Вы можете записаться на ТО, нажав кнопку «📅 Записаться на ТО».",
+            parse_mode="HTML"
+        )
+        return
+        
+    response = "<b>🟢 Ваши активные записи:</b>\n\n"
+    builder = InlineKeyboardBuilder()
+    for b in bookings:
+        response += (
+            f"<b>Запись №{b['id']}</b>\n"
+            f"• <b>Услуга:</b> {b['problem']}\n"
+            f"• <b>Автомобиль:</b> {b['car_model']}\n"
+            f"• <b>Дата и время:</b> {b['slot']}\n"
+            f"• <b>Телефон:</b> {b['phone']}\n"
+            "-------------------------\n"
+        )
+        builder.button(text=f"❌ Отменить запись №{b['id']}", callback_data=f"cancel_db_booking_{b['id']}")
+        
+    builder.adjust(1)
+    await callback.message.answer(response, parse_mode="HTML", reply_markup=builder.as_markup())
+
+# Показ всей истории записей
+@dp.callback_query(F.data == "view_all_bookings")
+async def view_all_bookings_handler(callback: types.CallbackQuery):
+    await callback.answer()
+    user_id = callback.from_user.id
+    bookings = get_user_bookings(user_id)
+    
+    if not bookings:
+        await callback.message.answer(
+            "<b>📜 История записей пуста.</b>",
+            parse_mode="HTML"
+        )
+        return
+        
+    response = "<b>📜 Полная история ваших записей:</b>\n\n"
+    for b in bookings:
+        status_icon = "🟢" if b["status"] == "Активна" else "🔴"
+        response += (
+            f"<b>Запись №{b['id']}</b> [{status_icon} {b['status']}]\n"
+            f"• <b>Услуга:</b> {b['problem']}\n"
+            f"• <b>Автомобиль:</b> {b['car_model']}\n"
+            f"• <b>Дата и время:</b> {b['slot']}\n"
+            f"• <b>Телефон:</b> {b['phone']}\n"
+            "-------------------------\n"
+        )
+    await callback.message.answer(response, parse_mode="HTML")
+
+# Запуск записи из личного кабинета
+@dp.callback_query(F.data == "start_booking_from_profile")
+async def start_booking_from_profile_handler(callback: types.CallbackQuery, state: FSMContext):
+    await callback.answer()
+    await state.set_state(BookingState.select_category)
+    await callback.message.answer(
+        "<b>Шаг 1 из 4:</b> Выберите категорию проблемы:",
+        parse_mode="HTML",
+        reply_markup=get_categories_keyboard()
+    )
+
+# Отмена записи из базы данных
+@dp.callback_query(F.data.startswith("cancel_db_booking_"))
+async def cancel_db_booking_handler(callback: types.CallbackQuery):
+    await callback.answer()
+    try:
+        booking_id = int(callback.data.replace("cancel_db_booking_", ""))
+    except ValueError:
+        return
+        
+    user_id = callback.from_user.id
+    success = cancel_booking_by_id(booking_id, user_id)
+    
+    if success:
+        await callback.message.edit_text(
+            f"<b>✅ Запись №{booking_id} успешно отменена.</b>",
+            parse_mode="HTML"
+        )
+    else:
+        await callback.message.answer(
+            "⚠️ Не удалось отменить запись или она уже была отменена.",
+            parse_mode="HTML"
+        )
 
 # --- 📅 Поток записи на ТО ---
 
@@ -517,12 +643,23 @@ async def confirm_booking(callback: types.CallbackQuery, state: FSMContext):
     data = await state.get_data()
     await state.clear()
     
+    booking_id = add_booking(
+        user_id=callback.from_user.id,
+        user_name=callback.from_user.full_name or callback.from_user.first_name,
+        problem=data.get('problem', 'Общий ремонт'),
+        car_model=data.get('car_model', 'Не указано'),
+        slot=data.get('slot', 'Не указано'),
+        phone=data.get('phone', 'Не указан')
+    )
+    
     final_text = (
-        "<b>🎉 Запись успешно подтверждена!</b>\n\n"
+        f"<b>🎉 Запись №{booking_id} успешно подтверждена!</b>\n\n"
         f"Дата и время: <b>{data.get('slot')}</b>\n"
-        f"Автомобиль: <b>{data.get('car_model')}</b>\n\n"
+        f"Автомобиль: <b>{data.get('car_model')}</b>\n"
+        f"Услуга: <b>{data.get('problem')}</b>\n\n"
         "Мы свяжемся с вами по телефону <b>"
-        f"{data.get('phone')}</b> при необходимости."
+        f"{data.get('phone')}</b> для подтверждения.\n\n"
+        "<i>Вы всегда можете посмотреть свои записи и их статус с помощью кнопки «📋 Мои записи».</i>"
     )
     await callback.message.answer(final_text, parse_mode="HTML", reply_markup=get_main_keyboard())
 
@@ -531,6 +668,10 @@ async def main():
     if not bot_token or bot_token == "your_bot_token_here":
         print("ОШИБКА: Укажите валидный BOT_TOKEN в переменных окружения!", flush=True)
         return
+
+    # Инициализация базы данных
+    init_db()
+    print("База данных SQLite успешно инициализирована!", flush=True)
 
     bot = Bot(token=bot_token)
     

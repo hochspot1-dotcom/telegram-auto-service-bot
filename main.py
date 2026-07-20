@@ -264,7 +264,7 @@ class BookingState(StatesGroup):
     enter_phone = State()           # Передача/ввод телефона
     confirm = State()               # Подтверждение записи
 
-# Главное меню бота (5 основных кнопок)
+# Главное меню бота (6 основных кнопок)
 def get_main_keyboard():
     builder = ReplyKeyboardBuilder()
     builder.button(text="🛠 Услуги и цены")
@@ -272,7 +272,8 @@ def get_main_keyboard():
     builder.button(text="👤 Личный кабинет")
     builder.button(text="📍 Контакты и адрес")
     builder.button(text="ℹ️ О нас")
-    builder.adjust(2, 1, 2)
+    builder.button(text="🔄 Обновить меню")
+    builder.adjust(2, 1, 2, 1)
     return builder.as_markup(resize_keyboard=True)
 
 # Инлайн-клавиатура выбора категорий проблем
@@ -329,16 +330,18 @@ def get_confirm_keyboard():
 
 dp = Dispatcher(storage=MemoryStorage())
 
-# --- Команда /start ---
+# --- Команда /start и /restart ---
 @dp.message(Command("start"))
+@dp.message(Command("restart"))
+@dp.message(F.text == "🔄 Обновить меню")
 async def start_handler(message: types.Message, state: FSMContext):
     await state.clear()
     welcome_text = (
         f"Здравствуйте, {message.from_user.first_name}!\n\n"
-        "Добро пожаловать в бот автосервиса.\n"
+        "🔄 <b>Меню бота успешно обновлено.</b>\n"
         "Выберите нужное действие в меню ниже:"
     )
-    await message.answer(welcome_text, reply_markup=get_main_keyboard())
+    await message.answer(welcome_text, parse_mode="HTML", reply_markup=get_main_keyboard())
 
 # --- Обработка Отмены ---
 @dp.message(F.text == "❌ Отмена")

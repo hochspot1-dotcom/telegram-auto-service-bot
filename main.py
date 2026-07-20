@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 from aiogram import Bot, Dispatcher, F, types
-from aiogram.filters import Command
+from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -51,7 +51,6 @@ BRANDS_MAP = {
     "ситроен": "Citroen",
     "шевроле": "Chevrolet",
     "шеви": "Chevrolet",
-    "опель": "Opel",
     "митсубиси": "Mitsubishi",
     "мицубиси": "Mitsubishi",
     "мицубиши": "Mitsubishi",
@@ -194,7 +193,7 @@ CYRILLIC_TO_LATIN = {
 }
 
 def transliterate_word(word: str) -> str:
-    """Транслитерация любого кириллического слова в латиницу"""
+    """Транслитерация кириллического слова в латиницу"""
     res = []
     for char in word:
         lower_char = char.lower()
@@ -209,10 +208,9 @@ def transliterate_word(word: str) -> str:
     return result.capitalize()
 
 def validate_and_format_car(text: str) -> str | None:
-    """Проверка, перенос марки и модели на английский язык"""
+    """Проверка и перевод марки и модели авто"""
     clean_text = text.strip()
     
-    # 1. Проверка длины и адекватности
     if len(clean_text) < 2 or len(clean_text) > 50:
         return None
         
@@ -227,7 +225,6 @@ def validate_and_format_car(text: str) -> str | None:
     
     i = 0
     while i < len(words):
-        # 1. Проверка составной марки из 2 слов ("ленд ровер", "мерседес бенц")
         if i + 1 < len(words):
             two_words = f"{words[i].lower()} {words[i+1].lower()}"
             if two_words in BRANDS_MAP:
@@ -241,16 +238,12 @@ def validate_and_format_car(text: str) -> str | None:
                 
         word_lower = words[i].lower()
         
-        # 2. Проверка в словаре марок
         if word_lower in BRANDS_MAP:
             formatted_words.append(BRANDS_MAP[word_lower])
-        # 3. Проверка в словаре известных моделей
         elif word_lower in MODELS_MAP:
             formatted_words.append(MODELS_MAP[word_lower])
-        # 4. Если слово состоит из кириллицы (но его нет в словаре), транслитерируем в латиницу
         elif re.search(r"[а-яА-ЯёЁ]", words[i]):
             formatted_words.append(transliterate_word(words[i]))
-        # 5. Если уже на английском или числа
         else:
             formatted_words.append(words[i].capitalize() if words[i].isalpha() else words[i])
             
@@ -403,8 +396,8 @@ async def start_booking(message: types.Message, state: FSMContext):
         reply_markup=get_categories_keyboard()
     )
 
-# Шаг 1.1: Выбрана категория из списка
-@dp.callback_query(BookingState.select_category, F.data.startswith("cat_"))
+# Шаг 1.1: Выбрана категория из списка (срабатывает ВСЕГДА, без жесткого фильтра состояний)
+@dp.callback_query(F.data.startswith("cat_"))
 async def category_selected(callback: types.CallbackQuery, state: FSMContext):
     await callback.answer()
     
@@ -431,7 +424,7 @@ async def category_selected(callback: types.CallbackQuery, state: FSMContext):
             parse_mode="HTML"
         )
 
-# Шаг 1.2: Если выбрана ручная запись проблемы
+# Шаг 1.2: Ручной ввод проблемы
 @dp.message(BookingState.custom_problem)
 async def custom_problem_entered(message: types.Message, state: FSMContext):
     if len(message.text.strip()) < 3:
@@ -444,7 +437,7 @@ async def custom_problem_entered(message: types.Message, state: FSMContext):
         parse_mode="HTML"
     )
 
-# Шаг 2: Ввод марки/модели с ПОЛНОЙ КОНВЕРТАЦИЕЙ И МАРКИ И МОДЕЛИ НА АНГЛИЙСКИЙ
+# Шаг 2: Ввод марки/модели
 @dp.message(BookingState.enter_car_model)
 async def car_model_entered(message: types.Message, state: FSMContext):
     formatted_car = validate_and_format_car(message.text)
@@ -468,8 +461,8 @@ async def car_model_entered(message: types.Message, state: FSMContext):
         reply_markup=get_time_slots_keyboard()
     )
 
-# Шаг 3: Выбор окошка с датой -> Ввод телефона
-@dp.callback_query(BookingState.select_time_slot, F.data.startswith("slot_"))
+# Шаг 3: Выбор окошка с датой (срабатывает ВСЕГДА)
+@dp.callback_query(F.data.startswith("slot_"))
 async def slot_selected(callback: types.CallbackQuery, state: FSMContext):
     await callback.answer()
     slot_text = callback.data.replace("slot_📅 ", "").replace("slot_", "")
@@ -483,7 +476,7 @@ async def slot_selected(callback: types.CallbackQuery, state: FSMContext):
         reply_markup=get_phone_keyboard()
     )
 
-# Шаг 4: Ввод телефона с валидацией
+# Шаг 4: Ввод телефона
 @dp.message(BookingState.enter_phone)
 async def phone_entered(message: types.Message, state: FSMContext):
     if message.contact:
@@ -517,8 +510,8 @@ async def phone_entered(message: types.Message, state: FSMContext):
     await message.answer("Отлично!", reply_markup=types.ReplyKeyboardRemove())
     await message.answer(summary, parse_mode="HTML", reply_markup=get_confirm_keyboard())
 
-# Шаг 5: Финальное подтверждение
-@dp.callback_query(BookingState.confirm, F.data == "confirm_booking")
+# Шаг 5: Финальное подтверждение (срабатывает ВСЕГДА)
+@dp.callback_query(F.data == "confirm_booking")
 async def confirm_booking(callback: types.CallbackQuery, state: FSMContext):
     await callback.answer()
     data = await state.get_data()
@@ -534,12 +527,16 @@ async def confirm_booking(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.answer(final_text, parse_mode="HTML", reply_markup=get_main_keyboard())
 
 async def main():
-    if not BOT_TOKEN or BOT_TOKEN == "your_bot_token_here":
-        print("ОШИБКА: Укажите токен BOT_TOKEN в файле .env")
+    bot_token = os.getenv("BOT_TOKEN")
+    if not bot_token or bot_token == "your_bot_token_here":
+        print("ОШИБКА: Укажите валидный BOT_TOKEN в переменных окружения!", flush=True)
         return
 
-    bot = Bot(token=BOT_TOKEN)
-    print("Бот запущен с автоконвертацией и марки, и модели на английский...")
+    bot = Bot(token=bot_token)
+    
+    # Удаляем вебхуки для очистки стэка у Telegram API
+    await bot.delete_webhook(drop_pending_updates=True)
+    print("Бот успешно запущен и готов к работе!", flush=True)
     await dp.start_polling(bot)
 
 if __name__ == "__main__":

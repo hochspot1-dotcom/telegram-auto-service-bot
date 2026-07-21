@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Автосервис — Telegram Mini App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <span class="logo-icon">🚗</span>
+        <div class="brand-text">
+          <h1>Автосервис</h1>
+          <p id="user-greeting">Добро пожаловать!</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="services">
+        <span class="tab-icon">🛠</span>
+        <span class="tab-label">Услуги</span>
+      </button>
+      <button class="tab-btn" data-tab="booking">
+        <span class="tab-icon">📅</span>
+        <span class="tab-label">Запись</span>
+      </button>
+      <button class="tab-btn" data-tab="profile">
+        <span class="tab-icon">👤</span>
+        <span class="tab-label">Кабинет</span>
+      </button>
+      <button class="tab-btn" data-tab="contacts">
+        <span class="tab-icon">📍</span>
+        <span class="tab-label">Инфо</span>
+      </button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="content">
+      <!-- 🛠 Tab: Services -->
+      <section id="tab-services" class="tab-content active">
+        <div class="section-title">
+          <h2>Услуги и прайс-лист</h2>
+          <p>Выберите нужную услугу для быстрого оформления</p>
+        </div>
+
+        <div class="services-grid" id="services-list">
+          <!-- Services rendered via JS -->
+        </div>
+      </section>
+
+      <!-- 📅 Tab: Booking -->
+      <section id="tab-booking" class="tab-content">
+        <div class="section-title">
+          <h2>Онлайн-запись на ТО</h2>
+          <p>Заполните форму для выбора удобного времени</p>
+        </div>
+
+        <form id="booking-form" class="booking-form">
+          <!-- Category -->
+          <div class="form-group">
+            <label class="form-label">Услуга или проблема:</label>
+            <div class="pills-grid" id="category-pills">
+              <div class="pill active" data-value="cat_engine">🔧 Двигатель и выхлоп</div>
+              <div class="pill" data-value="cat_chassis">🛞 Подвеска и тормоза</div>
+              <div class="pill" data-value="cat_electric">⚡ Электрика и диагностика</div>
+              <div class="pill" data-value="cat_to">🛢 Регулярное ТО</div>
+              <div class="pill" data-value="cat_climate">❄️ Климат и кондиционер</div>
+              <div class="pill" data-value="cat_custom">✏️ Написать вручную</div>
+            </div>
+          </div>
+
+          <!-- Custom problem input -->
+          <div class="form-group hidden" id="custom-problem-group">
+            <label class="form-label" for="custom-problem">Описание проблемы:</label>
+            <input type="text" id="custom-problem" class="form-input" placeholder="Например: Стучит подвеска справа..." />
+          </div>
+
+          <!-- Car Brand & Model -->
+          <div class="form-group">
+            <label class="form-label" for="car-model">Марка и модель авто:</label>
+            <input type="text" id="car-model" class="form-input" placeholder="Например: Toyota Camry или Опель астра" required />
+            <small class="form-hint">Укажите настоящую марку и модель авто</small>
+          </div>
+
+          <!-- Time slot -->
+          <div class="form-group">
+            <label class="form-label">Удобная дата и время:</label>
+            <div class="slots-grid" id="slots-container">
+              <!-- Slots loaded via JS -->
+            </div>
+          </div>
+
+          <!-- Phone number -->
+          <div class="form-group">
+            <label class="form-label" for="phone-number">Ваш телефон:</label>
+            <input type="tel" id="phone-number" class="form-input" placeholder="+7 (999) 000-00-00" required />
+          </div>
+
+          <button type="submit" class="submit-btn" id="submit-booking-btn">
+            <span>🚀 Отправить заявку</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- 👤 Tab: Profile & History -->
+      <section id="tab-profile" class="tab-content">
+        <div class="section-title">
+          <h2>Личный кабинет</h2>
+          <p>Информация о ваших заявках и посещениях</p>
+        </div>
+
+        <div class="profile-card">
+          <div class="profile-header">
+            <div class="profile-avatar" id="profile-avatar">👤</div>
+            <div class="profile-info">
+              <h3 id="profile-name">Клиент</h3>
+              <p id="profile-phone">Телефон: Не указан</p>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-val" id="stat-active">0</span>
+              <span class="stat-lbl">Активных</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-val" id="stat-total">0</span>
+              <span class="stat-lbl">Всего записей</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-val" id="stat-cancelled">0</span>
+              <span class="stat-lbl">Отклоненных</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bookings-section">
+          <h3>Ваши записи</h3>
+          <div id="user-bookings-list" class="bookings-list">
+            <!-- Bookings loaded via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- 📍 Tab: Contacts -->
+      <section id="tab-contacts" class="tab-content">
+        <div class="section-title">
+          <h2>Контакты и информация</h2>
+          <p>Всегда на связи и готовы помочь вам</p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-item">
+            <span class="info-icon">📍</span>
+            <div>
+              <strong>Адрес:</strong>
+              <p>г. Москва, ул. Автомобильная, д. 10</p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <span class="info-icon">🕒</span>
+            <div>
+              <strong>Режим работы:</strong>
+              <p>Ежедневно с 09:00 до 21:00</p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <span class="info-icon">📞</span>
+            <div>
+              <strong>Телефон:</strong>
+              <p><a href="tel:+79990000000" class="link-btn">+7 (999) 000-00-00</a></p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <span class="info-icon">💬</span>
+            <div>
+              <strong>Телеграм автосервиса:</strong>
+              <p><a href="https://t.me/autoservice_admin" target="_blank" class="link-btn">@autoservice_admin</a></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-card mt-16">
+          <h3>ℹ️ О нашем автосервисе</h3>
+          <ul class="about-list">
+            <li>✅ Опыт работы более 10 лет</li>
+            <li>✅ Современное диагностическое оборудование</li>
+            <li>✅ Официальная гарантия на все виды работ</li>
+            <li>✅ Прозрачные цены без скрытых переплат</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <!-- Toast / Notification container -->
+    <div id="toast" class="toast hidden"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

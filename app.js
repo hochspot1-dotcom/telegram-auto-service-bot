@@ -1,5 +1,5 @@
 // Укажите здесь ссылку на бэкенд бота (Аккаунт 1), например: "https://your-bot.netrun.io"
-const BACKEND_URL = "https://your-bot-backend.netrun.io";
+const BACKEND_URL = "https://carservicegorlovka.de1.netrun.io";
 
 document.addEventListener("DOMContentLoaded", () => {
   const tg = window.Telegram?.WebApp;

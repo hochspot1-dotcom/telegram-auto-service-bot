@@ -1,5 +1,30 @@
-// Укажите здесь ссылку на бэкенд бота (Аккаунт 1), например: "https://your-bot.netrun.io"
-const BACKEND_URL = "";
+// ==========================================
+// НАСТРОЙКА АДРЕСА БЭКЕНДА (Bot API URL)
+// ==========================================
+// Если Mini App размещен на отдельном хостинге (например GitHub Pages, Vercel, Netlify):
+// Укажите здесь HTTPS-адрес хостинга вашего бота (куда вы задеплоили main.py/web_server.py)!
+// Пример: const CONFIG_BACKEND_URL = "https://my-bot-backend.onrender.com";
+// Также можно передавать параметр в URL кнопки WebApp: https://your-miniapp.vercel.app?backend=https://my-bot-backend.onrender.com
+const CONFIG_BACKEND_URL = "https://carservicegorlovka.de1.netrun.io";
+
+function getBackendUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramUrl = urlParams.get("backend");
+  if (paramUrl) return paramUrl.replace(/\/$/, "");
+
+  if (CONFIG_BACKEND_URL && CONFIG_BACKEND_URL.trim() !== "") {
+    return CONFIG_BACKEND_URL.trim().replace(/\/$/, "");
+  }
+
+  // Если открыто как локальный файл или через браузер без указывания порт/домена
+  if (window.location.protocol === "file:" || window.location.hostname === "") {
+    return "";
+  }
+
+  return window.location.origin;
+}
+
+const BACKEND_URL = getBackendUrl();
 
 document.addEventListener("DOMContentLoaded", () => {
   const tg = window.Telegram?.WebApp;
@@ -298,6 +323,11 @@ document.addEventListener("DOMContentLoaded", () => {
     submitBtn.innerHTML = `<span>⏳ Отправка...</span>`;
 
     try {
+      if (!BACKEND_URL) {
+        showToast("⚠️ Ошибка: не указан адрес бэкенда (CONFIG_BACKEND_URL в app.js)!");
+        return;
+      }
+
       const res = await fetch(`${BACKEND_URL}/api/booking/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -313,7 +343,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const data = await res.json();
 
-      if (data.success) {
+      if (res.ok && data.success) {
         showToast(`🎉 Заявка №${data.booking_id} успешно создана!`);
         bookingForm.reset();
         selectCategoryPill("cat_engine");
@@ -324,7 +354,8 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast("⚠️ " + (data.error || "Ошибка создания записи"));
       }
     } catch (err) {
-      showToast("⚠️ Ошибка соединения с сервером");
+      console.error("Ошибка при отправке формы:", err);
+      showToast("⚠️ Бэкенд недоступен! Проверьте CONFIG_BACKEND_URL в app.js");
     } finally {
       submitBtn.disabled = false;
       submitBtn.innerHTML = `<span>🚀 Отправить заявку</span>`;

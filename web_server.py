@@ -171,9 +171,23 @@ async def handle_cancel_booking(request: web.Request):
 
 @web.middleware
 async def cors_middleware(request, handler):
-    response = await handler(request)
+    if request.method == "OPTIONS":
+        response = web.Response(status=200)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS, PUT, DELETE"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
+        response.headers["Access-Control-Max-Age"] = "86400"
+        return response
+
+    try:
+        response = await handler(request)
+    except web.HTTPException as ex:
+        response = ex
+
     response.headers["Bypass-Tunnel-Reminder"] = "true"
     response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS, PUT, DELETE"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
     return response
 
 def create_web_app(bot: Bot) -> web.Application:

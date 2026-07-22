@@ -2,26 +2,39 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Автосервис — Telegram Mini App</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/webapp/style.css" />
 </head>
 <body>
+  <!-- Ambient background lighting blobs -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
   <div id="app">
     <!-- Header -->
-    <header class="header">
+    <header class="header glass-card">
       <div class="brand">
-        <span class="logo-icon">🚗</span>
+        <div class="logo-box">
+          <span class="logo-icon">🚗</span>
+        </div>
         <div class="brand-text">
-          <h1>Автосервис</h1>
+          <h1>Автосервис<span class="brand-accent">.Pro</span></h1>
           <p id="user-greeting">Добро пожаловать!</p>
         </div>
+      </div>
+      <div class="status-indicator">
+        <span class="status-dot"></span>
+        <span class="status-text">Открыто</span>
       </div>
     </header>
 
     <!-- Navigation Tabs -->
-    <nav class="nav-tabs">
+    <nav class="nav-tabs glass-card">
       <button class="tab-btn active" data-tab="services">
         <span class="tab-icon">🛠</span>
         <span class="tab-label">Услуги</span>
@@ -44,9 +57,10 @@
     <main class="content">
       <!-- 🛠 Tab: Services -->
       <section id="tab-services" class="tab-content active">
-        <div class="section-title">
+        <div class="section-hero glass-card">
+          <div class="hero-badge">⚡ Профессиональный ремонт</div>
           <h2>Услуги и прайс-лист</h2>
-          <p>Выберите нужную услугу для быстрого оформления</p>
+          <p>Выберите нужную услугу для моментального бронирования времени</p>
         </div>
 
         <div class="services-grid" id="services-list">
@@ -56,41 +70,54 @@
 
       <!-- 📅 Tab: Booking -->
       <section id="tab-booking" class="tab-content">
-        <div class="section-title">
-          <h2>Онлайн-запись на ТО</h2>
-          <p>Заполните форму для выбора удобного времени</p>
+        <div class="section-hero glass-card">
+          <div class="hero-badge">📅 Онлайн Бронирование</div>
+          <h2>Запись на обслуживание</h2>
+          <p>Выберите удобную категорию и время для визита</p>
         </div>
 
-        <form id="booking-form" class="booking-form">
+        <form id="booking-form" class="booking-form glass-card">
           <!-- Category -->
           <div class="form-group">
             <label class="form-label">Услуга или проблема:</label>
             <div class="pills-grid" id="category-pills">
-              <div class="pill active" data-value="cat_engine">🔧 Двигатель и выхлоп</div>
-              <div class="pill" data-value="cat_chassis">🛞 Подвеска и тормоза</div>
-              <div class="pill" data-value="cat_electric">⚡ Электрика и диагностика</div>
-              <div class="pill" data-value="cat_to">🛢 Регулярное ТО</div>
-              <div class="pill" data-value="cat_climate">❄️ Климат и кондиционер</div>
-              <div class="pill" data-value="cat_custom">✏️ Написать вручную</div>
+              <div class="pill active" data-value="cat_engine">
+                <span class="pill-icon">🔧</span> Двигатель и выхлоп
+              </div>
+              <div class="pill" data-value="cat_chassis">
+                <span class="pill-icon">🛞</span> Подвеска и тормоза
+              </div>
+              <div class="pill" data-value="cat_electric">
+                <span class="pill-icon">⚡</span> Электрика и диагностика
+              </div>
+              <div class="pill" data-value="cat_to">
+                <span class="pill-icon">🛢</span> Регулярное ТО
+              </div>
+              <div class="pill" data-value="cat_climate">
+                <span class="pill-icon">❄️</span> Климат и кондиционер
+              </div>
+              <div class="pill" data-value="cat_custom">
+                <span class="pill-icon">✏️</span> Написать вручную
+              </div>
             </div>
           </div>
 
           <!-- Custom problem input -->
           <div class="form-group hidden" id="custom-problem-group">
             <label class="form-label" for="custom-problem">Описание проблемы:</label>
-            <input type="text" id="custom-problem" class="form-input" placeholder="Например: Стучит подвеска справа..." />
+            <input type="text" id="custom-problem" class="form-input glass-input" placeholder="Например: Стучит подвеска справа..." />
           </div>
 
           <!-- Car Brand & Model -->
           <div class="form-group">
             <label class="form-label" for="car-model">Марка и модель авто:</label>
-            <input type="text" id="car-model" class="form-input" placeholder="Например: Toyota Camry или Опель астра" required />
-            <small class="form-hint">Укажите настоящую марку и модель авто</small>
+            <input type="text" id="car-model" class="form-input glass-input" placeholder="Например: Toyota Camry или Opel Astra" required />
+            <small class="form-hint">Укажите марку и модель вашего автомобиля</small>
           </div>
 
           <!-- Time slot -->
           <div class="form-group">
-            <label class="form-label">Удобная дата и время:</label>
+            <label class="form-label">Выберите удобное время:</label>
             <div class="slots-grid" id="slots-container">
               <!-- Slots loaded via JS -->
             </div>
@@ -99,23 +126,18 @@
           <!-- Phone number -->
           <div class="form-group">
             <label class="form-label" for="phone-number">Ваш телефон:</label>
-            <input type="tel" id="phone-number" class="form-input" placeholder="+7 (999) 000-00-00" required />
+            <input type="tel" id="phone-number" class="form-input glass-input" placeholder="+7 (999) 000-00-00" required />
           </div>
 
-          <button type="submit" class="submit-btn" id="submit-booking-btn">
-            <span>🚀 Отправить заявку</span>
+          <button type="submit" class="submit-btn glow-btn" id="submit-booking-btn">
+            <span>🚀 Подтвердить запись</span>
           </button>
         </form>
       </section>
 
       <!-- 👤 Tab: Profile & History -->
       <section id="tab-profile" class="tab-content">
-        <div class="section-title">
-          <h2>Личный кабинет</h2>
-          <p>Информация о ваших заявках и посещениях</p>
-        </div>
-
-        <div class="profile-card">
+        <div class="profile-card glass-card">
           <div class="profile-header">
             <div class="profile-avatar" id="profile-avatar">👤</div>
             <div class="profile-info">
@@ -125,15 +147,15 @@
           </div>
 
           <div class="stats-grid">
-            <div class="stat-card">
+            <div class="stat-card glass-stat">
               <span class="stat-val" id="stat-active">0</span>
               <span class="stat-lbl">Активных</span>
             </div>
-            <div class="stat-card">
+            <div class="stat-card glass-stat">
               <span class="stat-val" id="stat-total">0</span>
               <span class="stat-lbl">Всего записей</span>
             </div>
-            <div class="stat-card">
+            <div class="stat-card glass-stat">
               <span class="stat-val" id="stat-cancelled">0</span>
               <span class="stat-lbl">Отклоненных</span>
             </div>
@@ -141,7 +163,9 @@
         </div>
 
         <div class="bookings-section">
-          <h3>Ваши записи</h3>
+          <div class="section-subtitle">
+            <h3>Ваши записи</h3>
+          </div>
           <div id="user-bookings-list" class="bookings-list">
             <!-- Bookings loaded via JS -->
           </div>
@@ -150,59 +174,60 @@
 
       <!-- 📍 Tab: Contacts -->
       <section id="tab-contacts" class="tab-content">
-        <div class="section-title">
-          <h2>Контакты и информация</h2>
-          <p>Всегда на связи и готовы помочь вам</p>
+        <div class="section-hero glass-card">
+          <div class="hero-badge">📍 Связь с нами</div>
+          <h2>Контакты и локация</h2>
+          <p>Всегда рады ответить на ваши вопросы</p>
         </div>
 
-        <div class="info-card">
+        <div class="info-card glass-card">
           <div class="info-item">
-            <span class="info-icon">📍</span>
+            <div class="info-icon-box">📍</div>
             <div>
-              <strong>Адрес:</strong>
+              <strong>Адрес сервиса:</strong>
               <p>г. Москва, ул. Автомобильная, д. 10</p>
             </div>
           </div>
 
           <div class="info-item">
-            <span class="info-icon">🕒</span>
+            <div class="info-icon-box">🕒</div>
             <div>
               <strong>Режим работы:</strong>
-              <p>Ежедневно с 09:00 до 21:00</p>
+              <p>Без выходных: с 09:00 до 21:00</p>
             </div>
           </div>
 
           <div class="info-item">
-            <span class="info-icon">📞</span>
+            <div class="info-icon-box">📞</div>
             <div>
-              <strong>Телефон:</strong>
+              <strong>Телефон для справок:</strong>
               <p><a href="tel:+79990000000" class="link-btn">+7 (999) 000-00-00</a></p>
             </div>
           </div>
 
           <div class="info-item">
-            <span class="info-icon">💬</span>
+            <div class="info-icon-box">💬</div>
             <div>
-              <strong>Телеграм автосервиса:</strong>
+              <strong>Прямой чат в Telegram:</strong>
               <p><a href="https://t.me/autoservice_admin" target="_blank" class="link-btn">@autoservice_admin</a></p>
             </div>
           </div>
         </div>
 
-        <div class="info-card mt-16">
-          <h3>ℹ️ О нашем автосервисе</h3>
+        <div class="info-card glass-card mt-16">
+          <h3>🏆 Почему выбирают нас</h3>
           <ul class="about-list">
-            <li>✅ Опыт работы более 10 лет</li>
-            <li>✅ Современное диагностическое оборудование</li>
-            <li>✅ Официальная гарантия на все виды работ</li>
-            <li>✅ Прозрачные цены без скрытых переплат</li>
+            <li><span class="check-icon">✓</span> <span>Опыт успешной работы более 10 лет</span></li>
+            <li><span class="check-icon">✓</span> <span>Современное компьютерное оборудование</span></li>
+            <li><span class="check-icon">✓</span> <span>Официальная гарантия на все виды работ</span></li>
+            <li><span class="check-icon">✓</span> <span>Честный расчет без скрытых услуг</span></li>
           </ul>
         </div>
       </section>
     </main>
 
     <!-- Toast / Notification container -->
-    <div id="toast" class="toast hidden"></div>
+    <div id="toast" class="toast hidden glass-toast"></div>
   </div>
 
   <script src="/webapp/app.js"></script>

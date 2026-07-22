@@ -94,7 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!container) return;
 
     container.innerHTML = defaultServices.map(s => `
-      <div class="service-card">
+      <div class="service-card glass-card">
         <div class="service-info">
           <span class="service-icon">${s.icon}</span>
           <div>
@@ -219,7 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!container) return;
 
     if (!bookings || bookings.length === 0) {
-      container.innerHTML = `<div class="info-card"><p>У вас пока нет оформленных записей.</p></div>`;
+      container.innerHTML = `<div class="info-card glass-card"><p style="text-align: center; color: var(--text-muted);">У вас пока нет оформленных записей.</p></div>`;
       return;
     }
 
@@ -237,7 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const isCancelable = ["На рассмотрении", "Одобрена", "Активна"].includes(b.status);
 
       return `
-        <div class="booking-card">
+        <div class="booking-card glass-card">
           <div class="booking-header">
             <span class="booking-id">Запись №${b.id}</span>
             <span class="badge ${badgeClass}">${statusIcon} ${b.status}</span>

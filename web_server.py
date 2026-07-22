@@ -26,6 +26,15 @@ async def handle_static(request: web.Request):
         return web.FileResponse(filepath)
     return web.HTTPNotFound()
 
+@routes.get("/{filename:(?:style\.css|app\.js|favicon\.ico)}")
+async def handle_root_assets(request: web.Request):
+    filename = request.match_info["filename"]
+    filepath = os.path.join(os.path.dirname(__file__), "webapp", filename)
+    if os.path.exists(filepath) and os.path.isfile(filepath):
+        return web.FileResponse(filepath)
+    return web.HTTPNotFound()
+
+
 # --- API Endpoints ---
 
 @routes.get("/api/slots")

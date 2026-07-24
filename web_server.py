@@ -8,7 +8,8 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from database import (
     add_booking, get_user_bookings, get_user_stats, 
-    cancel_booking_by_id, get_booking_by_id
+    cancel_booking_by_id, get_booking_by_id,
+    get_all_bookings, get_admin_stats, delete_booking_by_id
 )
 
 routes = web.RouteTableDef()
@@ -177,6 +178,92 @@ async def handle_cancel_booking(request: web.Request):
         return web.json_response({"success": True})
     else:
         return web.json_response({"error": "Запись не найдена или уже отменена"}, status=400)
+
+# --- Admin / Moderator Endpoints ---
+
+def check_is_admin(user_id: int) -> bool:
+    from main import get_admin_ids
+    return user_id in get_admin_ids()
+
+@routes.get("/api/admin/check")
+async def handle_admin_check(request: web.Request):
+    user_id_str = request.query.get("user_id")
+    if not user_id_str or not user_id_str.isdigit():
+        return web.json_response({"is_admin": False})
+    
+    is_adm = check_is_admin(int(user_id_str))
+    return web.json_response({"is_admin": is_adm})
+
+@routes.get("/api/admin/bookings")
+async def handle_admin_bookings(request: web.Request):
+    user_id_str = request.query.get("user_id")
+    if not user_id_str or not user_id_str.isdigit():
+        return web.json_response({"error": "Unauthorized"}, status=401)
+    
+    if not check_is_admin(int(user_id_str)):
+        return web.json_response({"error": "Forbidden: Not an admin"}, status=403)
+        
+    status_filter = request.query.get("status")
+    if status_filter == "all" or not status_filter:
+        status_filter = None
+
+    raw_bookings = get_all_bookings(status_filter)
+    stats = get_admin_stats()
+
+    bookings = []
+    for b in raw_bookings:
+        bookings.append({
+            "id": b["id"],
+            "user_id": b["user_id"],
+            "user_name": b["user_name"],
+            "problem": b["problem"],
+            "car_model": b["car_model"],
+            "slot": b["slot"],
+            "phone": b["phone"],
+            "status": b["status"],
+            "comment": b["comment"] if "comment" in b.keys() else "",
+            "created_at": str(b["created_at"]) if "created_at" in b.keys() else ""
+        })
+
+    return web.json_response({
+        "stats": stats,
+        "bookings": bookings
+    })
+
+@routes.post("/api/admin/booking/action")
+async def handle_admin_action(request: web.Request):
+    from main import process_moderator_decision
+
+    try:
+        data = await request.json()
+    except Exception:
+        return web.json_response({"error": "Invalid JSON"}, status=400)
+
+    admin_id = data.get("admin_id")
+    booking_id = data.get("booking_id")
+    action = data.get("action") # "approve", "reject", "delete"
+    comment = data.get("comment", "").strip()
+
+    if not admin_id or not check_is_admin(int(admin_id)):
+        return web.json_response({"error": "Forbidden"}, status=403)
+
+    if not booking_id or not action:
+        return web.json_response({"error": "Missing parameters"}, status=400)
+
+    booking_id = int(booking_id)
+
+    if action == "delete":
+        success = delete_booking_by_id(booking_id)
+        if success:
+            return web.json_response({"success": True, "message": "Запись успешно удалена"})
+        return web.json_response({"error": "Не удалось удалить запись"}, status=400)
+    
+    new_status = "Одобрена" if action == "approve" else "Отклонена"
+    bot: Bot = request.app.get("bot")
+    
+    await process_moderator_decision(bot, booking_id, new_status, comment)
+    return web.json_response({"success": True, "status": new_status})
+
 
 @web.middleware
 async def cors_middleware(request, handler):

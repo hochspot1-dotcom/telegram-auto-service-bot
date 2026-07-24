@@ -54,6 +54,26 @@ document.addEventListener("DOMContentLoaded", () => {
     profileNameEl.textContent = userName;
   }
 
+  let isAdmin = false;
+  let currentAdminFilter = "all";
+  let pendingAdminAction = null;
+
+  async function checkAdminStatus() {
+    if (!BACKEND_URL) return;
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/admin/check?user_id=${userId}`);
+      const data = await res.json();
+      if (data.is_admin) {
+        isAdmin = true;
+        const adminBtn = document.getElementById("admin-tab-btn");
+        if (adminBtn) adminBtn.classList.remove("hidden");
+      }
+    } catch (e) {
+      console.error("Admin check error:", e);
+    }
+  }
+  checkAdminStatus();
+
   // Tab switching
   const tabBtns = document.querySelectorAll(".tab-btn");
   const tabContents = document.querySelectorAll(".tab-content");
@@ -70,6 +90,8 @@ document.addEventListener("DOMContentLoaded", () => {
       loadUserProfile();
     } else if (tabName === "booking") {
       loadSlots();
+    } else if (tabName === "admin" && isAdmin) {
+      loadAdminBookings(currentAdminFilter);
     }
   }
 
@@ -78,6 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
       switchTab(btn.dataset.tab);
     });
   });
+
 
   // Services list rendering
   const defaultServices = [
@@ -372,4 +395,157 @@ document.addEventListener("DOMContentLoaded", () => {
       toast.classList.add("hidden");
     }, 3500);
   }
+
+  // ==========================================
+  // ADMIN / MODERATION PANEL LOGIC
+  // ==========================================
+  const adminPills = document.querySelectorAll("#admin-status-pills .pill");
+  adminPills.forEach(pill => {
+    pill.addEventListener("click", () => {
+      adminPills.forEach(p => p.classList.remove("active"));
+      pill.classList.add("active");
+      currentAdminFilter = pill.dataset.status;
+      loadAdminBookings(currentAdminFilter);
+    });
+  });
+
+  async function loadAdminBookings(statusFilter = "all") {
+    const container = document.getElementById("admin-bookings-list");
+    if (!container) return;
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/admin/bookings?user_id=${userId}&status=${statusFilter}`);
+      if (!res.ok) throw new Error("Access denied");
+      const data = await res.json();
+
+      document.getElementById("adm-stat-pending").textContent = data.stats.pending || 0;
+      document.getElementById("adm-stat-approved").textContent = data.stats.approved || 0;
+      document.getElementById("adm-stat-rejected").textContent = data.stats.rejected || 0;
+
+      renderAdminBookings(data.bookings || []);
+    } catch (e) {
+      container.innerHTML = `<div class="info-card glass-card"><p style="text-align: center; color: var(--text-muted);">Не удалось загрузить данные модерации</p></div>`;
+    }
+  }
+
+  function renderAdminBookings(bookings) {
+    const container = document.getElementById("admin-bookings-list");
+    if (!container) return;
+
+    if (!bookings || bookings.length === 0) {
+      container.innerHTML = `<div class="info-card glass-card"><p style="text-align: center; color: var(--text-muted);">Заявок не найдено.</p></div>`;
+      return;
+    }
+
+    container.innerHTML = bookings.map(b => {
+      let badgeClass = "badge-pending";
+      let statusIcon = "⏳";
+      let cardClass = "pending";
+      if (b.status === "Одобрена" || b.status === "Активна") {
+        badgeClass = "badge-approved";
+        statusIcon = "✅";
+        cardClass = "approved";
+      } else if (b.status.includes("Отменен") || b.status.includes("Отклонен")) {
+        badgeClass = "badge-cancelled";
+        statusIcon = "🔴";
+        cardClass = "rejected";
+      }
+
+      return `
+        <div class="booking-card glass-card admin-card ${cardClass}">
+          <div class="booking-header">
+            <span class="booking-id">Запись №${b.id}</span>
+            <span class="badge ${badgeClass}">${statusIcon} ${b.status}</span>
+          </div>
+          <div class="admin-card-user">
+            👤 <strong>${b.user_name}</strong> (ID: ${b.user_id}) | 📞 ${b.phone}
+          </div>
+          <div class="booking-details">
+            <p><strong>Услуга:</strong> ${b.problem}</p>
+            <p><strong>Автомобиль:</strong> ${b.car_model}</p>
+            <p><strong>Время:</strong> ${b.slot}</p>
+            ${b.comment ? `<p><strong>Прим. модератора:</strong> <em>${b.comment}</em></p>` : ''}
+          </div>
+          <div class="admin-actions-grid">
+            <button class="admin-btn admin-btn-approve" data-id="${b.id}">✅ Одобрить</button>
+            <button class="admin-btn admin-btn-reject" data-id="${b.id}">❌ Отклонить</button>
+            <button class="admin-btn admin-btn-delete" data-id="${b.id}">🗑 Удалить заявку</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    container.querySelectorAll(".admin-btn-approve").forEach(btn => {
+      btn.addEventListener("click", () => openAdminModal(btn.dataset.id, "approve"));
+    });
+    container.querySelectorAll(".admin-btn-reject").forEach(btn => {
+      btn.addEventListener("click", () => openAdminModal(btn.dataset.id, "reject"));
+    });
+    container.querySelectorAll(".admin-btn-delete").forEach(btn => {
+      btn.addEventListener("click", () => confirmDeleteBooking(btn.dataset.id));
+    });
+  }
+
+  // Admin Modal Handling
+  const modal = document.getElementById("admin-modal");
+  const modalComment = document.getElementById("modal-comment");
+  const modalConfirmBtn = document.getElementById("modal-confirm-btn");
+  const modalCancelBtn = document.getElementById("modal-cancel-btn");
+
+  function openAdminModal(bookingId, action) {
+    pendingAdminAction = { bookingId, action };
+    const title = action === "approve" ? `Одобрить запись №${bookingId}` : `Отклонить запись №${bookingId}`;
+    document.getElementById("modal-title").textContent = title;
+    if (modalComment) modalComment.value = "";
+    if (modal) modal.classList.remove("hidden");
+  }
+
+  if (modalCancelBtn) {
+    modalCancelBtn.addEventListener("click", () => {
+      if (modal) modal.classList.add("hidden");
+      pendingAdminAction = null;
+    });
+  }
+
+  if (modalConfirmBtn) {
+    modalConfirmBtn.addEventListener("click", async () => {
+      if (!pendingAdminAction) return;
+      const { bookingId, action } = pendingAdminAction;
+      const comment = modalComment ? modalComment.value.trim() : "";
+      if (modal) modal.classList.add("hidden");
+      await executeAdminAction(bookingId, action, comment);
+      pendingAdminAction = null;
+    });
+  }
+
+  async function confirmDeleteBooking(bookingId) {
+    if (confirm(`Вы действительно хотите НАВСЕГДА удалить запись №${bookingId}?`)) {
+      await executeAdminAction(bookingId, "delete", "");
+    }
+  }
+
+  async function executeAdminAction(bookingId, action, comment) {
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/admin/booking/action`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          admin_id: userId,
+          booking_id: parseInt(bookingId),
+          action: action,
+          comment: comment
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(`✅ Действие по записи №${bookingId} выполнено`);
+        loadAdminBookings(currentAdminFilter);
+      } else {
+        showToast("⚠️ " + (data.error || "Ошибка выполнения"));
+      }
+    } catch (e) {
+      showToast("⚠️ Ошибка соединения с сервером");
+    }
+  }
+
 });

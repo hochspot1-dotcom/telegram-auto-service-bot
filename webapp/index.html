@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=4.0" />
+  <link rel="stylesheet" href="style.css?v=5.0" />
 </head>
 <body>
   <div id="app">
@@ -30,7 +30,7 @@
     </header>
 
     <!-- Navigation Tabs -->
-    <nav class="nav-tabs glass-card">
+    <nav class="nav-tabs glass-card" id="main-nav">
       <button class="tab-btn active" data-tab="services">
         <span class="tab-icon">🛠</span>
         <span class="tab-label">Услуги</span>
@@ -47,7 +47,12 @@
         <span class="tab-icon">📍</span>
         <span class="tab-label">Инфо</span>
       </button>
+      <button class="tab-btn hidden" id="admin-tab-btn" data-tab="admin">
+        <span class="tab-icon">🛡</span>
+        <span class="tab-label">Админ</span>
+      </button>
     </nav>
+
 
     <!-- Main Content Area -->
     <main class="content">
@@ -220,12 +225,67 @@
           </ul>
         </div>
       </section>
+
+      <!-- 🛡 Tab: Admin Moderation -->
+      <section id="tab-admin" class="tab-content">
+        <div class="section-hero glass-card admin-hero">
+          <div class="hero-badge admin-badge">🛡 Панель Модератора</div>
+          <h2>Управление заявками</h2>
+          <p>Быстрое подтверждение, отмена и удаление записей</p>
+        </div>
+
+        <div class="profile-card glass-card admin-stats-card">
+          <div class="stats-grid">
+            <div class="stat-card glass-stat">
+              <span class="stat-val" id="adm-stat-pending">0</span>
+              <span class="stat-lbl">Ожидают</span>
+            </div>
+            <div class="stat-card glass-stat">
+              <span class="stat-val" id="adm-stat-approved">0</span>
+              <span class="stat-lbl">Одобрено</span>
+            </div>
+            <div class="stat-card glass-stat">
+              <span class="stat-val" id="adm-stat-rejected">0</span>
+              <span class="stat-lbl">Отклонено</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-filters-bar">
+          <div class="pills-grid" id="admin-status-pills">
+            <div class="pill active" data-status="all">Все записи</div>
+            <div class="pill" data-status="На рассмотрении">⏳ На рассмотрении</div>
+            <div class="pill" data-status="Одобрена">✅ Одобренные</div>
+            <div class="pill" data-status="Отклонена">🔴 Отклоненные</div>
+          </div>
+        </div>
+
+        <div class="bookings-section">
+          <div id="admin-bookings-list" class="bookings-list">
+            <!-- Admin bookings rendered via JS -->
+          </div>
+        </div>
+      </section>
     </main>
+
+    <!-- Admin Comment Modal -->
+    <div id="admin-modal" class="modal-overlay hidden">
+      <div class="modal-card glass-card">
+        <h3 id="modal-title">Решение по заявке</h3>
+        <p id="modal-subtitle" class="form-hint">Укажите примечание клиенту (необязательно):</p>
+        <textarea id="modal-comment" class="glass-input modal-textarea" placeholder="Например: Ждем вас на посту №2..." rows="3"></textarea>
+        <div class="modal-actions">
+          <button id="modal-cancel-btn" class="modal-btn btn-secondary">Отмена</button>
+          <button id="modal-confirm-btn" class="modal-btn btn-primary">Подтвердить</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Toast / Notification container -->
     <div id="toast" class="toast hidden glass-toast"></div>
   </div>
 
-  <script src="app.js?v=4.0"></script>
+  <script src="app.js?v=5.0"></script>
 </body>
 </html>
+

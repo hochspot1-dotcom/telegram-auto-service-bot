@@ -143,6 +143,15 @@ def update_booking_status(booking_id: int, new_status: str, comment: str = "") -
         conn.commit()
         return cursor.rowcount > 0
 
+def delete_booking_by_id(booking_id: int) -> bool:
+    """Полное удаление записи модератором"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM bookings WHERE id = ?", (booking_id,))
+        conn.commit()
+        return cursor.rowcount > 0
+
+
 def get_admin_stats() -> dict:
     """Общая статистика автосервиса для модератора"""
     with get_connection() as conn:

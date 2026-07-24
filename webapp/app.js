@@ -305,6 +305,71 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Multi-Step Wizard Logic
+  let currentStep = 1;
+  const toStep2Btn = document.getElementById("to-step-2-btn");
+  const toStep3Btn = document.getElementById("to-step-3-btn");
+  const backToStep1Btn = document.getElementById("back-to-step-1-btn");
+  const backToStep2Btn = document.getElementById("back-to-step-2-btn");
+
+  function goToStep(stepNum) {
+    currentStep = stepNum;
+
+    for (let i = 1; i <= 3; i++) {
+      const ind = document.getElementById(`wizard-step-ind-${i}`);
+      const content = document.getElementById(`form-step-${i}`);
+
+      if (ind) {
+        ind.classList.toggle("active", i === stepNum);
+        ind.classList.toggle("completed", i < stepNum);
+      }
+      if (content) {
+        content.classList.toggle("active", i === stepNum);
+        content.classList.toggle("hidden", i !== stepNum);
+      }
+    }
+  }
+
+  if (toStep2Btn) {
+    toStep2Btn.addEventListener("click", () => {
+      let problem = "";
+      if (selectedCategory === "cat_custom") {
+        problem = document.getElementById("custom-problem").value.trim();
+        if (!problem) {
+          showToast("⚠️ Пожалуйста, опишите вашу проблему!");
+          document.getElementById("custom-problem").focus();
+          return;
+        }
+      }
+      goToStep(2);
+      setTimeout(() => {
+        const carInput = document.getElementById("car-model");
+        if (carInput) carInput.focus();
+      }, 100);
+    });
+  }
+
+  if (toStep3Btn) {
+    toStep3Btn.addEventListener("click", () => {
+      const carModel = document.getElementById("car-model").value.trim();
+      if (!carModel || carModel.length < 2) {
+        showToast("⚠️ Пожалуйста, укажите марку и модель авто!");
+        const carInput = document.getElementById("car-model");
+        if (carInput) carInput.focus();
+        return;
+      }
+      goToStep(3);
+    });
+  }
+
+  if (backToStep1Btn) {
+    backToStep1Btn.addEventListener("click", () => goToStep(1));
+  }
+
+  if (backToStep2Btn) {
+    backToStep2Btn.addEventListener("click", () => goToStep(2));
+  }
+
   // Booking Form Submission
   const bookingForm = document.getElementById("booking-form");
   const submitBtn = document.getElementById("submit-booking-btn");
@@ -331,10 +396,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!problem) {
       showToast("⚠️ Опишите вашу проблему!");
+      goToStep(1);
       return;
     }
     if (!carModel) {
       showToast("⚠️ Укажите марку и модель авто!");
+      goToStep(2);
       return;
     }
     if (!phone) {
@@ -370,6 +437,7 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast(`🎉 Заявка №${data.booking_id} успешно создана!`);
         bookingForm.reset();
         selectCategoryPill("cat_engine");
+        goToStep(1);
         setTimeout(() => {
           switchTab("profile");
         }, 1200);
@@ -384,6 +452,7 @@ document.addEventListener("DOMContentLoaded", () => {
       submitBtn.innerHTML = `<span>🚀 Отправить заявку</span>`;
     }
   });
+
 
   // Toast Helper
   function showToast(msg) {

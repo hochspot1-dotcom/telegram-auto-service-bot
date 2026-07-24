@@ -169,41 +169,32 @@ def validate_custom_problem(text: str) -> bool:
     return True
 
 def validate_and_format_car(text: str) -> str | None:
-    """Максимально строгая валидация марки и модели авто с обязательной проверкой по авто-базе"""
+    """Удобная и надежная валидация марки и модели авто с авто-форматированием"""
     clean_text = text.strip()
-    if len(clean_text) < 2 or len(clean_text) > 40:
+    if len(clean_text) < 2 or len(clean_text) > 50:
         return None
         
     # Ссылки и спам заблокированы
     if re.search(r"http[s]?://|www\.|t\.me/", clean_text.lower()):
         return None
         
-    # Обязательно наличие букв
+    # Обязательно наличие букв или цифр
     letters = re.findall(r"[a-zA-Zа-яА-ЯёЁ]", clean_text)
-    if len(letters) < 2:
+    if len(letters) < 1:
         return None
-        
-    # Доля букв от общей длины не менее 50%
-    if len(letters) / len(clean_text) < 0.5:
-        return None
-        
+
     # Блокировка клавиатурных заборчиков
     kb_patterns = [r"qwerty", r"asdfgh", r"zxcvbn", r"йцукен", r"фывапр", r"ячсмит"]
     for pat in kb_patterns:
         if re.search(pat, clean_text.lower()):
             return None
 
-    # Блокировка повторяющихся букв (ааааа)
-    if re.search(r"([a-zA-Zа-яА-ЯёЁ])\1{2,}", clean_text.lower()):
-        return None
-        
-    # Блокировка хаотичного набора согласных
-    if re.search(r"[бвгджзклмнпрстфхцчшщbcdfghjklmnpqrstvwxyz]{4,}", clean_text.lower()):
+    # Блокировка повторяющихся одинаковых букв (ааааа)
+    if re.search(r"([a-zA-Zа-яА-ЯёЁ])\1{3,}", clean_text.lower()):
         return None
 
     words = clean_text.split()
     formatted_words = []
-    has_known_car_entity = False
     
     i = 0
     while i < len(words):
@@ -212,32 +203,26 @@ def validate_and_format_car(text: str) -> str | None:
             two_words = f"{word_lower} {words[i+1].lower()}"
             if two_words in BRANDS_MAP:
                 formatted_words.append(BRANDS_MAP[two_words])
-                has_known_car_entity = True
                 i += 2
                 continue
             if two_words in MODELS_MAP:
                 formatted_words.append(MODELS_MAP[two_words])
-                has_known_car_entity = True
                 i += 2
                 continue
                 
         if word_lower in BRANDS_MAP:
             formatted_words.append(BRANDS_MAP[word_lower])
-            has_known_car_entity = True
         elif word_lower in MODELS_MAP:
             formatted_words.append(MODELS_MAP[word_lower])
-            has_known_car_entity = True
-        elif re.search(r"[а-яА-ЯёЁ]", words[i]):
+        elif re.fullmatch(r"[а-яА-ЯёЁ]+", words[i]):
             formatted_words.append(transliterate_word(words[i]))
         else:
-            formatted_words.append(words[i].capitalize() if words[i].isalpha() else words[i])
+            formatted_words.append(words[i].capitalize() if words[i].isalpha() else words[i].upper() if len(words[i]) <= 3 and words[i].isalnum() else words[i].capitalize())
         i += 1
         
-    # ЖЕСТКАЯ ПРОВЕРКА: В тексте обязательно должна быть распознана известная марка или модель авто из базы!
-    if not has_known_car_entity:
-        return None
+    result = " ".join(formatted_words)
+    return result if len(result) >= 2 else None
 
-    return " ".join(formatted_words)
 
 # Состояния FSM для записи на ТО
 class BookingState(StatesGroup):

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=5.0" />
+  <link rel="stylesheet" href="style.css?v=6.0" />
 </head>
 <body>
   <div id="app">
@@ -74,67 +74,113 @@
         <div class="section-hero glass-card">
           <div class="hero-badge">📅 Онлайн Бронирование</div>
           <h2>Запись на обслуживание</h2>
-          <p>Выберите удобную категорию и время для визита</p>
+          <p>Пошаговое быстрое оформление заявки на ТО</p>
+        </div>
+
+        <!-- Wizard Progress Bar -->
+        <div class="wizard-progress-bar glass-card">
+          <div class="wizard-step active" id="wizard-step-ind-1">
+            <span class="step-num">1</span>
+            <span class="step-lbl">Услуга</span>
+          </div>
+          <div class="step-divider"></div>
+          <div class="wizard-step" id="wizard-step-ind-2">
+            <span class="step-num">2</span>
+            <span class="step-lbl">Автомобиль</span>
+          </div>
+          <div class="step-divider"></div>
+          <div class="wizard-step" id="wizard-step-ind-3">
+            <span class="step-num">3</span>
+            <span class="step-lbl">Время и телефон</span>
+          </div>
         </div>
 
         <form id="booking-form" class="booking-form glass-card">
-          <!-- Category -->
-          <div class="form-group">
-            <label class="form-label">Услуга или проблема:</label>
-            <div class="pills-grid" id="category-pills">
-              <div class="pill active" data-value="cat_engine">
-                <span class="pill-icon">🔧</span> Двигатель и выхлоп
+          <!-- 🔹 Step 1: Category & Problem -->
+          <div class="wizard-step-content active" id="form-step-1">
+            <div class="form-group">
+              <label class="form-label">Шаг 1: Выберите услугу или проблему:</label>
+              <div class="pills-grid" id="category-pills">
+                <div class="pill active" data-value="cat_engine">
+                  <span class="pill-icon">🔧</span> Двигатель и выхлоп
+                </div>
+                <div class="pill" data-value="cat_chassis">
+                  <span class="pill-icon">🛞</span> Подвеска и тормоза
+                </div>
+                <div class="pill" data-value="cat_electric">
+                  <span class="pill-icon">⚡</span> Электрика и диагностика
+                </div>
+                <div class="pill" data-value="cat_to">
+                  <span class="pill-icon">🛢</span> Регулярное ТО
+                </div>
+                <div class="pill" data-value="cat_climate">
+                  <span class="pill-icon">❄️</span> Климат и кондиционер
+                </div>
+                <div class="pill" data-value="cat_custom">
+                  <span class="pill-icon">✏️</span> Написать вручную
+                </div>
               </div>
-              <div class="pill" data-value="cat_chassis">
-                <span class="pill-icon">🛞</span> Подвеска и тормоза
-              </div>
-              <div class="pill" data-value="cat_electric">
-                <span class="pill-icon">⚡</span> Электрика и диагностика
-              </div>
-              <div class="pill" data-value="cat_to">
-                <span class="pill-icon">🛢</span> Регулярное ТО
-              </div>
-              <div class="pill" data-value="cat_climate">
-                <span class="pill-icon">❄️</span> Климат и кондиционер
-              </div>
-              <div class="pill" data-value="cat_custom">
-                <span class="pill-icon">✏️</span> Написать вручную
-              </div>
+            </div>
+
+            <!-- Custom problem input -->
+            <div class="form-group hidden" id="custom-problem-group">
+              <label class="form-label" for="custom-problem">Описание проблемы:</label>
+              <input type="text" id="custom-problem" class="form-input glass-input" placeholder="Например: Стучит подвеска справа..." />
+            </div>
+
+            <div class="wizard-actions">
+              <button type="button" class="wizard-nav-btn next-btn glow-btn" id="to-step-2-btn">
+                <span>Далее к выбору авто ➔</span>
+              </button>
             </div>
           </div>
 
-          <!-- Custom problem input -->
-          <div class="form-group hidden" id="custom-problem-group">
-            <label class="form-label" for="custom-problem">Описание проблемы:</label>
-            <input type="text" id="custom-problem" class="form-input glass-input" placeholder="Например: Стучит подвеска справа..." />
-          </div>
+          <!-- 🔹 Step 2: Car Brand & Model -->
+          <div class="wizard-step-content hidden" id="form-step-2">
+            <div class="form-group">
+              <label class="form-label" for="car-model">Шаг 2: Укажите марку и модель авто:</label>
+              <input type="text" id="car-model" class="form-input glass-input" placeholder="Например: Toyota Camry, Tank 500, Opel Astra" />
+              <small class="form-hint">Укажите марку и модель вашего автомобиля</small>
+            </div>
 
-          <!-- Car Brand & Model -->
-          <div class="form-group">
-            <label class="form-label" for="car-model">Марка и модель авто:</label>
-            <input type="text" id="car-model" class="form-input glass-input" placeholder="Например: Toyota Camry или Opel Astra" required />
-            <small class="form-hint">Укажите марку и модель вашего автомобиля</small>
-          </div>
-
-          <!-- Time slot -->
-          <div class="form-group">
-            <label class="form-label">Выберите удобное время:</label>
-            <div class="slots-grid" id="slots-container">
-              <!-- Slots loaded via JS -->
+            <div class="wizard-actions dual">
+              <button type="button" class="wizard-nav-btn back-btn" id="back-to-step-1-btn">
+                <span>← Назад</span>
+              </button>
+              <button type="button" class="wizard-nav-btn next-btn glow-btn" id="to-step-3-btn">
+                <span>Далее к выбору времени ➔</span>
+              </button>
             </div>
           </div>
 
-          <!-- Phone number -->
-          <div class="form-group">
-            <label class="form-label" for="phone-number">Ваш телефон:</label>
-            <input type="tel" id="phone-number" class="form-input glass-input" placeholder="+7 (999) 000-00-00" required />
-          </div>
+          <!-- 🔹 Step 3: Time Slot & Phone -->
+          <div class="wizard-step-content hidden" id="form-step-3">
+            <!-- Time slot -->
+            <div class="form-group">
+              <label class="form-label">Шаг 3: Выберите свободное окно:</label>
+              <div class="slots-grid" id="slots-container">
+                <!-- Slots loaded via JS -->
+              </div>
+            </div>
 
-          <button type="submit" class="submit-btn glow-btn" id="submit-booking-btn">
-            <span>🚀 Подтвердить запись</span>
-          </button>
+            <!-- Phone number -->
+            <div class="form-group">
+              <label class="form-label" for="phone-number">Ваш телефон для связи:</label>
+              <input type="tel" id="phone-number" class="form-input glass-input" placeholder="+7 (999) 000-00-00" />
+            </div>
+
+            <div class="wizard-actions dual">
+              <button type="button" class="wizard-nav-btn back-btn" id="back-to-step-2-btn">
+                <span>← Назад</span>
+              </button>
+              <button type="submit" class="submit-btn glow-btn" id="submit-booking-btn">
+                <span>🚀 Отправить заявку</span>
+              </button>
+            </div>
+          </div>
         </form>
       </section>
+
 
       <!-- 👤 Tab: Profile & History -->
       <section id="tab-profile" class="tab-content">
@@ -285,7 +331,7 @@
     <div id="toast" class="toast hidden glass-toast"></div>
   </div>
 
-  <script src="app.js?v=5.0"></script>
+  <script src="app.js?v=6.0"></script>
 </body>
 </html>
 

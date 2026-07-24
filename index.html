@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=8.0" />
+  <link rel="stylesheet" href="style.css?v=9.0" />
 </head>
 <body>
   <div id="app">
@@ -61,11 +61,17 @@
         <div class="section-hero glass-card">
           <div class="hero-badge">⚡ Профессиональный ремонт</div>
           <h2>Услуги и прайс-лист</h2>
-          <p>Выберите нужную услугу для моментального бронирования времени</p>
+          <p>Выберите нужную услугу или воспользуйтесь быстрым поиском</p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-box-wrapper glass-card">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="service-search-input" class="glass-input search-input" placeholder="Поиск проблемы (напр. масло, тормоза, свечи, кондиционер)..." />
         </div>
 
         <div class="services-grid" id="services-list">
-          <!-- Services rendered via JS -->
+          <!-- Services accordion & search rendered via JS -->
         </div>
       </section>
 
@@ -91,7 +97,7 @@
           <div class="step-divider"></div>
           <div class="wizard-step" id="wizard-step-ind-3">
             <span class="step-num">3</span>
-            <span class="step-lbl">Время и телефон</span>
+            <span class="step-lbl">Время и связь</span>
           </div>
         </div>
 
@@ -100,25 +106,13 @@
           <div class="wizard-step-content active" id="form-step-1">
             <div class="form-group">
               <label class="form-label">Шаг 1: Выберите услугу или проблему:</label>
+              <!-- Search inside Wizard Step 1 -->
+              <div class="search-box-wrapper wizard-search">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="wizard-search-input" class="glass-input search-input" placeholder="Поиск услуги (напр. ГРМ, диагност, фильтр)..." />
+              </div>
               <div class="pills-grid" id="category-pills">
-                <div class="pill active" data-value="cat_engine">
-                  <span class="pill-icon">🔧</span> Двигатель и выхлоп
-                </div>
-                <div class="pill" data-value="cat_chassis">
-                  <span class="pill-icon">🛞</span> Подвеска и тормоза
-                </div>
-                <div class="pill" data-value="cat_electric">
-                  <span class="pill-icon">⚡</span> Электрика и диагностика
-                </div>
-                <div class="pill" data-value="cat_to">
-                  <span class="pill-icon">🛢</span> Регулярное ТО
-                </div>
-                <div class="pill" data-value="cat_climate">
-                  <span class="pill-icon">❄️</span> Климат и кондиционер
-                </div>
-                <div class="pill" data-value="cat_custom">
-                  <span class="pill-icon">✏️</span> Написать вручную
-                </div>
+                <!-- Accordions / Pills rendered via JS -->
               </div>
             </div>
 
@@ -135,12 +129,18 @@
             </div>
           </div>
 
-          <!-- 🔹 Step 2: Car Brand & Model -->
+          <!-- 🔹 Step 2: Car Brand & Model + License Plate -->
           <div class="wizard-step-content hidden" id="form-step-2">
             <div class="form-group">
               <label class="form-label" for="car-model">Шаг 2: Укажите марку и модель авто:</label>
               <input type="text" id="car-model" class="form-input glass-input" placeholder="Например: Toyota Camry, Tank 500, Opel Astra" />
               <small class="form-hint">Укажите марку и модель вашего автомобиля</small>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="car-number">Госномер автомобиля (необязательно):</label>
+              <input type="text" id="car-number" class="form-input glass-input uppercase-input" placeholder="А000АА180" maxlength="12" />
+              <small class="form-hint">Автоматически преобразуется в ЗАГЛАВНЫЕ БУКВЫ</small>
             </div>
 
             <div class="wizard-actions dual">
@@ -153,7 +153,7 @@
             </div>
           </div>
 
-          <!-- 🔹 Step 3: Time Slot & Phone -->
+          <!-- 🔹 Step 3: Time Slot, Phone & Privacy Policy -->
           <div class="wizard-step-content hidden" id="form-step-3">
             <!-- Time slot -->
             <div class="form-group">
@@ -166,7 +166,15 @@
             <!-- Phone number -->
             <div class="form-group">
               <label class="form-label" for="phone-number">Ваш телефон для связи:</label>
-              <input type="tel" id="phone-number" class="form-input glass-input" placeholder="+7 (999) 000-00-00" />
+              <input type="tel" id="phone-number" class="form-input glass-input" placeholder="+7 (999) 000-00-00" required />
+            </div>
+
+            <!-- Privacy Policy Checkbox -->
+            <div class="form-group privacy-group">
+              <label class="privacy-label">
+                <input type="checkbox" id="privacy-agree" class="privacy-checkbox" checked required />
+                <span>Я согласен с <a href="#" id="privacy-link" class="privacy-link">Политикой конфиденциальности</a></span>
+              </label>
             </div>
 
             <div class="wizard-actions dual">
@@ -180,6 +188,7 @@
           </div>
         </form>
       </section>
+
 
 
       <!-- 👤 Tab: Profile & History -->
@@ -328,10 +337,32 @@
     </div>
 
     <!-- Toast / Notification container -->
-    <div id="toast" class="toast hidden glass-toast"></div>
+    <!-- 🔒 Privacy Policy Modal -->
+  <div id="privacy-modal" class="modal-overlay hidden">
+    <div class="modal-card glass-card">
+      <div class="modal-header">
+        <h3>🔒 Политика конфиденциальности</h3>
+      </div>
+      <div class="modal-body privacy-modal-body">
+        <p>Настоящая Политика конфиденциальности определяет порядок обработки и защиты персональных данных клиентов автосервиса.</p>
+        <br />
+        <p><strong>1. Сбор данных:</strong> Мы собираем ваше имя, номер телефона, марку и госномер автомобиля исключительно для оформления записи на техническое обслуживание.</p>
+        <br />
+        <p><strong>2. Использование данных:</strong> Данные используются модераторами и мастерами автосервиса для связи с вами и подтверждения бронирования времени.</p>
+        <br />
+        <p><strong>3. Безопасность:</strong> Ваши персональные данные хранятся в зашифрованном виде и не передаются третьим лицам.</p>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="modal-btn btn-primary" id="close-privacy-btn">Понятно, закрыть</button>
+      </div>
+    </div>
   </div>
 
-  <script src="app.js?v=8.0"></script>
+  <div id="toast" class="toast hidden glass-toast"></div>
+
+  </div>
+
+  <script src="app.js?v=9.0"></script>
 </body>
 </html>
 

@@ -65,14 +65,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       if (data.is_admin) {
         isAdmin = true;
-        const adminBtn = document.getElementById("admin-tab-btn");
-        if (adminBtn) adminBtn.classList.remove("hidden");
+        const adminProfileBtn = document.getElementById("admin-profile-btn");
+        if (adminProfileBtn) {
+          adminProfileBtn.classList.remove("hidden");
+          adminProfileBtn.addEventListener("click", () => {
+            switchTab("admin");
+          });
+        }
       }
     } catch (e) {
       console.error("Admin check error:", e);
     }
   }
   checkAdminStatus();
+
 
   // Floating Navbar Tab switching
   const navItems = document.querySelectorAll(".nav-item");
@@ -202,13 +208,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const selectedProblemsSet = new Set();
 
+  function updateEstimatedTotalPrice() {
+    const priceValEl = document.getElementById("total-price-val");
+    if (!priceValEl) return;
+
+    let total = 0;
+    selectedProblemsSet.forEach(title => {
+      SERVICE_CATEGORIES.forEach(cat => {
+        const found = cat.items.find(i => i.title === title);
+        if (found) {
+          const num = parseInt(found.price.replace(/[^\d]/g, ""), 10);
+          if (!isNaN(num)) total += num;
+        }
+      });
+    });
+
+    if (total > 0) {
+      priceValEl.textContent = `от ${total.toLocaleString("ru-RU")} ₽`;
+    } else {
+      priceValEl.textContent = "от 0 ₽";
+    }
+  }
+
   function toggleProblemSelection(title) {
     if (selectedProblemsSet.has(title)) {
       selectedProblemsSet.delete(title);
     } else {
       selectedProblemsSet.add(title);
     }
+    updateEstimatedTotalPrice();
   }
+
 
   function renderServicesAccordion(filterQuery = "") {
     const container = document.getElementById("services-list");

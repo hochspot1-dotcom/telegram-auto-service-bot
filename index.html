@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=12.0" />
+  <link rel="stylesheet" href="style.css?v=13.0" />
 </head>
 <body>
   <div id="app">
@@ -31,7 +31,7 @@
 
     <!-- Main Content Area -->
     <main class="content">
-      <!-- 🏠 Tab: Home (Главная страница - Приветствие и карточки цен) -->
+      <!-- 🏠 Tab: Home (Главная страница - Приветствие и 4 квадратные карточки цен) -->
       <section id="tab-home" class="tab-content active">
         <!-- Hero Action Card -->
         <div class="home-hero-card glass-card">
@@ -43,44 +43,37 @@
           </button>
         </div>
 
-        <!-- Static Popular Services Cards -->
+        <!-- 4 Static Popular Square Cards (2x2 Grid) -->
         <div class="home-section-title">
           <h3>💡 Популярные услуги и стоимость</h3>
         </div>
 
-        <div class="static-services-grid">
-          <div class="static-service-card glass-card">
-            <div class="static-service-info">
-              <span class="static-service-icon">⚡</span>
-              <div>
-                <div class="static-service-title">Компьютерная диагностика</div>
-                <div class="static-service-price">от 1 000 ₽</div>
-              </div>
-            </div>
+        <div class="home-square-grid">
+          <div class="home-square-card glass-card">
+            <div class="square-card-icon">⚡</div>
+            <div class="square-card-title">Компьютерная диагностика</div>
+            <div class="square-card-price">от 1 000 ₽</div>
           </div>
 
-          <div class="static-service-card glass-card">
-            <div class="static-service-info">
-              <span class="static-service-icon">🛢</span>
-              <div>
-                <div class="static-service-title">Замена масла и фильтров</div>
-                <div class="static-service-price">от 1 500 ₽</div>
-              </div>
-            </div>
+          <div class="home-square-card glass-card">
+            <div class="square-card-icon">🛢</div>
+            <div class="square-card-title">Замена масла и фильтров</div>
+            <div class="square-card-price">от 1 500 ₽</div>
           </div>
 
-          <div class="static-service-card glass-card">
-            <div class="static-service-info">
-              <span class="static-service-icon">🛞</span>
-              <div>
-                <div class="static-service-title">Диагностика ходовой части</div>
-                <div class="static-service-price">от 1 000 ₽</div>
-              </div>
-            </div>
+          <div class="home-square-card glass-card">
+            <div class="square-card-icon">🛞</div>
+            <div class="square-card-title">Диагностика ходовой части</div>
+            <div class="square-card-price">от 1 000 ₽</div>
+          </div>
+
+          <div class="home-square-card glass-card">
+            <div class="square-card-icon">❄️</div>
+            <div class="square-card-title">Заправка кондиционера</div>
+            <div class="square-card-price">от 2 000 ₽</div>
           </div>
         </div>
       </section>
-
 
       <!-- 📅 Tab: Booking -->
       <section id="tab-booking" class="tab-content">
@@ -160,7 +153,7 @@
             </div>
           </div>
 
-          <!-- 🔹 Step 3: Time Slot, Phone & Privacy Policy -->
+          <!-- 🔹 Step 3: Time Slot, Phone, Total Price & Privacy Policy -->
           <div class="wizard-step-content hidden" id="form-step-3">
             <!-- Time slot -->
             <div class="form-group">
@@ -177,9 +170,13 @@
                 <input type="tel" id="phone-number" class="form-input glass-input" placeholder="+7 (999) 000-00-00" readonly required />
                 <button type="button" id="edit-phone-btn" class="edit-phone-btn" title="Нажмите, чтобы изменить номер">
                   ✏️
-                </button>
-              </div>
-              <small class="form-hint" id="phone-hint">Номер автозаполнен из Telegram. Нажмите ✏️, если нужно указать другой номер.</small>
+                </button>              <small class="form-hint" id="phone-hint">Номер автозаполнен из Telegram. Нажмите ✏️, если нужно указать другой номер.</small>
+            </div>
+
+            <!-- Total Estimated Price Badge -->
+            <div class="total-price-badge glass-card" id="total-price-box">
+              <span class="total-price-label">💰 Ориентировочная стоимость:</span>
+              <span class="total-price-value" id="total-price-val">от 0 ₽</span>
             </div>
 
             <!-- Privacy Policy Checkbox -->
@@ -202,7 +199,8 @@
         </form>
       </section>
 
-      <!-- 👤 Tab: Profile & History -->
+
+      <!-- 👤 Tab: Profile -->
       <section id="tab-profile" class="tab-content">
         <div class="profile-card glass-card">
           <div class="profile-header">
@@ -212,21 +210,17 @@
               <p id="profile-phone">Телефон: Не указан</p>
             </div>
           </div>
-
-          <div class="stats-grid">
-            <div class="stat-card glass-stat">
-              <span class="stat-val" id="stat-active">0</span>
-              <span class="stat-lbl">Активных</span>
-            </div>
-            <div class="stat-card glass-stat">
-              <span class="stat-val" id="stat-total">0</span>
-              <span class="stat-lbl">Всего записей</span>
             </div>
             <div class="stat-card glass-stat">
               <span class="stat-val" id="stat-cancelled">0</span>
               <span class="stat-lbl">Отклоненных</span>
             </div>
           </div>
+
+          <!-- Admin Button inside Profile (Visible ONLY to Admins) -->
+          <button id="admin-profile-btn" class="admin-profile-btn glow-btn hidden">
+            <span>🛡 Панель модератора</span>
+          </button>
         </div>
 
         <div class="bookings-section">
@@ -239,60 +233,7 @@
         </div>
       </section>
 
-      <!-- 📍 Tab: Contacts -->
-      <section id="tab-contacts" class="tab-content">
-        <div class="section-hero glass-card">
-          <div class="hero-badge">📍 Связь с нами</div>
-          <h2>Контакты и локация</h2>
-          <p>Всегда рады ответить на ваши вопросы</p>
-        </div>
-
-        <div class="info-card glass-card">
-          <div class="info-item">
-            <div class="info-icon-box">📍</div>
-            <div>
-              <strong>Адрес сервиса:</strong>
-              <p>г. Москва, ул. Автомобильная, д. 10</p>
-            </div>
-          </div>
-
-          <div class="info-item">
-            <div class="info-icon-box">🕒</div>
-            <div>
-              <strong>Режим работы:</strong>
-              <p>Без выходных: с 09:00 до 21:00</p>
-            </div>
-          </div>
-
-          <div class="info-item">
-            <div class="info-icon-box">📞</div>
-            <div>
-              <strong>Телефон для справок:</strong>
-              <p><a href="tel:+79990000000" class="link-btn">+7 (999) 000-00-00</a></p>
-            </div>
-          </div>
-
-          <div class="info-item">
-            <div class="info-icon-box">💬</div>
-            <div>
-              <strong>Прямой чат в Telegram:</strong>
-              <p><a href="https://t.me/autoservice_admin" target="_blank" class="link-btn">@autoservice_admin</a></p>
-            </div>
-          </div>
-        </div>
-
-        <div class="info-card glass-card mt-16">
-          <h3>🏆 Почему выбирают нас</h3>
-          <ul class="about-list">
-            <li><span class="check-icon">✓</span> <span>Опыт успешной работы более 10 лет</span></li>
-            <li><span class="check-icon">✓</span> <span>Современное компьютерное оборудование</span></li>
-            <li><span class="check-icon">✓</span> <span>Официальная гарантия на все виды работ</span></li>
-            <li><span class="check-icon">✓</span> <span>Честный расчет без скрытых услуг</span></li>
-          </ul>
-        </div>
-      </section>
-
-      <!-- 🛡 Tab: Admin Moderation -->
+      <!-- 🛡 Tab: Admin Moderation (Opened via Profile for admins) -->
       <section id="tab-admin" class="tab-content">
         <div class="section-hero glass-card admin-hero">
           <div class="hero-badge admin-badge">🛡 Панель Модератора</div>
@@ -334,30 +275,28 @@
       </section>
     </main>
 
-    <!-- Floating Glass Navbar -->
+    <!-- Floating Glass Navbar WITH STRICTLY 3 BUTTONS (Home | Center Booking | Profile) -->
     <nav class="floating-navbar glass-navbar" id="main-nav">
       <button class="nav-item active" data-tab="home">
-        <span class="nav-icon">🏠</span>
+        <span class="nav-icon">
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        </span>
         <span class="nav-label">Главная</span>
       </button>
-      <button class="nav-item" data-tab="contacts">
-        <span class="nav-icon">ℹ️</span>
-        <span class="nav-label">Инфо</span>
-      </button>
-      <!-- Center Main Action Button -->
+
+      <!-- Center Main Action Button (Strictly Centered Glow Circle) -->
       <button class="nav-item nav-item-main" data-tab="booking">
         <div class="nav-main-circle">
-          <span class="nav-main-icon">📅</span>
+          <svg class="nav-svg-main" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="12" y1="14" x2="12" y2="18"></line><line x1="10" y1="16" x2="14" y2="16"></line></svg>
         </div>
         <span class="nav-label main-label">Записаться</span>
       </button>
+
       <button class="nav-item" data-tab="profile">
-        <span class="nav-icon">👤</span>
+        <span class="nav-icon">
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        </span>
         <span class="nav-label">Профиль</span>
-      </button>
-      <button class="nav-item hidden" id="admin-tab-btn" data-tab="admin">
-        <span class="nav-icon">🛡</span>
-        <span class="nav-label">Админ</span>
       </button>
     </nav>
 
@@ -398,8 +337,6 @@
     <div id="toast" class="toast hidden glass-toast"></div>
   </div>
 
-  <script src="app.js?v=11.0"></script>
+  <script src="app.js?v=13.0"></script>
 </body>
 </html>
-
-

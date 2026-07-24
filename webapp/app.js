@@ -74,13 +74,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   checkAdminStatus();
 
-  // Tab switching
-  const tabBtns = document.querySelectorAll(".tab-btn");
+  // Floating Navbar Tab switching
+  const navItems = document.querySelectorAll(".nav-item");
   const tabContents = document.querySelectorAll(".tab-content");
 
   function switchTab(tabName) {
-    tabBtns.forEach(btn => {
-      btn.classList.toggle("active", btn.dataset.tab === tabName);
+    navItems.forEach(item => {
+      item.classList.toggle("active", item.dataset.tab === tabName);
     });
     tabContents.forEach(content => {
       content.classList.toggle("active", content.id === `tab-${tabName}`);
@@ -95,11 +95,46 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  tabBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      switchTab(btn.dataset.tab);
+  navItems.forEach(item => {
+    item.addEventListener("click", () => {
+      switchTab(item.dataset.tab);
     });
   });
+
+  // Home CTA Button Handler
+  const homeStartBookingBtn = document.getElementById("home-start-booking-btn");
+  if (homeStartBookingBtn) {
+    homeStartBookingBtn.addEventListener("click", () => {
+      switchTab("booking");
+      goToStep(1);
+    });
+  }
+
+  // Home Quick Categories Click Handlers
+  document.querySelectorAll(".home-cat-card").forEach(card => {
+    card.addEventListener("click", () => {
+      const cat = card.dataset.cat;
+      if (cat) {
+        selectedCategory = cat;
+        selectedProblemTitle = "";
+        switchTab("booking");
+        goToStep(1);
+      }
+    });
+  });
+
+  // Privacy Checkbox Enable/Disable Submit Button Handler
+  const privacyAgreeCheckbox = document.getElementById("privacy-agree");
+  const submitBookingBtn = document.getElementById("submit-booking-btn");
+
+  if (privacyAgreeCheckbox && submitBookingBtn) {
+    submitBookingBtn.disabled = !privacyAgreeCheckbox.checked;
+
+    privacyAgreeCheckbox.addEventListener("change", () => {
+      submitBookingBtn.disabled = !privacyAgreeCheckbox.checked;
+    });
+  }
+
 
 
   // Services Categories & Subservices Tree

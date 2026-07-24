@@ -215,6 +215,8 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   const selectedProblemsSet = new Set();
+  // Map: catId -> custom problem text entered by user
+  const customCategoryInputs = {};
 
   function updateEstimatedTotalPrice() {
     const priceValEl = document.getElementById("total-price-val");
@@ -238,6 +240,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Renders summary list of selected problems below the accordion
+  function renderSelectedSummary() {
+    const summaryEl = document.getElementById("selected-summary");
+    if (!summaryEl) return;
+
+    const items = [];
+    selectedProblemsSet.forEach(t => items.push(t));
+    Object.values(customCategoryInputs).forEach(v => { if (v.trim()) items.push(v.trim()); });
+
+    if (items.length === 0) {
+      summaryEl.innerHTML = "";
+      return;
+    }
+
+    summaryEl.innerHTML = `
+      <div class="selected-summary-box glass-card">
+        <div class="selected-summary-title">✅ Выбранные услуги:</div>
+        <ul class="selected-summary-list">
+          ${items.map(i => `<li>${i}</li>`).join("")}
+        </ul>
+      </div>
+    `;
+  }
+
   function toggleProblemSelection(title) {
     if (selectedProblemsSet.has(title)) {
       selectedProblemsSet.delete(title);
@@ -245,6 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
       selectedProblemsSet.add(title);
     }
     updateEstimatedTotalPrice();
+    renderSelectedSummary();
   }
 
 
@@ -337,33 +364,20 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-  }
-
-  renderServicesAccordion();
-
-
-  // Search Inputs Setup
-  const serviceSearchInput = document.getElementById("service-search-input");
-  if (serviceSearchInput) {
-    serviceSearchInput.addEventListener("input", (e) => {
-      renderServicesAccordion(e.target.value);
-    });
-  }
+  renderCategoryAccordion();
 
   // Wizard Step 1 Accordion + Search Setup
   const wizardSearchInput = document.getElementById("wizard-search-input");
   const customProblemGroup = document.getElementById("custom-problem-group");
   let selectedCategory = "";
 
-  // Renders accordion categories with multi-select checkboxes into #category-pills
-  // If filterQuery is set, shows flat search results instead
   function renderCategoryAccordion(filterQuery = "") {
     const container = document.getElementById("category-pills");
     if (!container) return;
     const query = filterQuery.toLowerCase().trim();
 
     if (query) {
-      // Search results view (flat list with checkboxes)
+      // Search results: flat list with checkboxes
       const matched = [];
       SERVICE_CATEGORIES.forEach(cat => {
         cat.items.forEach(item => {
@@ -375,6 +389,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (matched.length === 0) {
         container.innerHTML = `<div class="info-card glass-card"><p style="text-align:center;color:var(--text-muted);">По запросу «${filterQuery}» ничего не найдено.</p></div>`;
+        renderSelectedSummary();
         return;
       }
 
@@ -391,35 +406,41 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
       }).join("");
     } else {
-      // Accordion categories view
-      container.innerHTML = SERVICE_CATEGORIES.map(cat => `
-        <div class="accordion-category glass-card" data-cat-id="${cat.id}">
-          <div class="accordion-header">
-            <span>${cat.title}</span>
-            <span class="accordion-arrow">▼</span>
-          </div>
-          <div class="accordion-body">
-            ${cat.items.map(item => {
-              const isChecked = selectedProblemsSet.has(item.title);
-              return `
-                <div class="subservice-item ${isChecked ? 'selected' : ''}" data-title="${item.title}">
-                  <label class="subservice-checkbox-label" onclick="event.stopPropagation();">
-                    <input type="checkbox" class="subservice-checkbox" ${isChecked ? 'checked' : ''} data-title="${item.title}" />
-                    <span class="subservice-title">${item.title}</span>
-                  </label>
-                  <span class="subservice-price">${item.price}</span>
-                </div>
-              `;
-            }).join('')}
-            <div class="subservice-item" data-cat-custom="${cat.id}">
-              <label class="subservice-checkbox-label" onclick="event.stopPropagation();">
-                <input type="checkbox" class="subservice-checkbox cat-custom-check" data-cat="${cat.id}" />
-                <span class="subservice-title">✏️ Другая проблема (написать вручную)</span>
-              </label>
+      // Accordion categories view — each has checkboxes + a text input at the bottom
+      container.innerHTML = SERVICE_CATEGORIES.map(cat => {
+        const customVal = customCategoryInputs[cat.id] || "";
+        return `
+          <div class="accordion-category glass-card" data-cat-id="${cat.id}">
+            <div class="accordion-header">
+              <span>${cat.title}</span>
+              <span class="accordion-arrow">▼</span>
+            </div>
+            <div class="accordion-body">
+              ${cat.items.map(item => {
+                const isChecked = selectedProblemsSet.has(item.title);
+                return `
+                  <div class="subservice-item ${isChecked ? 'selected' : ''}" data-title="${item.title}">
+                    <label class="subservice-checkbox-label" onclick="event.stopPropagation();">
+                      <input type="checkbox" class="subservice-checkbox" ${isChecked ? 'checked' : ''} data-title="${item.title}" />
+                      <span class="subservice-title">${item.title}</span>
+                    </label>
+                    <span class="subservice-price">${item.price}</span>
+                  </div>
+                `;
+              }).join('')}
+              <div class="custom-cat-input-row" onclick="event.stopPropagation();">
+                <input
+                  type="text"
+                  class="form-input glass-input custom-cat-input"
+                  data-cat-id="${cat.id}"
+                  placeholder="Другая проблема..."
+                  value="${customVal}"
+                />
+              </div>
             </div>
           </div>
-        </div>
-      `).join("");
+        `;
+      }).join("");
     }
 
     // Bind accordion header toggles
@@ -433,20 +454,8 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Bind subservice item clicks (toggle checkbox without closing accordion)
+    // Bind subservice checkboxes
     container.querySelectorAll(".subservice-item").forEach(itemEl => {
-      if (itemEl.dataset.catCustom) {
-        // "write own problem" option
-        itemEl.addEventListener("click", (e) => {
-          e.stopPropagation();
-          selectedCategory = "cat_custom";
-          if (customProblemGroup) customProblemGroup.classList.remove("hidden");
-          const cb = itemEl.querySelector(".subservice-checkbox");
-          if (cb) cb.checked = true;
-        });
-        return;
-      }
-
       itemEl.addEventListener("click", (e) => {
         e.stopPropagation();
         const title = itemEl.dataset.title;
@@ -456,13 +465,22 @@ document.addEventListener("DOMContentLoaded", () => {
           const isChecked = selectedProblemsSet.has(title);
           if (checkbox) checkbox.checked = isChecked;
           itemEl.classList.toggle("selected", isChecked);
-          // Hide custom problem group if user is picking from list
-          if (customProblemGroup && !customProblemGroup.classList.contains("hidden")) {
-            customProblemGroup.classList.add("hidden");
-          }
         }
       });
     });
+
+    // Bind custom text inputs per category
+    container.querySelectorAll(".custom-cat-input").forEach(input => {
+      input.addEventListener("input", (e) => {
+        e.stopPropagation();
+        const catId = input.dataset.catId;
+        customCategoryInputs[catId] = input.value;
+        renderSelectedSummary();
+      });
+      input.addEventListener("click", (e) => e.stopPropagation());
+    });
+
+    renderSelectedSummary();
   }
 
   renderCategoryAccordion();
@@ -701,20 +719,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (toStep2Btn) {
     toStep2Btn.addEventListener("click", () => {
+      // Collect selected checkbox problems
+      const checkedProblems = Array.from(selectedProblemsSet);
+      // Collect custom text inputs per category
+      const customProblems = Object.values(customCategoryInputs).map(v => v.trim()).filter(v => v.length > 0);
+      const allProblems = [...checkedProblems, ...customProblems];
+
       let problem = "";
-      if (selectedProblemsSet.size > 0) {
-        problem = Array.from(selectedProblemsSet).join(", ");
+      if (allProblems.length > 0) {
+        problem = allProblems.join(", ");
       } else if (selectedCategory === "cat_custom") {
-        problem = document.getElementById("custom-problem").value.trim();
-      } else {
-        const categoryLabels = {
-          cat_engine: "🔧 Двигатель и выхлопная система",
-          cat_chassis: "🛞 Подвеска и тормозная система",
-          cat_electric: "⚡ Электрика и автоэлектроника",
-          cat_to: "🛢 Регулярное ТО и масляный сервис",
-          cat_climate: "❄️ Климат и кондиционер"
-        };
-        problem = categoryLabels[selectedCategory] || "Общий ремонт";
+        const customProblemInput = document.getElementById("custom-problem");
+        problem = customProblemInput ? customProblemInput.value.trim() : "";
       }
 
       if (!problem) {
@@ -757,20 +773,17 @@ document.addEventListener("DOMContentLoaded", () => {
   bookingForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    // Collect all problems (checkboxes + custom text inputs)
+    const checkedProblems = Array.from(selectedProblemsSet);
+    const customProblems = Object.values(customCategoryInputs).map(v => v.trim()).filter(v => v.length > 0);
+    const allProblems = [...checkedProblems, ...customProblems];
+
     let problem = "";
-    if (selectedProblemsSet.size > 0) {
-      problem = Array.from(selectedProblemsSet).join(", ");
+    if (allProblems.length > 0) {
+      problem = allProblems.join(", ");
     } else if (selectedCategory === "cat_custom") {
-      problem = document.getElementById("custom-problem").value.trim();
-    } else {
-      const categoryLabels = {
-        cat_engine: "🔧 Двигатель и выхлопная система",
-        cat_chassis: "🛞 Подвеска и тормозная система",
-        cat_electric: "⚡ Электрика и автоэлектроника",
-        cat_to: "🛢 Регулярное ТО и масляный сервис",
-        cat_climate: "❄️ Климат и кондиционер"
-      };
-      problem = categoryLabels[selectedCategory] || "Общий ремонт";
+      const customProblemInput = document.getElementById("custom-problem");
+      problem = customProblemInput ? customProblemInput.value.trim() : "";
     }
 
 
@@ -827,6 +840,8 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast(`🎉 Заявка №${data.booking_id} успешно создана!`);
         bookingForm.reset();
         selectedProblemsSet.clear();
+        // Clear custom inputs
+        Object.keys(customCategoryInputs).forEach(k => delete customCategoryInputs[k]);
         renderCategoryAccordion();
         goToStep(1);
         setTimeout(() => {

@@ -28,16 +28,20 @@ def init_db():
             cursor.execute("ALTER TABLE bookings ADD COLUMN comment TEXT DEFAULT ''")
         except Exception:
             pass
+        try:
+            cursor.execute("ALTER TABLE bookings ADD COLUMN car_number TEXT DEFAULT ''")
+        except Exception:
+            pass
         conn.commit()
 
-def add_booking(user_id: int, user_name: str, problem: str, car_model: str, slot: str, phone: str) -> int:
+def add_booking(user_id: int, user_name: str, problem: str, car_model: str, slot: str, phone: str, car_number: str = "") -> int:
     """Добавление новой записи на ТО со статусом 'На рассмотрении'"""
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO bookings (user_id, user_name, problem, car_model, slot, phone, status)
-            VALUES (?, ?, ?, ?, ?, ?, 'На рассмотрении')
-        """, (user_id, user_name, problem, car_model, slot, phone))
+            INSERT INTO bookings (user_id, user_name, problem, car_model, car_number, slot, phone, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'На рассмотрении')
+        """, (user_id, user_name, problem, car_model, car_number, slot, phone))
         conn.commit()
         return cursor.lastrowid
 
@@ -57,14 +61,14 @@ def get_user_bookings(user_id: int, status_filter: str = None) -> list:
         cursor = conn.cursor()
         if status_filter:
             cursor.execute("""
-                SELECT id, problem, car_model, slot, phone, status, comment, created_at
+                SELECT id, problem, car_model, car_number, slot, phone, status, comment, created_at
                 FROM bookings
                 WHERE user_id = ? AND status = ?
                 ORDER BY id DESC
             """, (user_id, status_filter))
         else:
             cursor.execute("""
-                SELECT id, problem, car_model, slot, phone, status, comment, created_at
+                SELECT id, problem, car_model, car_number, slot, phone, status, comment, created_at
                 FROM bookings
                 WHERE user_id = ?
                 ORDER BY id DESC
@@ -86,7 +90,7 @@ def get_user_stats(user_id: int) -> dict:
         cursor.execute("SELECT COUNT(*) as cnt FROM bookings WHERE user_id = ? AND status = 'Отклонена'", (user_id,))
         cancelled = cursor.fetchone()["cnt"]
         
-        cursor.execute("SELECT phone, car_model FROM bookings WHERE user_id = ? ORDER BY id DESC LIMIT 1", (user_id,))
+        cursor.execute("SELECT phone, car_model, car_number FROM bookings WHERE user_id = ? ORDER BY id DESC LIMIT 1", (user_id,))
         last = cursor.fetchone()
         
         return {
@@ -94,7 +98,8 @@ def get_user_stats(user_id: int) -> dict:
             "active": active,
             "cancelled": cancelled,
             "phone": last["phone"] if last else "Не указан",
-            "car_model": last["car_model"] if last else "Не указан"
+            "car_model": last["car_model"] if last else "Не указан",
+            "car_number": last["car_number"] if last else ""
         }
 
 def cancel_booking_by_id(booking_id: int, user_id: int) -> bool:
@@ -118,18 +123,19 @@ def get_all_bookings(status_filter: str = None) -> list:
         cursor = conn.cursor()
         if status_filter:
             cursor.execute("""
-                SELECT id, user_id, user_name, problem, car_model, slot, phone, status, comment, created_at
+                SELECT id, user_id, user_name, problem, car_model, car_number, slot, phone, status, comment, created_at
                 FROM bookings
                 WHERE status = ?
                 ORDER BY id DESC
             """, (status_filter,))
         else:
             cursor.execute("""
-                SELECT id, user_id, user_name, problem, car_model, slot, phone, status, comment, created_at
+                SELECT id, user_id, user_name, problem, car_model, car_number, slot, phone, status, comment, created_at
                 FROM bookings
                 ORDER BY id DESC
             """)
         return cursor.fetchall()
+
 
 def update_booking_status(booking_id: int, new_status: str, comment: str = "") -> bool:
     """Изменение статуса записи и добавление комментария модератора"""

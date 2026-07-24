@@ -102,67 +102,259 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 
-  // Services list rendering
-  const defaultServices = [
-    { icon: "⚡", title: "Компьютерная диагностика", price: "от 1 000 ₽", cat: "cat_electric" },
-    { icon: "🛢", title: "Замена масла и фильтров", price: "от 1 500 ₽", cat: "cat_to" },
-    { icon: "🛞", title: "Ремонт тормозной системы", price: "от 2 000 ₽", cat: "cat_chassis" },
-    { icon: "🔧", title: "Обслуживание подвески", price: "от 2 500 ₽", cat: "cat_chassis" },
-    { icon: "❄️", title: "Заправка кондиционера", price: "от 2 000 ₽", cat: "cat_climate" },
-    { icon: "🚗", title: "Шиномонтаж (комплект)", price: "от 2 000 ₽", cat: "cat_chassis" }
+  // Services Categories & Subservices Tree
+  const SERVICE_CATEGORIES = [
+    {
+      id: "cat_engine",
+      title: "🔧 Двигатель и выхлопная система",
+      icon: "🔧",
+      items: [
+        { title: "Замена моторного масла и фильтра", price: "от 1 500 ₽" },
+        { title: "Компьютерная диагностика двигателя", price: "от 1 000 ₽" },
+        { title: "Замена ремня / цепи ГРМ", price: "от 4 500 ₽" },
+        { title: "Замена свечей зажигания", price: "от 1 200 ₽" },
+        { title: "Замена глушителя / катализатора", price: "от 2 500 ₽" },
+        { title: "Промывка форсунок и инжектора", price: "от 3 000 ₽" }
+      ]
+    },
+    {
+      id: "cat_chassis",
+      title: "🛞 Подвеска и тормозная система",
+      icon: "🛞",
+      items: [
+        { title: "Замена тормозных колодок (пара)", price: "от 1 500 ₽" },
+        { title: "Замена тормозных дисков", price: "от 2 500 ₽" },
+        { title: "Комплексная диагностика ходовой", price: "от 1 000 ₽" },
+        { title: "Замена амортизаторов / пружин", price: "от 3 000 ₽" },
+        { title: "Замена шаровых опор и сайлентблоков", price: "от 2 000 ₽" },
+        { title: "Шиномонтаж и балансировка (комплект)", price: "от 2 000 ₽" }
+      ]
+    },
+    {
+      id: "cat_electric",
+      title: "⚡ Электрика и автоэлектроника",
+      icon: "⚡",
+      items: [
+        { title: "Полная компьютерная диагностика", price: "от 1 000 ₽" },
+        { title: "Замена генератора / стартера", price: "от 2 500 ₽" },
+        { title: "Замена и зарядка аккумулятора", price: "от 800 ₽" },
+        { title: "Поиск и устранение утечки тока", price: "от 2 000 ₽" },
+        { title: "Установка автосигнализации", price: "от 4 000 ₽" }
+      ]
+    },
+    {
+      id: "cat_to",
+      title: "🛢 Регулярное ТО и масляный сервис",
+      icon: "🛢",
+      items: [
+        { title: "Комплексное ТО (масло + 3 фильтра)", price: "от 3 500 ₽" },
+        { title: "Замена масла в АКПП / МКПП", price: "от 3 000 ₽" },
+        { title: "Замена антифриза / охл. жидкости", price: "от 1 800 ₽" },
+        { title: "Замена тормозной жидкости", price: "от 1 500 ₽" }
+      ]
+    },
+    {
+      id: "cat_climate",
+      title: "❄️ Климат и кондиционер",
+      icon: "❄️",
+      items: [
+        { title: "Диагностика и заправка кондиционера", price: "от 2 000 ₽" },
+        { title: "Антибактериальная чистка кондиционера", price: "от 1 500 ₽" },
+        { title: "Замена радиатора печки / кондиционера", price: "от 4 000 ₽" }
+      ]
+    }
   ];
 
-  function renderServices() {
+  let selectedProblemTitle = "";
+
+  function renderServicesAccordion(filterQuery = "") {
     const container = document.getElementById("services-list");
     if (!container) return;
 
-    container.innerHTML = defaultServices.map(s => `
-      <div class="service-card glass-card">
-        <div class="service-info">
-          <span class="service-icon">${s.icon}</span>
-          <div>
-            <div class="service-title">${s.title}</div>
-            <div class="service-price">${s.price}</div>
+    const query = filterQuery.toLowerCase().trim();
+
+    if (query) {
+      // Search Results View
+      const matched = [];
+      SERVICE_CATEGORIES.forEach(cat => {
+        cat.items.forEach(item => {
+          if (item.title.toLowerCase().includes(query) || cat.title.toLowerCase().includes(query)) {
+            matched.push({ ...item, catTitle: cat.title });
+          }
+        });
+      });
+
+      if (matched.length === 0) {
+        container.innerHTML = `<div class="info-card glass-card"><p style="text-align: center; color: var(--text-muted);">По вашему запросу «${filterQuery}» ничего не найдено. Попробуйте сформулировать иначе.</p></div>`;
+        return;
+      }
+
+      container.innerHTML = matched.map(m => `
+        <div class="service-card glass-card">
+          <div class="service-info">
+            <span class="service-icon">🔍</span>
+            <div>
+              <div class="service-title">${m.title}</div>
+              <div class="service-price">${m.price} (${m.catTitle})</div>
+            </div>
+          </div>
+          <button class="service-action-btn select-subservice-btn" data-title="${m.title}">Записаться</button>
+        </div>
+      `).join("");
+    } else {
+      // Accordion Categories View
+      container.innerHTML = SERVICE_CATEGORIES.map(cat => `
+        <div class="accordion-category glass-card">
+          <div class="accordion-header">
+            <span>${cat.title}</span>
+            <span class="accordion-arrow">▼</span>
+          </div>
+          <div class="accordion-body">
+            ${cat.items.map(item => `
+              <div class="subservice-item" data-title="${item.title}">
+                <span class="subservice-title">${item.title}</span>
+                <span class="subservice-price">${item.price}</span>
+              </div>
+            `).join("")}
           </div>
         </div>
-        <button class="service-action-btn" data-cat="${s.cat}" data-title="${s.title}">Записаться</button>
-      </div>
-    `).join("");
+      `).join("");
+    }
 
-    container.querySelectorAll(".service-action-btn").forEach(btn => {
-      btn.addEventListener("click", (e) => {
-        const cat = e.target.dataset.cat;
-        selectCategoryPill(cat);
-        switchTab("booking");
+    // Bind Accordion Click Handlers
+    container.querySelectorAll(".accordion-header").forEach(header => {
+      header.addEventListener("click", () => {
+        const parent = header.parentElement;
+        parent.classList.toggle("open");
+      });
+    });
+
+    // Bind Subservice Select Handlers
+    container.querySelectorAll(".subservice-item, .select-subservice-btn").forEach(el => {
+      el.addEventListener("click", (e) => {
+        const title = el.dataset.title || el.closest("[data-title]")?.dataset.title;
+        if (title) {
+          selectedProblemTitle = title;
+          const customProblemInput = document.getElementById("custom-problem");
+          if (customProblemInput) customProblemInput.value = title;
+          switchTab("booking");
+          goToStep(2);
+        }
       });
     });
   }
 
-  renderServices();
+  renderServicesAccordion();
 
-  // Category Pills in Booking Form
-  const categoryPills = document.querySelectorAll("#category-pills .pill");
+  // Search Inputs Setup
+  const serviceSearchInput = document.getElementById("service-search-input");
+  if (serviceSearchInput) {
+    serviceSearchInput.addEventListener("input", (e) => {
+      renderServicesAccordion(e.target.value);
+    });
+  }
+
+  // Wizard Step 1 Pills & Search Setup
+  const wizardSearchInput = document.getElementById("wizard-search-input");
+  const categoryPills = document.getElementById("category-pills");
   const customProblemGroup = document.getElementById("custom-problem-group");
   let selectedCategory = "cat_engine";
 
-  function selectCategoryPill(value) {
-    selectedCategory = value;
-    categoryPills.forEach(p => {
-      p.classList.toggle("active", p.dataset.value === value);
-    });
+  function renderWizardPills(filterQuery = "") {
+    if (!categoryPills) return;
+    const query = filterQuery.toLowerCase().trim();
 
-    if (value === "cat_custom") {
-      customProblemGroup.classList.remove("hidden");
+    if (query) {
+      const matchedItems = [];
+      SERVICE_CATEGORIES.forEach(cat => {
+        cat.items.forEach(item => {
+          if (item.title.toLowerCase().includes(query)) {
+            matchedItems.push(item);
+          }
+        });
+      });
+
+      if (matchedItems.length === 0) {
+        categoryPills.innerHTML = `<div style="font-size: 13px; color: var(--text-muted); padding: 8px;">Не найдено совпадающих услуг. Перейдите к ручному вводу.</div>`;
+        return;
+      }
+
+      categoryPills.innerHTML = matchedItems.map(item => `
+        <div class="pill wizard-subservice-pill" data-title="${item.title}">
+          <span class="pill-icon">🔹</span> ${item.title} (${item.price})
+        </div>
+      `).join("");
+
+      categoryPills.querySelectorAll(".wizard-subservice-pill").forEach(p => {
+        p.addEventListener("click", () => {
+          selectedProblemTitle = p.dataset.title;
+          const customProblemInput = document.getElementById("custom-problem");
+          if (customProblemInput) customProblemInput.value = selectedProblemTitle;
+          goToStep(2);
+        });
+      });
     } else {
-      customProblemGroup.classList.add("hidden");
+      categoryPills.innerHTML = `
+        <div class="pill active" data-value="cat_engine"><span class="pill-icon">🔧</span> Двигатель и выхлоп</div>
+        <div class="pill" data-value="cat_chassis"><span class="pill-icon">🛞</span> Подвеска и тормоза</div>
+        <div class="pill" data-value="cat_electric"><span class="pill-icon">⚡</span> Электрика и диагностика</div>
+        <div class="pill" data-value="cat_to"><span class="pill-icon">🛢</span> Регулярное ТО</div>
+        <div class="pill" data-value="cat_climate"><span class="pill-icon">❄️</span> Климат и кондиционер</div>
+        <div class="pill" data-value="cat_custom"><span class="pill-icon">✏️</span> Написать свою проблему</div>
+      `;
+
+      categoryPills.querySelectorAll(".pill").forEach(pill => {
+        pill.addEventListener("click", () => {
+          categoryPills.querySelectorAll(".pill").forEach(p => p.classList.remove("active"));
+          pill.classList.add("active");
+          selectedCategory = pill.dataset.value;
+
+          if (selectedCategory === "cat_custom") {
+            customProblemGroup.classList.remove("hidden");
+            selectedProblemTitle = "";
+          } else {
+            customProblemGroup.classList.add("hidden");
+            selectedProblemTitle = "";
+          }
+        });
+      });
     }
   }
 
-  categoryPills.forEach(pill => {
-    pill.addEventListener("click", () => {
-      selectCategoryPill(pill.dataset.value);
+  renderWizardPills();
+
+  if (wizardSearchInput) {
+    wizardSearchInput.addEventListener("input", (e) => {
+      renderWizardPills(e.target.value);
     });
-  });
+  }
+
+  // Car Number Input Auto-Caps
+  const carNumberInput = document.getElementById("car-number");
+  if (carNumberInput) {
+    carNumberInput.addEventListener("input", () => {
+      carNumberInput.value = carNumberInput.value.toUpperCase();
+    });
+  }
+
+  // Privacy Policy Modal Handlers
+  const privacyLink = document.getElementById("privacy-link");
+  const privacyModal = document.getElementById("privacy-modal");
+  const closePrivacyBtn = document.getElementById("close-privacy-btn");
+
+  if (privacyLink && privacyModal) {
+    privacyLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      privacyModal.classList.remove("hidden");
+    });
+  }
+
+  if (closePrivacyBtn && privacyModal) {
+    closePrivacyBtn.addEventListener("click", () => {
+      privacyModal.classList.add("hidden");
+    });
+  }
+
 
   // Time Slots Loading
   let selectedSlot = "";
@@ -231,6 +423,20 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("stat-cancelled").textContent = data.stats.cancelled || 0;
       document.getElementById("profile-phone").textContent = `Телефон: ${data.stats.phone || 'Не указан'}`;
 
+      // Auto-fill phone and car_number in booking form
+      if (data.stats.phone && data.stats.phone !== "Не указан") {
+        const phoneInput = document.getElementById("phone-number");
+        if (phoneInput && !phoneInput.value) {
+          phoneInput.value = data.stats.phone;
+        }
+      }
+      if (data.stats.car_number) {
+        const carNumInput = document.getElementById("car-number");
+        if (carNumInput && !carNumInput.value) {
+          carNumInput.value = data.stats.car_number;
+        }
+      }
+
       renderUserBookings(data.bookings || []);
     } catch (e) {
       console.error(e);
@@ -268,6 +474,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="booking-details">
             <p><strong>Услуга:</strong> ${b.problem}</p>
             <p><strong>Автомобиль:</strong> ${b.car_model}</p>
+            ${b.car_number ? `<p><strong>Госномер:</strong> ${b.car_number}</p>` : ''}
             <p><strong>Время:</strong> ${b.slot}</p>
             ${b.comment ? `<p><strong>Комментарий:</strong> <em>${b.comment}</em></p>` : ''}
           </div>
@@ -332,14 +539,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (toStep2Btn) {
     toStep2Btn.addEventListener("click", () => {
-      let problem = "";
-      if (selectedCategory === "cat_custom") {
-        problem = document.getElementById("custom-problem").value.trim();
-        if (!problem) {
-          showToast("⚠️ Пожалуйста, опишите вашу проблему!");
-          document.getElementById("custom-problem").focus();
-          return;
+      let problem = selectedProblemTitle;
+      if (!problem) {
+        if (selectedCategory === "cat_custom") {
+          problem = document.getElementById("custom-problem").value.trim();
+        } else {
+          const categoryLabels = {
+            cat_engine: "🔧 Двигатель и выхлопная система",
+            cat_chassis: "🛞 Подвеска и тормозная система",
+            cat_electric: "⚡ Электрика и автоэлектроника",
+            cat_to: "🛢 Регулярное ТО и масляный сервис",
+            cat_climate: "❄️ Климат и кондиционер"
+          };
+          problem = categoryLabels[selectedCategory] || "Общий ремонт";
         }
+      }
+
+      if (!problem) {
+        showToast("⚠️ Пожалуйста, выберите или опишите вашу проблему!");
+        return;
       }
       goToStep(2);
       setTimeout(() => {
@@ -377,22 +595,26 @@ document.addEventListener("DOMContentLoaded", () => {
   bookingForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    let problem = "";
-    if (selectedCategory === "cat_custom") {
-      problem = document.getElementById("custom-problem").value.trim();
-    } else {
-      const categoryLabels = {
-        cat_engine: "🔧 Двигатель и выхлоп",
-        cat_chassis: "🛞 Подвеска и тормоза",
-        cat_electric: "⚡ Электрика и диагностика",
-        cat_to: "🛢 Регулярное ТО",
-        cat_climate: "❄️ Климат и кондиционер"
-      };
-      problem = categoryLabels[selectedCategory] || "Общий ремонт";
+    let problem = selectedProblemTitle;
+    if (!problem) {
+      if (selectedCategory === "cat_custom") {
+        problem = document.getElementById("custom-problem").value.trim();
+      } else {
+        const categoryLabels = {
+          cat_engine: "🔧 Двигатель и выхлопная система",
+          cat_chassis: "🛞 Подвеска и тормозная система",
+          cat_electric: "⚡ Электрика и автоэлектроника",
+          cat_to: "🛢 Регулярное ТО и масляный сервис",
+          cat_climate: "❄️ Климат и кондиционер"
+        };
+        problem = categoryLabels[selectedCategory] || "Общий ремонт";
+      }
     }
 
     const carModel = document.getElementById("car-model").value.trim();
+    const carNumber = document.getElementById("car-number") ? document.getElementById("car-number").value.trim().toUpperCase() : "";
     const phone = document.getElementById("phone-number").value.trim();
+    const privacyAgree = document.getElementById("privacy-agree");
 
     if (!problem) {
       showToast("⚠️ Опишите вашу проблему!");
@@ -406,6 +628,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     if (!phone) {
       showToast("⚠️ Укажите ваш телефон!");
+      return;
+    }
+    if (privacyAgree && !privacyAgree.checked) {
+      showToast("⚠️ Необходимо согласие с Политикой конфиденциальности!");
       return;
     }
 
@@ -426,6 +652,7 @@ document.addEventListener("DOMContentLoaded", () => {
           user_name: userName,
           problem: problem,
           car_model: carModel,
+          car_number: carNumber,
           slot: selectedSlot,
           phone: phone
         })
@@ -436,7 +663,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (res.ok && data.success) {
         showToast(`🎉 Заявка №${data.booking_id} успешно создана!`);
         bookingForm.reset();
-        selectCategoryPill("cat_engine");
+        selectedProblemTitle = "";
+        renderWizardPills();
         goToStep(1);
         setTimeout(() => {
           switchTab("profile");
@@ -452,6 +680,7 @@ document.addEventListener("DOMContentLoaded", () => {
       submitBtn.innerHTML = `<span>🚀 Отправить заявку</span>`;
     }
   });
+
 
 
   // Toast Helper
@@ -545,9 +774,11 @@ document.addEventListener("DOMContentLoaded", () => {
           <div class="booking-details">
             <p><strong>Услуга:</strong> ${b.problem}</p>
             <p><strong>Автомобиль:</strong> ${b.car_model}</p>
+            ${b.car_number ? `<p><strong>Госномер:</strong> ${b.car_number}</p>` : ''}
             <p><strong>Время:</strong> ${b.slot}</p>
             ${b.comment ? `<p><strong>Прим. модератора:</strong> <em>${b.comment}</em></p>` : ''}
           </div>
+
           ${actionsHtml}
         </div>
       `;

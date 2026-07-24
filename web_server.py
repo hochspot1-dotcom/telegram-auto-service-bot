@@ -67,6 +67,7 @@ async def handle_user_info(request: web.Request):
             "id": b["id"],
             "problem": b["problem"],
             "car_model": b["car_model"],
+            "car_number": b["car_number"] if "car_number" in b.keys() else "",
             "slot": b["slot"],
             "phone": b["phone"],
             "status": b["status"],
@@ -93,6 +94,7 @@ async def handle_create_booking(request: web.Request):
     user_name = data.get("user_name", "Клиент")
     problem = data.get("problem", "").strip()
     car_model_raw = data.get("car_model", "").strip()
+    car_number = data.get("car_number", "").strip().upper()
     slot = data.get("slot", "").strip()
     phone = data.get("phone", "").strip()
 
@@ -126,7 +128,8 @@ async def handle_create_booking(request: web.Request):
         problem=problem,
         car_model=formatted_car,
         slot=slot,
-        phone=phone
+        phone=phone,
+        car_number=car_number
     )
 
     # Уведомление модераторов
@@ -134,11 +137,17 @@ async def handle_create_booking(request: web.Request):
     if bot:
         admin_ids = get_admin_ids()
         if admin_ids:
+            car_num_str = f"• <b>Госномер:</b> {car_number}\n" if car_number else ""
             admin_card = (
                 f"🚨 <b>НОВАЯ ЗАЯВКА ИЗ MINI APP №{booking_id}!</b> (⏳ На рассмотрении)\n\n"
                 f"• <b>Клиент:</b> {user_name} (ID: {user_id})\n"
                 f"• <b>Телефон:</b> {phone}\n"
                 f"• <b>Автомобиль:</b> {formatted_car}\n"
+                f"{car_num_str}"
+                f"• <b>Услуга:</b> {problem}\n"
+                f"• <b>Дата и время:</b> {slot}\n"
+            )
+
                 f"• <b>Услуга:</b> {problem}\n"
                 f"• <b>Дата и время:</b> {slot}\n"
             )
@@ -218,12 +227,14 @@ async def handle_admin_bookings(request: web.Request):
             "user_name": b["user_name"],
             "problem": b["problem"],
             "car_model": b["car_model"],
+            "car_number": b["car_number"] if "car_number" in b.keys() else "",
             "slot": b["slot"],
             "phone": b["phone"],
             "status": b["status"],
             "comment": b["comment"] if "comment" in b.keys() else "",
             "created_at": str(b["created_at"]) if "created_at" in b.keys() else ""
         })
+
 
     return web.json_response({
         "stats": stats,

@@ -520,6 +520,19 @@ document.addEventListener("DOMContentLoaded", () => {
         cardClass = "rejected";
       }
 
+      const isPending = b.status === "На рассмотрении";
+      const actionsHtml = isPending ? `
+        <div class="admin-actions-grid">
+          <button class="admin-btn admin-btn-approve" data-id="${b.id}">✅ Одобрить</button>
+          <button class="admin-btn admin-btn-reject" data-id="${b.id}">❌ Отклонить</button>
+          <button class="admin-btn admin-btn-delete" data-id="${b.id}">🗑 Удалить заявку</button>
+        </div>
+      ` : `
+        <div class="admin-actions-grid">
+          <button class="admin-btn admin-btn-delete" data-id="${b.id}">🗑 Удалить заявку</button>
+        </div>
+      `;
+
       return `
         <div class="booking-card glass-card admin-card ${cardClass}">
           <div class="booking-header">
@@ -535,14 +548,11 @@ document.addEventListener("DOMContentLoaded", () => {
             <p><strong>Время:</strong> ${b.slot}</p>
             ${b.comment ? `<p><strong>Прим. модератора:</strong> <em>${b.comment}</em></p>` : ''}
           </div>
-          <div class="admin-actions-grid">
-            <button class="admin-btn admin-btn-approve" data-id="${b.id}">✅ Одобрить</button>
-            <button class="admin-btn admin-btn-reject" data-id="${b.id}">❌ Отклонить</button>
-            <button class="admin-btn admin-btn-delete" data-id="${b.id}">🗑 Удалить заявку</button>
-          </div>
+          ${actionsHtml}
         </div>
       `;
     }).join("");
+
 
     container.querySelectorAll(".admin-btn-approve").forEach(btn => {
       btn.addEventListener("click", () => openAdminModal(btn.dataset.id, "approve"));

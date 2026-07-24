@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=9.0" />
+  <link rel="stylesheet" href="style.css?v=10.0" />
 </head>
 <body>
   <div id="app">
@@ -29,49 +29,54 @@
       </div>
     </header>
 
-    <!-- Navigation Tabs -->
-    <nav class="nav-tabs glass-card" id="main-nav">
-      <button class="tab-btn active" data-tab="services">
-        <span class="tab-icon">🛠</span>
-        <span class="tab-label">Услуги</span>
-      </button>
-      <button class="tab-btn" data-tab="booking">
-        <span class="tab-icon">📅</span>
-        <span class="tab-label">Запись</span>
-      </button>
-      <button class="tab-btn" data-tab="profile">
-        <span class="tab-icon">👤</span>
-        <span class="tab-label">Кабинет</span>
-      </button>
-      <button class="tab-btn" data-tab="contacts">
-        <span class="tab-icon">📍</span>
-        <span class="tab-label">Инфо</span>
-      </button>
-      <button class="tab-btn hidden" id="admin-tab-btn" data-tab="admin">
-        <span class="tab-icon">🛡</span>
-        <span class="tab-label">Админ</span>
-      </button>
-    </nav>
-
-
     <!-- Main Content Area -->
     <main class="content">
-      <!-- 🛠 Tab: Services -->
-      <section id="tab-services" class="tab-content active">
-        <div class="section-hero glass-card">
-          <div class="hero-badge">⚡ Профессиональный ремонт</div>
-          <h2>Услуги и прайс-лист</h2>
-          <p>Выберите нужную услугу или воспользуйтесь быстрым поиском</p>
+      <!-- 🏠 Tab: Home (Главная страница) -->
+      <section id="tab-home" class="tab-content active">
+        <!-- Hero Action Card -->
+        <div class="home-hero-card glass-card">
+          <div class="hero-badge">⚡ Профессиональный Автосервис</div>
+          <h2>Качественный ремонт и ТО вашего авто</h2>
+          <p>Запишитесь на свободное время за 3 простых шага без очередей и переплат.</p>
+          <button class="home-cta-btn glow-btn" id="home-start-booking-btn">
+            <span>🚀 Записаться на обслуживание ➔</span>
+          </button>
         </div>
 
+        <!-- Quick Categories Grid -->
+        <div class="home-section-title">
+          <h3>🔧 Направления ремонта</h3>
+        </div>
+        <div class="home-cats-grid">
+          <div class="home-cat-card glass-card" data-cat="cat_engine">
+            <span class="cat-card-icon">🔧</span>
+            <span class="cat-card-title">Двигатель</span>
+          </div>
+          <div class="home-cat-card glass-card" data-cat="cat_chassis">
+            <span class="cat-card-icon">🛞</span>
+            <span class="cat-card-title">Подвеска</span>
+          </div>
+          <div class="home-cat-card glass-card" data-cat="cat_electric">
+            <span class="cat-card-icon">⚡</span>
+            <span class="cat-card-title">Электрика</span>
+          </div>
+          <div class="home-cat-card glass-card" data-cat="cat_to">
+            <span class="cat-card-icon">🛢</span>
+            <span class="cat-card-title">ТО и Масла</span>
+          </div>
+        </div>
+
+        <!-- Services Preview List -->
+        <div class="home-section-title">
+          <h3>⚡ Популярные услуги и цены</h3>
+        </div>
         <!-- Search Bar -->
         <div class="search-box-wrapper glass-card">
           <span class="search-icon">🔍</span>
           <input type="text" id="service-search-input" class="glass-input search-input" placeholder="Поиск проблемы (напр. масло, тормоза, свечи, кондиционер)..." />
         </div>
-
         <div class="services-grid" id="services-list">
-          <!-- Services accordion & search rendered via JS -->
+          <!-- Rendered via JS -->
         </div>
       </section>
 
@@ -172,7 +177,7 @@
             <!-- Privacy Policy Checkbox -->
             <div class="form-group privacy-group">
               <label class="privacy-label">
-                <input type="checkbox" id="privacy-agree" class="privacy-checkbox" checked required />
+                <input type="checkbox" id="privacy-agree" class="privacy-checkbox" required />
                 <span>Я согласен с <a href="#" id="privacy-link" class="privacy-link">Политикой конфиденциальности</a></span>
               </label>
             </div>
@@ -181,13 +186,14 @@
               <button type="button" class="wizard-nav-btn back-btn" id="back-to-step-2-btn">
                 <span>← Назад</span>
               </button>
-              <button type="submit" class="submit-btn glow-btn" id="submit-booking-btn">
+              <button type="submit" class="submit-btn glow-btn" id="submit-booking-btn" disabled>
                 <span>🚀 Отправить заявку</span>
               </button>
             </div>
           </div>
         </form>
       </section>
+
 
 
 
@@ -323,6 +329,33 @@
       </section>
     </main>
 
+    <!-- Floating Glass Navbar -->
+    <nav class="floating-navbar glass-navbar" id="main-nav">
+      <button class="nav-item active" data-tab="home">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Главная</span>
+      </button>
+      <button class="nav-item" data-tab="contacts">
+        <span class="nav-icon">ℹ️</span>
+        <span class="nav-label">Инфо</span>
+      </button>
+      <!-- Center Main Action Button -->
+      <button class="nav-item nav-item-main" data-tab="booking">
+        <div class="nav-main-circle">
+          <span class="nav-main-icon">📅</span>
+        </div>
+        <span class="nav-label main-label">Записаться</span>
+      </button>
+      <button class="nav-item" data-tab="profile">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Профиль</span>
+      </button>
+      <button class="nav-item hidden" id="admin-tab-btn" data-tab="admin">
+        <span class="nav-icon">🛡</span>
+        <span class="nav-label">Админ</span>
+      </button>
+    </nav>
+
     <!-- Admin Comment Modal -->
     <div id="admin-modal" class="modal-overlay hidden">
       <div class="modal-card glass-card">
@@ -336,33 +369,32 @@
       </div>
     </div>
 
-    <!-- Toast / Notification container -->
     <!-- 🔒 Privacy Policy Modal -->
-  <div id="privacy-modal" class="modal-overlay hidden">
-    <div class="modal-card glass-card">
-      <div class="modal-header">
-        <h3>🔒 Политика конфиденциальности</h3>
-      </div>
-      <div class="modal-body privacy-modal-body">
-        <p>Настоящая Политика конфиденциальности определяет порядок обработки и защиты персональных данных клиентов автосервиса.</p>
-        <br />
-        <p><strong>1. Сбор данных:</strong> Мы собираем ваше имя, номер телефона, марку и госномер автомобиля исключительно для оформления записи на техническое обслуживание.</p>
-        <br />
-        <p><strong>2. Использование данных:</strong> Данные используются модераторами и мастерами автосервиса для связи с вами и подтверждения бронирования времени.</p>
-        <br />
-        <p><strong>3. Безопасность:</strong> Ваши персональные данные хранятся в зашифрованном виде и не передаются третьим лицам.</p>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="modal-btn btn-primary" id="close-privacy-btn">Понятно, закрыть</button>
+    <div id="privacy-modal" class="modal-overlay hidden">
+      <div class="modal-card glass-card">
+        <div class="modal-header">
+          <h3>🔒 Политика конфиденциальности</h3>
+        </div>
+        <div class="modal-body privacy-modal-body">
+          <p>Настоящая Политика конфиденциальности определяет порядок обработки и защиты персональных данных клиентов автосервиса.</p>
+          <br />
+          <p><strong>1. Сбор данных:</strong> Мы собираем ваше имя, номер телефона, марку и госномер автомобиля исключительно для оформления записи на техническое обслуживание.</p>
+          <br />
+          <p><strong>2. Использование данных:</strong> Данные используются модераторами и мастерами автосервиса для связи с вами и подтверждения бронирования времени.</p>
+          <br />
+          <p><strong>3. Безопасность:</strong> Ваши персональные данные хранятся в зашифрованном виде и не передаются третьим лицам.</p>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="modal-btn btn-primary" id="close-privacy-btn">Понятно, закрыть</button>
+        </div>
       </div>
     </div>
+
+    <div id="toast" class="toast hidden glass-toast"></div>
   </div>
 
-  <div id="toast" class="toast hidden glass-toast"></div>
-
-  </div>
-
-  <script src="app.js?v=9.0"></script>
+  <script src="app.js?v=10.0"></script>
 </body>
 </html>
+
 

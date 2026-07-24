@@ -1418,7 +1418,60 @@ body {
   white-space: nowrap;
 }
 
-/* Privacy Checkbox & Modal */
+/* Custom problem text input row inside each accordion category */
+.custom-cat-input-row {
+  padding: 10px 16px 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.custom-cat-input {
+  width: 100%;
+  font-size: 13px;
+  padding: 9px 12px;
+  border-radius: 10px;
+}
+
+/* Selected services summary box below accordion */
+.selected-summary-box {
+  margin-top: 10px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  background: rgba(56, 189, 248, 0.07);
+}
+
+.selected-summary-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #38bdf8;
+  margin-bottom: 8px;
+}
+
+.selected-summary-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.selected-summary-list li {
+  font-size: 13px;
+  color: var(--text-primary);
+  padding: 4px 0;
+  padding-left: 16px;
+  position: relative;
+}
+
+.selected-summary-list li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #22c55e;
+  font-weight: 700;
+}
+
 .privacy-group {
   margin-top: 6px;
 }

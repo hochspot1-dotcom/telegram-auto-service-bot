@@ -168,10 +168,16 @@
               </div>
             </div>
 
-            <!-- Phone number -->
+            <!-- Phone number with Edit pencil icon -->
             <div class="form-group">
               <label class="form-label" for="phone-number">Ваш телефон для связи:</label>
-              <input type="tel" id="phone-number" class="form-input glass-input" placeholder="+7 (999) 000-00-00" required />
+              <div class="phone-input-wrapper">
+                <input type="tel" id="phone-number" class="form-input glass-input" placeholder="+7 (999) 000-00-00" readonly required />
+                <button type="button" id="edit-phone-btn" class="edit-phone-btn" title="Нажмите, чтобы изменить номер">
+                  ✏️
+                </button>
+              </div>
+              <small class="form-hint" id="phone-hint">Номер автозаполнен из Telegram. Нажмите ✏️, если нужно указать другой номер.</small>
             </div>
 
             <!-- Privacy Policy Checkbox -->
@@ -193,9 +199,6 @@
           </div>
         </form>
       </section>
-
-
-
 
       <!-- 👤 Tab: Profile & History -->
       <section id="tab-profile" class="tab-content">
@@ -393,7 +396,7 @@
     <div id="toast" class="toast hidden glass-toast"></div>
   </div>
 
-  <script src="app.js?v=10.0"></script>
+  <script src="app.js?v=11.0"></script>
 </body>
 </html>
 

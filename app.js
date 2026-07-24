@@ -200,7 +200,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   ];
 
-  let selectedProblemTitle = "";
+  const selectedProblemsSet = new Set();
+
+  function toggleProblemSelection(title) {
+    if (selectedProblemsSet.has(title)) {
+      selectedProblemsSet.delete(title);
+    } else {
+      selectedProblemsSet.add(title);
+    }
+  }
 
   function renderServicesAccordion(filterQuery = "") {
     const container = document.getElementById("services-list");
@@ -224,20 +232,25 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      container.innerHTML = matched.map(m => `
-        <div class="service-card glass-card">
-          <div class="service-info">
-            <span class="service-icon">🔍</span>
-            <div>
-              <div class="service-title">${m.title}</div>
-              <div class="service-price">${m.price} (${m.catTitle})</div>
+      container.innerHTML = matched.map(m => {
+        const isChecked = selectedProblemsSet.has(m.title);
+        return `
+          <div class="service-card glass-card ${isChecked ? 'selected' : ''}">
+            <div class="service-info">
+              <input type="checkbox" class="subservice-checkbox" ${isChecked ? 'checked' : ''} data-title="${m.title}" />
+              <div>
+                <div class="service-title">${m.title}</div>
+                <div class="service-price">${m.price} (${m.catTitle})</div>
+              </div>
             </div>
+            <button class="service-action-btn select-subservice-btn" data-title="${m.title}">
+              ${isChecked ? '✓ Выбрано' : '+ Выбрать'}
+            </button>
           </div>
-          <button class="service-action-btn select-subservice-btn" data-title="${m.title}">Записаться</button>
-        </div>
-      `).join("");
+        `;
+      }).join("");
     } else {
-      // Accordion Categories View
+      // Accordion Categories View with Multi-Select Checkboxes
       container.innerHTML = SERVICE_CATEGORIES.map(cat => `
         <div class="accordion-category glass-card">
           <div class="accordion-header">
@@ -245,12 +258,18 @@ document.addEventListener("DOMContentLoaded", () => {
             <span class="accordion-arrow">▼</span>
           </div>
           <div class="accordion-body">
-            ${cat.items.map(item => `
-              <div class="subservice-item" data-title="${item.title}">
-                <span class="subservice-title">${item.title}</span>
-                <span class="subservice-price">${item.price}</span>
-              </div>
-            `).join("")}
+            ${cat.items.map(item => {
+              const isChecked = selectedProblemsSet.has(item.title);
+              return `
+                <div class="subservice-item ${isChecked ? 'selected' : ''}" data-title="${item.title}">
+                  <label class="subservice-checkbox-label" onclick="event.stopPropagation();">
+                    <input type="checkbox" class="subservice-checkbox" ${isChecked ? 'checked' : ''} data-title="${item.title}" />
+                    <span class="subservice-title">${item.title}</span>
+                  </label>
+                  <span class="subservice-price">${item.price}</span>
+                </div>
+              `;
+            }).join("")}
           </div>
         </div>
       `).join("");
@@ -264,22 +283,21 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Bind Subservice Select Handlers
-    container.querySelectorAll(".subservice-item, .select-subservice-btn").forEach(el => {
+    // Bind Subservice Checkbox & Item Selection Handlers
+    container.querySelectorAll(".subservice-item, .subservice-checkbox, .select-subservice-btn").forEach(el => {
       el.addEventListener("click", (e) => {
         const title = el.dataset.title || el.closest("[data-title]")?.dataset.title;
         if (title) {
-          selectedProblemTitle = title;
-          const customProblemInput = document.getElementById("custom-problem");
-          if (customProblemInput) customProblemInput.value = title;
-          switchTab("booking");
-          goToStep(2);
+          toggleProblemSelection(title);
+          renderServicesAccordion(filterQuery);
+          renderWizardPills();
         }
       });
     });
   }
 
   renderServicesAccordion();
+
 
   // Search Inputs Setup
   const serviceSearchInput = document.getElementById("service-search-input");
@@ -572,22 +590,40 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Phone Edit Pencil Handler
+  const editPhoneBtn = document.getElementById("edit-phone-btn");
+  const phoneInput = document.getElementById("phone-number");
+  const phoneHint = document.getElementById("phone-hint");
+
+  if (editPhoneBtn && phoneInput) {
+    editPhoneBtn.addEventListener("click", () => {
+      phoneInput.removeAttribute("readonly");
+      phoneInput.focus();
+      phoneInput.select();
+      if (phoneHint) {
+        phoneHint.textContent = "✏️ Режим редактирования. Введите нужный номер.";
+        phoneHint.style.color = "#38bdf8";
+      }
+      showToast("✏️ Вы можете изменить номер телефона");
+    });
+  }
+
   if (toStep2Btn) {
     toStep2Btn.addEventListener("click", () => {
-      let problem = selectedProblemTitle;
-      if (!problem) {
-        if (selectedCategory === "cat_custom") {
-          problem = document.getElementById("custom-problem").value.trim();
-        } else {
-          const categoryLabels = {
-            cat_engine: "🔧 Двигатель и выхлопная система",
-            cat_chassis: "🛞 Подвеска и тормозная система",
-            cat_electric: "⚡ Электрика и автоэлектроника",
-            cat_to: "🛢 Регулярное ТО и масляный сервис",
-            cat_climate: "❄️ Климат и кондиционер"
-          };
-          problem = categoryLabels[selectedCategory] || "Общий ремонт";
-        }
+      let problem = "";
+      if (selectedProblemsSet.size > 0) {
+        problem = Array.from(selectedProblemsSet).join(", ");
+      } else if (selectedCategory === "cat_custom") {
+        problem = document.getElementById("custom-problem").value.trim();
+      } else {
+        const categoryLabels = {
+          cat_engine: "🔧 Двигатель и выхлопная система",
+          cat_chassis: "🛞 Подвеска и тормозная система",
+          cat_electric: "⚡ Электрика и автоэлектроника",
+          cat_to: "🛢 Регулярное ТО и масляный сервис",
+          cat_climate: "❄️ Климат и кондиционер"
+        };
+        problem = categoryLabels[selectedCategory] || "Общий ремонт";
       }
 
       if (!problem) {
@@ -630,21 +666,22 @@ document.addEventListener("DOMContentLoaded", () => {
   bookingForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    let problem = selectedProblemTitle;
-    if (!problem) {
-      if (selectedCategory === "cat_custom") {
-        problem = document.getElementById("custom-problem").value.trim();
-      } else {
-        const categoryLabels = {
-          cat_engine: "🔧 Двигатель и выхлопная система",
-          cat_chassis: "🛞 Подвеска и тормозная система",
-          cat_electric: "⚡ Электрика и автоэлектроника",
-          cat_to: "🛢 Регулярное ТО и масляный сервис",
-          cat_climate: "❄️ Климат и кондиционер"
-        };
-        problem = categoryLabels[selectedCategory] || "Общий ремонт";
-      }
+    let problem = "";
+    if (selectedProblemsSet.size > 0) {
+      problem = Array.from(selectedProblemsSet).join(", ");
+    } else if (selectedCategory === "cat_custom") {
+      problem = document.getElementById("custom-problem").value.trim();
+    } else {
+      const categoryLabels = {
+        cat_engine: "🔧 Двигатель и выхлопная система",
+        cat_chassis: "🛞 Подвеска и тормозная система",
+        cat_electric: "⚡ Электрика и автоэлектроника",
+        cat_to: "🛢 Регулярное ТО и масляный сервис",
+        cat_climate: "❄️ Климат и кондиционер"
+      };
+      problem = categoryLabels[selectedCategory] || "Общий ремонт";
     }
+
 
     const carModel = document.getElementById("car-model").value.trim();
     const carNumber = document.getElementById("car-number") ? document.getElementById("car-number").value.trim().toUpperCase() : "";
@@ -698,13 +735,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (res.ok && data.success) {
         showToast(`🎉 Заявка №${data.booking_id} успешно создана!`);
         bookingForm.reset();
-        selectedProblemTitle = "";
+        selectedProblemsSet.clear();
+        renderServicesAccordion();
         renderWizardPills();
         goToStep(1);
         setTimeout(() => {
           switchTab("profile");
         }, 1200);
       } else {
+
         showToast("⚠️ " + (data.error || "Ошибка создания записи"));
       }
     } catch (err) {

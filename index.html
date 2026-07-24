@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=13.0" />
+  <link rel="stylesheet" href="style.css?v=14.0" />
 </head>
 <body>
   <div id="app">
@@ -31,9 +31,9 @@
 
     <!-- Main Content Area -->
     <main class="content">
-      <!-- 🏠 Tab: Home (Главная страница - Приветствие и 4 квадратные карточки цен) -->
+
+      <!-- 🏠 Tab: Home -->
       <section id="tab-home" class="tab-content active">
-        <!-- Hero Action Card -->
         <div class="home-hero-card glass-card">
           <div class="hero-badge">⚡ Профессиональный Автосервис</div>
           <h2>Приветствуем в Автосервис.Pro!</h2>
@@ -102,21 +102,23 @@
         </div>
 
         <form id="booking-form" class="booking-form glass-card">
-          <!-- 🔹 Step 1: Category & Problem -->
+
+          <!-- 🔹 Step 1: Category accordion with multi-select checkboxes -->
           <div class="wizard-step-content active" id="form-step-1">
             <div class="form-group">
               <label class="form-label">Шаг 1: Выберите услугу или проблему:</label>
-              <!-- Search inside Wizard Step 1 -->
+              <!-- Search -->
               <div class="search-box-wrapper wizard-search">
                 <span class="search-icon">🔍</span>
                 <input type="text" id="wizard-search-input" class="glass-input search-input" placeholder="Поиск услуги (напр. ГРМ, диагност, фильтр)..." />
               </div>
-              <div class="pills-grid" id="category-pills">
-                <!-- Accordions / Pills rendered via JS -->
+              <!-- Accordion categories rendered here by JS -->
+              <div id="category-pills" class="category-accordion-container">
+                <!-- JS renders accordion items here -->
               </div>
             </div>
 
-            <!-- Custom problem input -->
+            <!-- Custom problem input (shown when user selects "написать свою проблему") -->
             <div class="form-group hidden" id="custom-problem-group">
               <label class="form-label" for="custom-problem">Описание проблемы:</label>
               <input type="text" id="custom-problem" class="form-input glass-input" placeholder="Например: Стучит подвеска справа..." />
@@ -163,14 +165,14 @@
               </div>
             </div>
 
-            <!-- Phone number with Edit pencil icon -->
+            <!-- Phone number with Edit pencil icon — NO hint text -->
             <div class="form-group">
-              <label class="form-label" for="phone-number">Ваш телефон для связи:</label>
               <div class="phone-input-wrapper">
                 <input type="tel" id="phone-number" class="form-input glass-input" placeholder="+7 (999) 000-00-00" readonly required />
                 <button type="button" id="edit-phone-btn" class="edit-phone-btn" title="Нажмите, чтобы изменить номер">
                   ✏️
-                </button>              <small class="form-hint" id="phone-hint">Номер автозаполнен из Telegram. Нажмите ✏️, если нужно указать другой номер.</small>
+                </button>
+              </div>
             </div>
 
             <!-- Total Estimated Price Badge -->
@@ -179,10 +181,10 @@
               <span class="total-price-value" id="total-price-val">от 0 ₽</span>
             </div>
 
-            <!-- Privacy Policy Checkbox -->
+            <!-- Privacy Policy Checkbox (UNCHECKED by default) -->
             <div class="form-group privacy-group">
               <label class="privacy-label">
-                <input type="checkbox" id="privacy-agree" class="privacy-checkbox" required />
+                <input type="checkbox" id="privacy-agree" class="privacy-checkbox" />
                 <span>Я согласен с <a href="#" id="privacy-link" class="privacy-link">Политикой конфиденциальности</a></span>
               </label>
             </div>
@@ -196,11 +198,12 @@
               </button>
             </div>
           </div>
+
         </form>
       </section>
 
-
-      <!-- 👤 Tab: Profile -->
+      <!-- 👤 Tab: Profile & History -->
+      <!-- Admin button is ONLY here, ONLY for approved admins -->
       <section id="tab-profile" class="tab-content">
         <div class="profile-card glass-card">
           <div class="profile-header">
@@ -210,6 +213,15 @@
               <p id="profile-phone">Телефон: Не указан</p>
             </div>
           </div>
+
+          <div class="stats-grid">
+            <div class="stat-card glass-stat">
+              <span class="stat-val" id="stat-active">0</span>
+              <span class="stat-lbl">Активных</span>
+            </div>
+            <div class="stat-card glass-stat">
+              <span class="stat-val" id="stat-total">0</span>
+              <span class="stat-lbl">Всего записей</span>
             </div>
             <div class="stat-card glass-stat">
               <span class="stat-val" id="stat-cancelled">0</span>
@@ -217,7 +229,7 @@
             </div>
           </div>
 
-          <!-- Admin Button inside Profile (Visible ONLY to Admins) -->
+          <!-- Admin Button inside Profile ONLY (hidden until admin check confirms) -->
           <button id="admin-profile-btn" class="admin-profile-btn glow-btn hidden">
             <span>🛡 Панель модератора</span>
           </button>
@@ -233,7 +245,7 @@
         </div>
       </section>
 
-      <!-- 🛡 Tab: Admin Moderation (Opened via Profile for admins) -->
+      <!-- 🛡 Tab: Admin Moderation (accessed via Profile → admin button) -->
       <section id="tab-admin" class="tab-content">
         <div class="section-hero glass-card admin-hero">
           <div class="hero-badge admin-badge">🛡 Панель Модератора</div>
@@ -273,9 +285,10 @@
           </div>
         </div>
       </section>
+
     </main>
 
-    <!-- Floating Glass Navbar WITH STRICTLY 3 BUTTONS (Home | Center Booking | Profile) -->
+    <!-- Floating Glass Navbar: 3 buttons only (Home | Booking | Profile) -->
     <nav class="floating-navbar glass-navbar" id="main-nav">
       <button class="nav-item active" data-tab="home">
         <span class="nav-icon">
@@ -284,7 +297,7 @@
         <span class="nav-label">Главная</span>
       </button>
 
-      <!-- Center Main Action Button (Strictly Centered Glow Circle) -->
+      <!-- Center Main Action Button -->
       <button class="nav-item nav-item-main" data-tab="booking">
         <div class="nav-main-circle">
           <svg class="nav-svg-main" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="12" y1="14" x2="12" y2="18"></line><line x1="10" y1="16" x2="14" y2="16"></line></svg>
@@ -337,6 +350,6 @@
     <div id="toast" class="toast hidden glass-toast"></div>
   </div>
 
-  <script src="app.js?v=13.0"></script>
+  <script src="app.js?v=14.0"></script>
 </body>
 </html>

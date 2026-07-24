@@ -364,6 +364,8 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
+  } // end renderServicesAccordion
+
   renderCategoryAccordion();
 
   // Wizard Step 1 Accordion + Search Setup

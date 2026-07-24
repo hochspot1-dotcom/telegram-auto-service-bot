@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=10.0" />
+  <link rel="stylesheet" href="style.css?v=12.0" />
 </head>
 <body>
   <div id="app">
@@ -31,54 +31,56 @@
 
     <!-- Main Content Area -->
     <main class="content">
-      <!-- 🏠 Tab: Home (Главная страница) -->
+      <!-- 🏠 Tab: Home (Главная страница - Приветствие и карточки цен) -->
       <section id="tab-home" class="tab-content active">
         <!-- Hero Action Card -->
         <div class="home-hero-card glass-card">
           <div class="hero-badge">⚡ Профессиональный Автосервис</div>
-          <h2>Качественный ремонт и ТО вашего авто</h2>
-          <p>Запишитесь на свободное время за 3 простых шага без очередей и переплат.</p>
+          <h2>Приветствуем в Автосервис.Pro!</h2>
+          <p>Быстрая и удобная запись на ремонт и ТО без очередей. Выберите удобный день и время за пару кликов.</p>
           <button class="home-cta-btn glow-btn" id="home-start-booking-btn">
             <span>🚀 Записаться на обслуживание ➔</span>
           </button>
         </div>
 
-        <!-- Quick Categories Grid -->
+        <!-- Static Popular Services Cards -->
         <div class="home-section-title">
-          <h3>🔧 Направления ремонта</h3>
-        </div>
-        <div class="home-cats-grid">
-          <div class="home-cat-card glass-card" data-cat="cat_engine">
-            <span class="cat-card-icon">🔧</span>
-            <span class="cat-card-title">Двигатель</span>
-          </div>
-          <div class="home-cat-card glass-card" data-cat="cat_chassis">
-            <span class="cat-card-icon">🛞</span>
-            <span class="cat-card-title">Подвеска</span>
-          </div>
-          <div class="home-cat-card glass-card" data-cat="cat_electric">
-            <span class="cat-card-icon">⚡</span>
-            <span class="cat-card-title">Электрика</span>
-          </div>
-          <div class="home-cat-card glass-card" data-cat="cat_to">
-            <span class="cat-card-icon">🛢</span>
-            <span class="cat-card-title">ТО и Масла</span>
-          </div>
+          <h3>💡 Популярные услуги и стоимость</h3>
         </div>
 
-        <!-- Services Preview List -->
-        <div class="home-section-title">
-          <h3>⚡ Популярные услуги и цены</h3>
-        </div>
-        <!-- Search Bar -->
-        <div class="search-box-wrapper glass-card">
-          <span class="search-icon">🔍</span>
-          <input type="text" id="service-search-input" class="glass-input search-input" placeholder="Поиск проблемы (напр. масло, тормоза, свечи, кондиционер)..." />
-        </div>
-        <div class="services-grid" id="services-list">
-          <!-- Rendered via JS -->
+        <div class="static-services-grid">
+          <div class="static-service-card glass-card">
+            <div class="static-service-info">
+              <span class="static-service-icon">⚡</span>
+              <div>
+                <div class="static-service-title">Компьютерная диагностика</div>
+                <div class="static-service-price">от 1 000 ₽</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="static-service-card glass-card">
+            <div class="static-service-info">
+              <span class="static-service-icon">🛢</span>
+              <div>
+                <div class="static-service-title">Замена масла и фильтров</div>
+                <div class="static-service-price">от 1 500 ₽</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="static-service-card glass-card">
+            <div class="static-service-info">
+              <span class="static-service-icon">🛞</span>
+              <div>
+                <div class="static-service-title">Диагностика ходовой части</div>
+                <div class="static-service-price">от 1 000 ₽</div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
+
 
       <!-- 📅 Tab: Booking -->
       <section id="tab-booking" class="tab-content">

@@ -58,6 +58,13 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentAdminFilter = "all";
   let pendingAdminAction = null;
 
+  // Auto-fill phone from Telegram on load
+  const tgPhone = tg?.initDataUnsafe?.user?.phone_number || "";
+  const phoneInputEl = document.getElementById("phone-number");
+  if (tgPhone && phoneInputEl) {
+    phoneInputEl.value = "+" + tgPhone.replace(/\D/g, "");
+  }
+
   async function checkAdminStatus() {
     if (!BACKEND_URL) return;
     try {
@@ -65,6 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       if (data.is_admin) {
         isAdmin = true;
+        // Show admin button ONLY inside Profile tab
         const adminProfileBtn = document.getElementById("admin-profile-btn");
         if (adminProfileBtn) {
           adminProfileBtn.classList.remove("hidden");
@@ -241,7 +249,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   function renderServicesAccordion(filterQuery = "") {
-    const container = document.getElementById("services-list");
+    const container = document.getElementById("category-pills");
     if (!container) return;
 
     const query = filterQuery.toLowerCase().trim();
@@ -342,78 +350,126 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Wizard Step 1 Pills & Search Setup
+  // Wizard Step 1 Accordion + Search Setup
   const wizardSearchInput = document.getElementById("wizard-search-input");
-  const categoryPills = document.getElementById("category-pills");
   const customProblemGroup = document.getElementById("custom-problem-group");
-  let selectedCategory = "cat_engine";
+  let selectedCategory = "";
 
-  function renderWizardPills(filterQuery = "") {
-    if (!categoryPills) return;
+  // Renders accordion categories with multi-select checkboxes into #category-pills
+  // If filterQuery is set, shows flat search results instead
+  function renderCategoryAccordion(filterQuery = "") {
+    const container = document.getElementById("category-pills");
+    if (!container) return;
     const query = filterQuery.toLowerCase().trim();
 
     if (query) {
-      const matchedItems = [];
+      // Search results view (flat list with checkboxes)
+      const matched = [];
       SERVICE_CATEGORIES.forEach(cat => {
         cat.items.forEach(item => {
-          if (item.title.toLowerCase().includes(query)) {
-            matchedItems.push(item);
+          if (item.title.toLowerCase().includes(query) || cat.title.toLowerCase().includes(query)) {
+            matched.push({ ...item, catTitle: cat.title });
           }
         });
       });
 
-      if (matchedItems.length === 0) {
-        categoryPills.innerHTML = `<div style="font-size: 13px; color: var(--text-muted); padding: 8px;">Не найдено совпадающих услуг. Перейдите к ручному вводу.</div>`;
+      if (matched.length === 0) {
+        container.innerHTML = `<div class="info-card glass-card"><p style="text-align:center;color:var(--text-muted);">По запросу «${filterQuery}» ничего не найдено.</p></div>`;
         return;
       }
 
-      categoryPills.innerHTML = matchedItems.map(item => `
-        <div class="pill wizard-subservice-pill" data-title="${item.title}">
-          <span class="pill-icon">🔹</span> ${item.title} (${item.price})
+      container.innerHTML = matched.map(m => {
+        const isChecked = selectedProblemsSet.has(m.title);
+        return `
+          <div class="subservice-item ${isChecked ? 'selected' : ''}" data-title="${m.title}">
+            <label class="subservice-checkbox-label" onclick="event.stopPropagation();">
+              <input type="checkbox" class="subservice-checkbox" ${isChecked ? 'checked' : ''} data-title="${m.title}" />
+              <span class="subservice-title">${m.title}</span>
+            </label>
+            <span class="subservice-price">${m.price}</span>
+          </div>
+        `;
+      }).join("");
+    } else {
+      // Accordion categories view
+      container.innerHTML = SERVICE_CATEGORIES.map(cat => `
+        <div class="accordion-category glass-card" data-cat-id="${cat.id}">
+          <div class="accordion-header">
+            <span>${cat.title}</span>
+            <span class="accordion-arrow">▼</span>
+          </div>
+          <div class="accordion-body">
+            ${cat.items.map(item => {
+              const isChecked = selectedProblemsSet.has(item.title);
+              return `
+                <div class="subservice-item ${isChecked ? 'selected' : ''}" data-title="${item.title}">
+                  <label class="subservice-checkbox-label" onclick="event.stopPropagation();">
+                    <input type="checkbox" class="subservice-checkbox" ${isChecked ? 'checked' : ''} data-title="${item.title}" />
+                    <span class="subservice-title">${item.title}</span>
+                  </label>
+                  <span class="subservice-price">${item.price}</span>
+                </div>
+              `;
+            }).join('')}
+            <div class="subservice-item" data-cat-custom="${cat.id}">
+              <label class="subservice-checkbox-label" onclick="event.stopPropagation();">
+                <input type="checkbox" class="subservice-checkbox cat-custom-check" data-cat="${cat.id}" />
+                <span class="subservice-title">✏️ Другая проблема (написать вручную)</span>
+              </label>
+            </div>
+          </div>
         </div>
       `).join("");
-
-      categoryPills.querySelectorAll(".wizard-subservice-pill").forEach(p => {
-        p.addEventListener("click", () => {
-          selectedProblemTitle = p.dataset.title;
-          const customProblemInput = document.getElementById("custom-problem");
-          if (customProblemInput) customProblemInput.value = selectedProblemTitle;
-          goToStep(2);
-        });
-      });
-    } else {
-      categoryPills.innerHTML = `
-        <div class="pill active" data-value="cat_engine"><span class="pill-icon">🔧</span> Двигатель и выхлоп</div>
-        <div class="pill" data-value="cat_chassis"><span class="pill-icon">🛞</span> Подвеска и тормоза</div>
-        <div class="pill" data-value="cat_electric"><span class="pill-icon">⚡</span> Электрика и диагностика</div>
-        <div class="pill" data-value="cat_to"><span class="pill-icon">🛢</span> Регулярное ТО</div>
-        <div class="pill" data-value="cat_climate"><span class="pill-icon">❄️</span> Климат и кондиционер</div>
-        <div class="pill" data-value="cat_custom"><span class="pill-icon">✏️</span> Написать свою проблему</div>
-      `;
-
-      categoryPills.querySelectorAll(".pill").forEach(pill => {
-        pill.addEventListener("click", () => {
-          categoryPills.querySelectorAll(".pill").forEach(p => p.classList.remove("active"));
-          pill.classList.add("active");
-          selectedCategory = pill.dataset.value;
-
-          if (selectedCategory === "cat_custom") {
-            customProblemGroup.classList.remove("hidden");
-            selectedProblemTitle = "";
-          } else {
-            customProblemGroup.classList.add("hidden");
-            selectedProblemTitle = "";
-          }
-        });
-      });
     }
+
+    // Bind accordion header toggles
+    container.querySelectorAll(".accordion-header").forEach(header => {
+      header.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const parent = header.parentElement;
+        parent.classList.toggle("open");
+        const arrow = header.querySelector(".accordion-arrow");
+        if (arrow) arrow.textContent = parent.classList.contains("open") ? "▲" : "▼";
+      });
+    });
+
+    // Bind subservice item clicks (toggle checkbox without closing accordion)
+    container.querySelectorAll(".subservice-item").forEach(itemEl => {
+      if (itemEl.dataset.catCustom) {
+        // "write own problem" option
+        itemEl.addEventListener("click", (e) => {
+          e.stopPropagation();
+          selectedCategory = "cat_custom";
+          if (customProblemGroup) customProblemGroup.classList.remove("hidden");
+          const cb = itemEl.querySelector(".subservice-checkbox");
+          if (cb) cb.checked = true;
+        });
+        return;
+      }
+
+      itemEl.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const title = itemEl.dataset.title;
+        if (title) {
+          toggleProblemSelection(title);
+          const checkbox = itemEl.querySelector(".subservice-checkbox");
+          const isChecked = selectedProblemsSet.has(title);
+          if (checkbox) checkbox.checked = isChecked;
+          itemEl.classList.toggle("selected", isChecked);
+          // Hide custom problem group if user is picking from list
+          if (customProblemGroup && !customProblemGroup.classList.contains("hidden")) {
+            customProblemGroup.classList.add("hidden");
+          }
+        }
+      });
+    });
   }
 
-  renderWizardPills();
+  renderCategoryAccordion();
 
   if (wizardSearchInput) {
     wizardSearchInput.addEventListener("input", (e) => {
-      renderWizardPills(e.target.value);
+      renderCategoryAccordion(e.target.value);
     });
   }
 
@@ -511,7 +567,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("stat-cancelled").textContent = data.stats.cancelled || 0;
       document.getElementById("profile-phone").textContent = `Телефон: ${data.stats.phone || 'Не указан'}`;
 
-      // Auto-fill phone and car_number in booking form
+      // Auto-fill phone from profile if not yet set
       if (data.stats.phone && data.stats.phone !== "Не указан") {
         const phoneInput = document.getElementById("phone-number");
         if (phoneInput && !phoneInput.value) {
@@ -771,8 +827,7 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast(`🎉 Заявка №${data.booking_id} успешно создана!`);
         bookingForm.reset();
         selectedProblemsSet.clear();
-        renderServicesAccordion();
-        renderWizardPills();
+        renderCategoryAccordion();
         goToStep(1);
         setTimeout(() => {
           switchTab("profile");

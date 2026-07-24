@@ -27,7 +27,7 @@ async def handle_static(request: web.Request):
         return web.FileResponse(filepath)
     return web.HTTPNotFound()
 
-@routes.get("/{filename:(?:style\.css|app\.js|favicon\.ico)}")
+@routes.get(r"/{filename:(?:style\.css|app\.js|favicon\.ico)}")
 async def handle_root_assets(request: web.Request):
     filename = request.match_info["filename"]
     filepath = os.path.join(os.path.dirname(__file__), "webapp", filename)
@@ -144,10 +144,6 @@ async def handle_create_booking(request: web.Request):
                 f"• <b>Телефон:</b> {phone}\n"
                 f"• <b>Автомобиль:</b> {formatted_car}\n"
                 f"{car_num_str}"
-                f"• <b>Услуга:</b> {problem}\n"
-                f"• <b>Дата и время:</b> {slot}\n"
-            )
-
                 f"• <b>Услуга:</b> {problem}\n"
                 f"• <b>Дата и время:</b> {slot}\n"
             )

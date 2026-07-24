@@ -275,25 +275,30 @@ document.addEventListener("DOMContentLoaded", () => {
       `).join("");
     }
 
-    // Bind Accordion Click Handlers
+    // Bind Accordion Header Click Handlers
     container.querySelectorAll(".accordion-header").forEach(header => {
-      header.addEventListener("click", () => {
+      header.addEventListener("click", (e) => {
+        e.stopPropagation();
         const parent = header.parentElement;
         parent.classList.toggle("open");
       });
     });
 
-    // Bind Subservice Checkbox & Item Selection Handlers
-    container.querySelectorAll(".subservice-item, .subservice-checkbox, .select-subservice-btn").forEach(el => {
-      el.addEventListener("click", (e) => {
-        const title = el.dataset.title || el.closest("[data-title]")?.dataset.title;
+    // Bind Subservice Checkbox Handlers WITHOUT closing accordion!
+    container.querySelectorAll(".subservice-item").forEach(itemEl => {
+      itemEl.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const title = itemEl.dataset.title;
         if (title) {
           toggleProblemSelection(title);
-          renderServicesAccordion(filterQuery);
-          renderWizardPills();
+          const checkbox = itemEl.querySelector(".subservice-checkbox");
+          const isChecked = selectedProblemsSet.has(title);
+          if (checkbox) checkbox.checked = isChecked;
+          itemEl.classList.toggle("selected", isChecked);
         }
       });
     });
+
   }
 
   renderServicesAccordion();

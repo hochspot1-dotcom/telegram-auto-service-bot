@@ -739,3 +739,175 @@ body {
   text-align: center;
   max-width: 90%;
 }
+
+/* ==========================================
+   ADMIN / MODERATION PANEL STYLES
+   ========================================== */
+
+/* 5-column layout for nav tabs when admin tab is visible */
+.nav-tabs:has(#admin-tab-btn:not(.hidden)) {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.admin-hero {
+  border-color: rgba(59, 130, 246, 0.35);
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+}
+
+.admin-badge {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #60a5fa;
+}
+
+.admin-filters-bar {
+  margin-bottom: 4px;
+}
+
+.admin-card {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-left: 3px solid #3b82f6;
+}
+
+.admin-card.pending {
+  border-left-color: #f59e0b;
+}
+
+.admin-card.approved {
+  border-left-color: #10b981;
+}
+
+.admin-card.rejected {
+  border-left-color: #ef4444;
+}
+
+.admin-card-user {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.admin-btn {
+  padding: 9px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.admin-btn:active {
+  transform: scale(0.96);
+}
+
+.admin-btn-approve {
+  background: rgba(16, 185, 129, 0.16);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.admin-btn-approve:active {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.admin-btn-reject {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.admin-btn-reject:active {
+  background: #f59e0b;
+  color: #ffffff;
+}
+
+.admin-btn-delete {
+  grid-column: span 2;
+  background: rgba(239, 68, 68, 0.14);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.admin-btn-delete:active {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(17, 24, 39, 0.95);
+}
+
+.modal-textarea {
+  resize: none;
+  font-family: inherit;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.modal-btn {
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: var(--transition-fast);
+}
+
+.modal-btn.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-color);
+}
+
+.modal-btn.btn-primary {
+  background: var(--accent-gradient);
+  color: #ffffff;
+  box-shadow: var(--accent-glow);
+}
+

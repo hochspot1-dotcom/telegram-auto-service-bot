@@ -972,6 +972,10 @@ async def adm_comment_received(message: types.Message, state: FSMContext, bot: B
         try:
             fake_msg = await bot.send_message(message.chat.id, "Обработка...", reply_markup=types.ReplyKeyboardRemove())
             fake_msg.message_id = admin_msg_id
+            fake_cb = FakeCallback(fake_msg)
+        except Exception:
+            pass
+
     await process_moderator_decision(bot, booking_id, new_status=new_status, comment=comment_text, callback=fake_cb)
 
 # Обработка кнопки "Перенести запись" от клиента

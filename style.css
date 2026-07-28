@@ -773,16 +773,31 @@ body {
   border: 1px solid var(--glass-border);
   background: var(--glass-1);
   cursor: pointer;
-  transition: all var(--fast) var(--ease);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  will-change: transform;
 }
 
 .master-card:hover {
   background: var(--glass-2);
+  transform: translateY(-2px);
+  border-color: rgba(249, 115, 22, 0.3);
+}
+
+.master-card:active {
+  transform: scale(0.97);
 }
 
 .master-card.selected {
   background: rgba(249, 115, 22, 0.14);
   border-color: var(--accent);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4), 0 0 14px rgba(249, 115, 22, 0.25);
+  animation: popSelect 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes popSelect {
+  0%   { transform: scale(0.96); }
+  50%  { transform: scale(1.02); }
+  100% { transform: scale(1); }
 }
 
 .master-avatar {
@@ -939,6 +954,16 @@ body {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 4px;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.cal-days-grid.flip {
+  animation: calFlip 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes calFlip {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 .cal-day {
@@ -951,8 +976,13 @@ body {
   color: var(--text-primary);
   border-radius: 10px;
   cursor: pointer;
-  transition: all var(--fast) var(--ease);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s ease, border-color 0.15s ease;
   border: 1px solid transparent;
+  will-change: transform;
+}
+
+.cal-day:active:not(.past):not(.empty) {
+  transform: scale(0.90);
 }
 
 .cal-day.empty {
@@ -979,6 +1009,13 @@ body {
   font-weight: 900;
   box-shadow: var(--accent-glow-sm);
   border-color: transparent;
+  animation: dayPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes dayPop {
+  0%   { transform: scale(0.88); }
+  60%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
 }
 
 .cal-day:hover:not(.past):not(.empty):not(.selected) {
@@ -1047,11 +1084,16 @@ body {
   color: var(--text-second);
   text-align: center;
   cursor: pointer;
-  transition: all var(--fast) var(--ease);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.15s ease, background 0.15s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 4px;
+  will-change: transform;
+}
+
+.slot-item:active:not(.busy) {
+  transform: scale(0.94);
 }
 
 .slot-item.busy {
@@ -1068,6 +1110,14 @@ body {
   border-color: var(--accent);
   color: var(--accent);
   font-weight: 800;
+  box-shadow: var(--accent-glow-sm);
+  animation: slotPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes slotPop {
+  0%   { transform: scale(0.92); }
+  60%  { transform: scale(1.04); }
+  100% { transform: scale(1); }
 }
 
 /* ── Phone Input Row ─────────────────────────────────────── */

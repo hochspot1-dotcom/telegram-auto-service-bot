@@ -8,11 +8,11 @@
   --bg-deep:       #06080e;
   --bg-layer:      #0b0e17;
 
-  /* High contrast glass surfaces */
-  --glass-1:       rgba(16, 22, 34, 0.75);
-  --glass-2:       rgba(24, 32, 48, 0.88);
-  --glass-3:       rgba(34, 44, 66, 0.95);
-  --glass-border:  rgba(255, 255, 255, 0.15);
+  /* Translucent frosted glass surfaces */
+  --glass-1:       rgba(255, 255, 255, 0.05);
+  --glass-2:       rgba(255, 255, 255, 0.09);
+  --glass-3:       rgba(255, 255, 255, 0.14);
+  --glass-border:  rgba(255, 255, 255, 0.12);
   --glass-border-accent: rgba(249, 115, 22, 0.45);
 
   /* Accents — Electric Orange + Steel Blue */
@@ -100,18 +100,18 @@ body {
 }
 
 /* ── Glass Card Base ────────────────────────────────────── */
-/* Lightweight glass card with high contrast border & top highlight */
+/* Lightweight translucent glass card */
 .glass-card {
   background: var(--glass-1);
   border: 1px solid var(--glass-border);
   border-radius: var(--r-lg);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
   transition: border-color var(--fast) var(--ease), transform var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
 }
 
 .glass-card:hover {
   border-color: rgba(249, 115, 22, 0.35);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
 }
 
 /* Heavy glass (blur) — only on key surfaces */
@@ -328,9 +328,8 @@ body {
   justify-content: flex-end;
   position: relative;
   overflow: hidden;
-  background: var(--glass-2);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  background: var(--glass-1);
+  border: 1px solid var(--glass-border);
 }
 
 .home-square-card:hover {

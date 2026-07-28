@@ -538,59 +538,115 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
-  // Time Slots Loading
+  // Masters Dataset & Time Slots Loading
+  const MASTERS_DATA = [
+    {
+      id: "master_any",
+      name: "🌟 Любой свободный мастер",
+      role: "Ближайшее доступное время",
+      avatar: "👨‍🔧",
+      badge: "⚡ Быстрый выбор",
+      slots: ["Завтра 10:00", "Завтра 12:00", "Завтра 14:00", "Завтра 16:00", "Послезавтра 11:00", "Послезавтра 15:00"]
+    },
+    {
+      id: "master_alexey",
+      name: "Алексей Смирнов",
+      role: "Старший механик (Двигатель и ТО)",
+      avatar: "👨‍🔧",
+      badge: "Опыт 12 лет",
+      slots: ["Завтра 10:00", "Завтра 14:00", "Послезавтра 11:00"]
+    },
+    {
+      id: "master_dmitry",
+      name: "Дмитрий Ковалев",
+      role: "Диагност-автоэлектрик",
+      avatar: "⚡",
+      badge: "Опыт 9 лет",
+      slots: ["Завтра 12:00", "Завтра 16:00", "Послезавтра 15:00"]
+    },
+    {
+      id: "master_igor",
+      name: "Игорь Соколов",
+      role: "Мастер по ходовой части",
+      avatar: "🛞",
+      badge: "Опыт 8 лет",
+      slots: ["Завтра 10:00", "Завтра 16:00", "Послезавтра 11:00", "Послезавтра 15:00"]
+    }
+  ];
+
+  let selectedMasterId = "master_any";
+  let selectedMasterName = "Любой свободный мастер";
   let selectedSlot = "";
 
-  async function loadSlots() {
-    const slotsContainer = document.getElementById("slots-container");
-    if (!slotsContainer) return;
+  function renderMasters() {
+    const container = document.getElementById("masters-container");
+    if (!container) return;
 
-    try {
-      const res = await fetch(`${BACKEND_URL}/api/slots`);
-      const data = await res.json();
-      renderSlots(data.slots);
-    } catch (e) {
-      // Fallback local slot generation
-      const fallbackSlots = generateFallbackSlots();
-      renderSlots(fallbackSlots);
-    }
-  }
+    container.innerHTML = MASTERS_DATA.map(m => {
+      const isSelected = m.id === selectedMasterId;
+      return `
+        <div class="master-card glass-card ${isSelected ? 'selected' : ''}" data-master-id="${m.id}">
+          <div class="master-avatar">${m.avatar}</div>
+          <div class="master-info">
+            <div class="master-name">${m.name}</div>
+            <div class="master-role">${m.role}</div>
+          </div>
+          <div class="master-badge">${m.badge}</div>
+        </div>
+      `;
+    }).join("");
 
-  function generateFallbackSlots() {
-    const daysRu = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
-    const slots = [];
-    const today = new Date();
-    for (let offset = 1; offset <= 3; offset++) {
-      const d = new Date(today);
-      d.setDate(today.getDate() + offset);
-      const dateStr = String(d.getDate()).padStart(2, '0') + '.' + String(d.getMonth() + 1).padStart(2, '0');
-      const dayName = daysRu[d.getDay() === 0 ? 6 : d.getDay() - 1];
-      ["10:00", "14:00", "17:00"].forEach(t => {
-        slots.push(`${dateStr} (${dayName}) в ${t}`);
+    container.querySelectorAll(".master-card").forEach(card => {
+      card.addEventListener("click", () => {
+        const id = card.dataset.masterId;
+        const master = MASTERS_DATA.find(m => m.id === id);
+        if (master) {
+          selectedMasterId = master.id;
+          selectedMasterName = master.name;
+          renderMasters();
+          renderSlotsForMaster(master);
+        }
       });
-    }
-    return slots;
+    });
   }
 
-  function renderSlots(slots) {
-    const slotsContainer = document.getElementById("slots-container");
-    if (!slotsContainer) return;
+  function renderSlotsForMaster(master) {
+    const container = document.getElementById("slots-container");
+    const label = document.getElementById("slots-header-label");
+    if (!container) return;
 
-    slotsContainer.innerHTML = slots.map((s, idx) => `
+    if (label) {
+      label.textContent = `Свободное время (${master.name}):`;
+    }
+
+    const slots = master.slots || [];
+    if (slots.length === 0) {
+      container.innerHTML = `<div class="info-card glass-card"><p style="text-align:center;">У данного мастера нет свободных окон на ближайшие дни.</p></div>`;
+      selectedSlot = "";
+      return;
+    }
+
+    selectedSlot = slots[0];
+
+    container.innerHTML = slots.map((s, idx) => `
       <div class="slot-item ${idx === 0 ? 'active' : ''}" data-slot="${s}">
         📅 ${s}
       </div>
     `).join("");
 
-    selectedSlot = slots[0] || "";
-
-    slotsContainer.querySelectorAll(".slot-item").forEach(item => {
+    container.querySelectorAll(".slot-item").forEach(item => {
       item.addEventListener("click", () => {
-        slotsContainer.querySelectorAll(".slot-item").forEach(i => i.classList.remove("active"));
+        container.querySelectorAll(".slot-item").forEach(i => i.classList.remove("active"));
         item.classList.add("active");
         selectedSlot = item.dataset.slot;
       });
     });
+  }
+
+  async function loadSlots() {
+    renderMasters();
+    const defaultMaster = MASTERS_DATA.find(m => m.id === selectedMasterId) || MASTERS_DATA[0];
+    renderSlotsForMaster(defaultMaster);
   }
 
   // User Profile loading
@@ -694,17 +750,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Multi-Step Wizard Logic
+  // Multi-Step Wizard Logic (4 steps)
   let currentStep = 1;
   const toStep2Btn = document.getElementById("to-step-2-btn");
   const toStep3Btn = document.getElementById("to-step-3-btn");
+  const toStep4Btn = document.getElementById("to-step-4-btn");
   const backToStep1Btn = document.getElementById("back-to-step-1-btn");
   const backToStep2Btn = document.getElementById("back-to-step-2-btn");
+  const backToStep3Btn = document.getElementById("back-to-step-3-btn");
 
   function goToStep(stepNum) {
     currentStep = stepNum;
 
-    for (let i = 1; i <= 3; i++) {
+    for (let i = 1; i <= 4; i++) {
       const ind = document.getElementById(`wizard-step-ind-${i}`);
       const content = document.getElementById(`form-step-${i}`);
 
@@ -717,6 +775,41 @@ document.addEventListener("DOMContentLoaded", () => {
         content.classList.toggle("hidden", i !== stepNum);
       }
     }
+
+    if (stepNum === 4) {
+      renderFinalBookingSummary();
+    }
+  }
+
+  function renderFinalBookingSummary() {
+    const summaryContainer = document.getElementById("final-booking-summary");
+    if (!summaryContainer) return;
+
+    const checkedProblems = Array.from(selectedProblemsSet);
+    const customProblems = Object.values(customCategoryInputs).map(v => v.trim()).filter(v => v.length > 0);
+    const allProblems = [...checkedProblems, ...customProblems];
+    const problemText = allProblems.length > 0 ? allProblems.join(", ") : "Не указано";
+    const carModel = document.getElementById("car-model") ? document.getElementById("car-model").value.trim() : "";
+    const carNumber = document.getElementById("car-number") ? document.getElementById("car-number").value.trim().toUpperCase() : "";
+
+    summaryContainer.innerHTML = `
+      <div class="summary-item">
+        <span class="summary-label">🛠 Выбранные работы:</span>
+        <span class="summary-val">${problemText}</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">👨‍🔧 Специалист:</span>
+        <span class="summary-val highlight">${selectedMasterName}</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">📅 Дата и время:</span>
+        <span class="summary-val highlight">${selectedSlot || "Не выбрано"}</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">🚗 Автомобиль:</span>
+        <span class="summary-val">${carModel || "Не указан"} ${carNumber ? `(${carNumber})` : ""}</span>
+      </div>
+    `;
   }
 
   // Phone Edit Pencil Handler
@@ -737,11 +830,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Step 1 -> Step 2
   if (toStep2Btn) {
     toStep2Btn.addEventListener("click", () => {
-      // Collect selected checkbox problems
       const checkedProblems = Array.from(selectedProblemsSet);
-      // Collect custom text inputs per category
       const customProblems = Object.values(customCategoryInputs).map(v => v.trim()).filter(v => v.length > 0);
       const allProblems = [...checkedProblems, ...customProblems];
 
@@ -758,6 +850,17 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       goToStep(2);
+    });
+  }
+
+  // Step 2 -> Step 3
+  if (toStep3Btn) {
+    toStep3Btn.addEventListener("click", () => {
+      if (!selectedSlot) {
+        showToast("⚠️ Пожалуйста, выберите удобное время записи!");
+        return;
+      }
+      goToStep(3);
       setTimeout(() => {
         const carInput = document.getElementById("car-model");
         if (carInput) carInput.focus();
@@ -765,8 +868,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if (toStep3Btn) {
-    toStep3Btn.addEventListener("click", () => {
+  // Step 3 -> Step 4
+  if (toStep4Btn) {
+    toStep4Btn.addEventListener("click", () => {
       const carModel = document.getElementById("car-model").value.trim();
       if (!carModel || carModel.length < 2) {
         showToast("⚠️ Пожалуйста, укажите марку и модель авто!");
@@ -774,17 +878,13 @@ document.addEventListener("DOMContentLoaded", () => {
         if (carInput) carInput.focus();
         return;
       }
-      goToStep(3);
+      goToStep(4);
     });
   }
 
-  if (backToStep1Btn) {
-    backToStep1Btn.addEventListener("click", () => goToStep(1));
-  }
-
-  if (backToStep2Btn) {
-    backToStep2Btn.addEventListener("click", () => goToStep(2));
-  }
+  if (backToStep1Btn) backToStep1Btn.addEventListener("click", () => goToStep(1));
+  if (backToStep2Btn) backToStep2Btn.addEventListener("click", () => goToStep(2));
+  if (backToStep3Btn) backToStep3Btn.addEventListener("click", () => goToStep(3));
 
   // Booking Form Submission
   const bookingForm = document.getElementById("booking-form");
@@ -849,7 +949,7 @@ document.addEventListener("DOMContentLoaded", () => {
           problem: problem,
           car_model: carModel,
           car_number: carNumber,
-          slot: selectedSlot,
+          slot: `${selectedSlot} (Мастер: ${selectedMasterName})`,
           phone: phone
         })
       });

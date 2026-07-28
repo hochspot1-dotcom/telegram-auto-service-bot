@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=17.0" />
+  <link rel="stylesheet" href="style.css?v=18.0" />
 </head>
 <body>
   <div id="app">
@@ -91,7 +91,7 @@
           <p>Пошаговое быстрое оформление заявки на ТО</p>
         </div>
 
-        <!-- Wizard Progress Bar -->
+        <!-- Wizard Progress Bar (4 steps) -->
         <div class="wizard-progress-bar glass-card">
           <div class="wizard-step active" id="wizard-step-ind-1">
             <span class="step-num">1</span>
@@ -100,12 +100,17 @@
           <div class="step-divider"></div>
           <div class="wizard-step" id="wizard-step-ind-2">
             <span class="step-num">2</span>
-            <span class="step-lbl">Автомобиль</span>
+            <span class="step-lbl">Мастер</span>
           </div>
           <div class="step-divider"></div>
           <div class="wizard-step" id="wizard-step-ind-3">
             <span class="step-num">3</span>
-            <span class="step-lbl">Время и связь</span>
+            <span class="step-lbl">Авто</span>
+          </div>
+          <div class="step-divider"></div>
+          <div class="wizard-step" id="wizard-step-ind-4">
+            <span class="step-num">4</span>
+            <span class="step-lbl">Запись</span>
           </div>
         </div>
 
@@ -135,15 +140,41 @@
 
             <div class="wizard-actions">
               <button type="button" class="wizard-nav-btn next-btn glow-btn" id="to-step-2-btn">
+                <span>Далее: выбор мастера и времени ➔</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 🔹 Step 2: Master & Free Time Slots -->
+          <div class="wizard-step-content hidden" id="form-step-2">
+            <div class="form-group">
+              <label class="form-label">Шаг 2: Выберите специалиста:</label>
+              <div class="masters-grid" id="masters-container">
+                <!-- Masters rendered via JS -->
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" id="slots-header-label">Свободное время мастера:</label>
+              <div class="slots-grid" id="slots-container">
+                <!-- Slots rendered via JS -->
+              </div>
+            </div>
+
+            <div class="wizard-actions dual">
+              <button type="button" class="wizard-nav-btn back-btn" id="back-to-step-1-btn">
+                <span>← Назад</span>
+              </button>
+              <button type="button" class="wizard-nav-btn next-btn glow-btn" id="to-step-3-btn">
                 <span>Далее к выбору авто ➔</span>
               </button>
             </div>
           </div>
 
-          <!-- 🔹 Step 2: Car Brand & Model + License Plate -->
-          <div class="wizard-step-content hidden" id="form-step-2">
+          <!-- 🔹 Step 3: Car Brand & Model + License Plate -->
+          <div class="wizard-step-content hidden" id="form-step-3">
             <div class="form-group">
-              <label class="form-label" for="car-model">Шаг 2: Укажите марку и модель авто:</label>
+              <label class="form-label" for="car-model">Шаг 3: Укажите марку и модель авто:</label>
               <input type="text" id="car-model" class="form-input glass-input" placeholder="Например: Toyota Camry, Tank 500, Opel Astra" />
               <small class="form-hint">Укажите марку и модель вашего автомобиля</small>
             </div>
@@ -155,27 +186,28 @@
             </div>
 
             <div class="wizard-actions dual">
-              <button type="button" class="wizard-nav-btn back-btn" id="back-to-step-1-btn">
+              <button type="button" class="wizard-nav-btn back-btn" id="back-to-step-2-btn">
                 <span>← Назад</span>
               </button>
-              <button type="button" class="wizard-nav-btn next-btn glow-btn" id="to-step-3-btn">
-                <span>Далее к выбору времени ➔</span>
+              <button type="button" class="wizard-nav-btn next-btn glow-btn" id="to-step-4-btn">
+                <span>Далее к итогу ➔</span>
               </button>
             </div>
           </div>
 
-          <!-- 🔹 Step 3: Time Slot, Phone, Total Price & Privacy Policy -->
-          <div class="wizard-step-content hidden" id="form-step-3">
-            <!-- Time slot -->
+          <!-- 🔹 Step 4: Final Confirmation & Summary -->
+          <div class="wizard-step-content hidden" id="form-step-4">
             <div class="form-group">
-              <label class="form-label">Шаг 3: Выберите свободное окно:</label>
-              <div class="slots-grid" id="slots-container">
-                <!-- Slots loaded via JS -->
+              <label class="form-label">Шаг 4: Проверьте данные записи:</label>
+              <!-- Summary Card -->
+              <div class="booking-summary-card glass-card" id="final-booking-summary">
+                <!-- Rendered dynamically by JS -->
               </div>
             </div>
 
-            <!-- Phone number with Edit pencil icon — NO hint text -->
+            <!-- Phone number with Edit pencil icon -->
             <div class="form-group">
+              <label class="form-label" for="phone-number">Ваш телефон для связи:</label>
               <div class="phone-input-wrapper">
                 <input type="tel" id="phone-number" class="form-input glass-input" placeholder="+7 (999) 000-00-00" readonly required />
                 <button type="button" id="edit-phone-btn" class="edit-phone-btn" title="Нажмите, чтобы изменить номер">
@@ -186,7 +218,7 @@
 
             <!-- Total Estimated Price Badge -->
             <div class="total-price-badge glass-card" id="total-price-box">
-              <span class="total-price-label">💰 Ориентировочная стоимость:</span>
+              <span class="total-price-label">💰 Итоговая ориентировочная стоимость:</span>
               <span class="total-price-value" id="total-price-val">от 0 ₽</span>
             </div>
 
@@ -199,11 +231,11 @@
             </div>
 
             <div class="wizard-actions dual">
-              <button type="button" class="wizard-nav-btn back-btn" id="back-to-step-2-btn">
+              <button type="button" class="wizard-nav-btn back-btn" id="back-to-step-3-btn">
                 <span>← Назад</span>
               </button>
               <button type="submit" class="submit-btn glow-btn" id="submit-booking-btn" disabled>
-                <span>🚀 Отправить заявку</span>
+                <span>🚀 Подтвердить запись</span>
               </button>
             </div>
           </div>
@@ -368,6 +400,6 @@
     <div id="toast" class="toast hidden glass-toast"></div>
   </div>
 
-  <script src="app.js?v=16.0"></script>
+  <script src="app.js?v=18.0"></script>
 </body>
 </html>

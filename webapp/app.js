@@ -915,10 +915,17 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    let activeRescheduleBookingId = null;
+
     container.innerHTML = bookings.map(b => {
       let badgeClass = "badge-pending";
       let statusIcon = "⏳";
-      if (b.status === "Одобрена" || b.status === "Активна") {
+      let isUnavailable = b.status.includes("недоступен") || b.status.includes("Перенос");
+
+      if (isUnavailable) {
+        badgeClass = "badge-warning";
+        statusIcon = "⚠️";
+      } else if (b.status === "Одобрена" || b.status === "Активна") {
         badgeClass = "badge-approved";
         statusIcon = "✅";
       } else if (b.status.includes("Отменен") || b.status.includes("Отклонен")) {
@@ -926,10 +933,10 @@ document.addEventListener("DOMContentLoaded", () => {
         statusIcon = "🔴";
       }
 
-      const isCancelable = ["На рассмотрении", "Одобрена", "Активна"].includes(b.status);
+      const isCancelable = ["На рассмотрении", "Одобрена", "Активна"].includes(b.status) || isUnavailable;
 
       return `
-        <div class="booking-card glass-card">
+        <div class="booking-card glass-card ${isUnavailable ? 'warning-card' : ''}">
           <div class="booking-header">
             <span class="booking-id">Запись №${b.id}</span>
             <span class="badge ${badgeClass}">${statusIcon} ${b.status}</span>
@@ -939,12 +946,25 @@ document.addEventListener("DOMContentLoaded", () => {
             <p><strong>Автомобиль:</strong> ${b.car_model}</p>
             ${b.car_number ? `<p><strong>Госномер:</strong> ${b.car_number}</p>` : ''}
             <p><strong>Время:</strong> ${b.slot}</p>
-            ${b.comment ? `<p><strong>Комментарий:</strong> <em>${b.comment}</em></p>` : ''}
+            ${b.comment ? `<p class="booking-comment-box"><strong>Сообщение автосервиса:</strong> <em>${b.comment}</em></p>` : ''}
           </div>
-          ${isCancelable ? `<button class="cancel-btn" data-id="${b.id}">Отменить запись</button>` : ''}
+
+          <div class="booking-card-actions">
+            ${isUnavailable ? `<button class="reschedule-btn glow-btn" data-id="${b.id}">🔄 Выбрать другого мастера / время</button>` : ''}
+            ${isCancelable ? `<button class="cancel-btn" data-id="${b.id}">Отменить запись</button>` : ''}
+          </div>
         </div>
       `;
     }).join("");
+
+    container.querySelectorAll(".reschedule-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        activeRescheduleBookingId = parseInt(btn.dataset.id);
+        switchTab("booking");
+        goToStep(2);
+        showToast(`🔄 Перенос записи №${activeRescheduleBookingId}: выберите мастера и время`);
+      });
+    });
 
     container.querySelectorAll(".cancel-btn").forEach(btn => {
       btn.addEventListener("click", async () => {
@@ -1165,6 +1185,34 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      const targetSlot = `${selectedSlot} (Мастер: ${selectedMasterName})`;
+
+      // If client is rescheduling an existing affected booking
+      if (activeRescheduleBookingId) {
+        const res = await fetch(`${BACKEND_URL}/api/booking/reschedule`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            booking_id: activeRescheduleBookingId,
+            user_id: userId,
+            new_slot: targetSlot
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast(`🎉 Запись №${activeRescheduleBookingId} успешно перенесена!`);
+          activeRescheduleBookingId = null;
+          switchTab("profile");
+          return;
+        } else {
+          showToast("⚠️ " + (data.error || "Не удалось перенести запись"));
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `<span>🚀 Подтвердить запись</span>`;
+          return;
+        }
+      }
+
       const res = await fetch(`${BACKEND_URL}/api/booking/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1174,7 +1222,7 @@ document.addEventListener("DOMContentLoaded", () => {
           problem: problem,
           car_model: carModel,
           car_number: carNumber,
-          slot: `${selectedSlot} (Мастер: ${selectedMasterName})`,
+          slot: targetSlot,
           phone: phone
         })
       });
@@ -1377,9 +1425,54 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         showToast("⚠️ " + (data.error || "Ошибка выполнения"));
       }
-    } catch (e) {
-      showToast("⚠️ Ошибка соединения с сервером");
-    }
+  // Admin Master Unavailability Trigger Handler
+  const admTriggerRescheduleBtn = document.getElementById("adm-trigger-reschedule-btn");
+  if (admTriggerRescheduleBtn) {
+    admTriggerRescheduleBtn.addEventListener("click", async () => {
+      const masterSelect = document.getElementById("adm-master-select");
+      const reasonInput = document.getElementById("adm-master-reason");
+
+      const masterName = masterSelect ? masterSelect.value : "";
+      const reason = reasonInput ? reasonInput.value.trim() : "";
+
+      if (!masterName) {
+        showToast("⚠️ Выберите мастера!");
+        return;
+      }
+
+      if (!confirm(`Отменить смену мастера "${masterName}" и уведомить всех записанных клиентов?`)) {
+        return;
+      }
+
+      admTriggerRescheduleBtn.disabled = true;
+      admTriggerRescheduleBtn.innerHTML = "<span>⏳ Отправка...</span>";
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/admin/master/reschedule`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            admin_id: userId,
+            master_name: masterName,
+            reason: reason
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast(`✅ Записи к мастеру "${masterName}" помечены (затронуто ${data.affected_count} записей)!`);
+          if (reasonInput) reasonInput.value = "";
+          loadAdminBookings(currentAdminFilter);
+        } else {
+          showToast("⚠️ " + (data.error || "Ошибка смены мастера"));
+        }
+      } catch (e) {
+        showToast("⚠️ Ошибка соединения с сервером");
+      } finally {
+        admTriggerRescheduleBtn.disabled = false;
+        admTriggerRescheduleBtn.innerHTML = "<span>⚠️ Снять мастера и уведомить клиентов</span>";
+      }
+    });
   }
 
 });

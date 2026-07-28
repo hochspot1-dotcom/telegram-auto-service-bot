@@ -563,33 +563,24 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
-  // Calendar & Slot Availability Data
-  function generateUpcomingDays() {
-    const daysRu = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
-    const monthsRu = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
-    const days = [];
-    const today = new Date();
+  // Full Interactive Month Calendar & Time Slots
+  const MONTH_NAMES_RU = [
+    "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+    "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+  ];
+  const MONTH_NAMES_RU_GENITIVE = [
+    "января", "февраля", "марта", "апреля", "мая", "июня",
+    "июля", "августа", "сентября", "октября", "ноября", "декабря"
+  ];
 
-    for (let offset = 0; offset < 6; offset++) {
-      const d = new Date(today);
-      d.setDate(today.getDate() + offset);
-      const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      let label = offset === 0 ? "Сегодня" : (offset === 1 ? "Завтра" : `${daysRu[d.getDay()]}, ${d.getDate()} ${monthsRu[d.getMonth()]}`);
-      days.push({
-        key: dateKey,
-        label: label,
-        shortDay: daysRu[d.getDay()],
-        dayNum: d.getDate()
-      });
-    }
-    return days;
-  }
+  const todayObj = new Date();
+  let calendarYear = todayObj.getFullYear();
+  let calendarMonth = todayObj.getMonth();
 
-  const UPCOMING_DAYS = generateUpcomingDays();
-  let selectedDateKey = UPCOMING_DAYS[0].key;
-  let selectedDateLabel = UPCOMING_DAYS[0].label;
+  let selectedDateObj = new Date(todayObj.getFullYear(), todayObj.getMonth(), todayObj.getDate());
+  let selectedDateLabel = `${todayObj.getDate()} ${MONTH_NAMES_RU_GENITIVE[todayObj.getMonth()]} ${todayObj.getFullYear()}`;
 
-  // Master schedule matrix: time slots with free/busy status
+  // Daily schedule slots (clean time display)
   const DAILY_TIME_SLOTS = ["09:00", "10:30", "12:00", "13:30", "15:00", "16:30", "18:00"];
 
   const BUSY_SLOTS_MAP = {
@@ -665,25 +656,99 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function renderCalendarDates() {
-    const container = document.getElementById("calendar-dates-container");
+  function renderFullMonthCalendar() {
+    const container = document.getElementById("full-calendar-widget");
     if (!container) return;
 
-    container.innerHTML = UPCOMING_DAYS.map(d => {
-      const isSelected = d.key === selectedDateKey;
-      return `
-        <div class="date-pill ${isSelected ? 'active' : ''}" data-date-key="${d.key}" data-date-label="${d.label}">
-          <span class="date-pill-num">${d.dayNum}</span>
-          <span class="date-pill-lbl">${d.label}</span>
+    const firstDayOfMonth = new Date(calendarYear, calendarMonth, 1);
+    const lastDayOfMonth = new Date(calendarYear, calendarMonth + 1, 0);
+    const totalDays = lastDayOfMonth.getDate();
+
+    // Calculate day offset (Monday = 0, Sunday = 6)
+    let startDayOfWeek = firstDayOfMonth.getDay() - 1;
+    if (startDayOfWeek === -1) startDayOfWeek = 6;
+
+    const isPrevDisabled = (calendarYear < todayObj.getFullYear()) ||
+                           (calendarYear === todayObj.getFullYear() && calendarMonth <= todayObj.getMonth());
+
+    let daysHtml = "";
+    // Empty padding cells for first week
+    for (let i = 0; i < startDayOfWeek; i++) {
+      daysHtml += `<div class="cal-day empty"></div>`;
+    }
+
+    // Days 1..totalDays
+    for (let day = 1; day <= totalDays; day++) {
+      const cellDate = new Date(calendarYear, calendarMonth, day);
+      const isToday = (cellDate.toDateString() === todayObj.toDateString());
+      const isPast = (cellDate < new Date(todayObj.getFullYear(), todayObj.getMonth(), todayObj.getDate()));
+      const isSelected = (cellDate.toDateString() === selectedDateObj.toDateString());
+
+      let classes = "cal-day";
+      if (isPast) classes += " past disabled";
+      if (isToday) classes += " today";
+      if (isSelected) classes += " selected";
+
+      daysHtml += `
+        <div class="${classes}" data-year="${calendarYear}" data-month="${calendarMonth}" data-day="${day}">
+          ${day}
         </div>
       `;
-    }).join("");
+    }
 
-    container.querySelectorAll(".date-pill").forEach(pill => {
-      pill.addEventListener("click", () => {
-        selectedDateKey = pill.dataset.dateKey;
-        selectedDateLabel = pill.dataset.dateLabel;
-        renderCalendarDates();
+    container.innerHTML = `
+      <div class="cal-header">
+        <button type="button" class="cal-nav-btn" id="cal-prev-month" ${isPrevDisabled ? 'disabled' : ''}>‹</button>
+        <span class="cal-month-title">${MONTH_NAMES_RU[calendarMonth]} ${calendarYear}</span>
+        <button type="button" class="cal-nav-btn" id="cal-next-month">›</button>
+      </div>
+      <div class="cal-weekdays">
+        <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
+      </div>
+      <div class="cal-days-grid">
+        ${daysHtml}
+      </div>
+    `;
+
+    // Month Navigation Handlers
+    const prevBtn = document.getElementById("cal-prev-month");
+    const nextBtn = document.getElementById("cal-next-month");
+
+    if (prevBtn) {
+      prevBtn.addEventListener("click", () => {
+        if (calendarMonth === 0) {
+          calendarMonth = 11;
+          calendarYear--;
+        } else {
+          calendarMonth--;
+        }
+        renderFullMonthCalendar();
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener("click", () => {
+        if (calendarMonth === 11) {
+          calendarMonth = 0;
+          calendarYear++;
+        } else {
+          calendarMonth++;
+        }
+        renderFullMonthCalendar();
+      });
+    }
+
+    // Day Selection Click Handlers
+    container.querySelectorAll(".cal-day:not(.past):not(.empty)").forEach(cell => {
+      cell.addEventListener("click", () => {
+        const y = parseInt(cell.dataset.year);
+        const m = parseInt(cell.dataset.month);
+        const d = parseInt(cell.dataset.day);
+
+        selectedDateObj = new Date(y, m, d);
+        selectedDateLabel = `${d} ${MONTH_NAMES_RU_GENITIVE[m]} ${y}`;
+
+        renderFullMonthCalendar();
         renderSlotsForMasterAndDate();
       });
     });
@@ -711,17 +776,18 @@ document.addEventListener("DOMContentLoaded", () => {
         selectedSlot = `${selectedDateLabel} в ${time}`;
       }
 
+      // Simple line-through grayed out style for occupied slots (no locks, no tags)
       if (isBusy) {
         return `
-          <div class="slot-item busy disabled" title="Окно занято">
-            🔒 ${time} <small class="busy-tag">Занято</small>
+          <div class="slot-item busy disabled" title="Время занято">
+            ${time}
           </div>
         `;
       }
 
       return `
         <div class="slot-item ${isSelected ? 'active' : ''}" data-time="${time}">
-          📅 ${time}
+          ${time}
         </div>
       `;
     }).join("");
@@ -737,7 +803,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function loadSlots() {
     renderMasters();
-    renderCalendarDates();
+    renderFullMonthCalendar();
     renderSlotsForMasterAndDate();
   }
 

@@ -1073,43 +1073,50 @@ async def main():
         except Exception:
             pass
 
-    bot_token = os.getenv("BOT_TOKEN")
-    if not bot_token or bot_token == "your_bot_token_here":
-        print("ОШИБКА: Укажите валидный BOT_TOKEN в переменных окружения!", flush=True)
-        return
-
     init_db()
     print("База данных SQLite успешно инициализирована!", flush=True)
 
-    bot = Bot(token=bot_token)
-    await bot.delete_webhook(drop_pending_updates=True)
+    port = int(os.getenv("PORT", "8080"))
+    bot_token = os.getenv("BOT_TOKEN")
+    bot = None
 
-    if WEBAPP_URL:
-        if WEBAPP_URL.startswith("https://"):
-            try:
-                await bot.set_chat_menu_button(
-                    menu_button=types.MenuButtonWebApp(
-                        text="🚗 Mini App",
-                        web_app=types.WebAppInfo(url=WEBAPP_URL)
-                    )
-                )
-                print(f"[OK] Кнопка меню Mini App успешно привязана к {WEBAPP_URL}", flush=True)
-            except Exception as e:
-                logging.warning(f"[WARN] Ошибка установки кнопки WebApp через API: {e}")
-        else:
-            print(f"[INFO] WEBAPP_URL ({WEBAPP_URL}) использует HTTP. Telegram требует HTTPS для встроенных WebApp.", flush=True)
+    if bot_token and bot_token != "your_bot_token_here":
+        try:
+            bot = Bot(token=bot_token)
+            await bot.delete_webhook(drop_pending_updates=True)
 
-    # Запуск встроенного веб-сервера Mini App
+            if WEBAPP_URL:
+                if WEBAPP_URL.startswith("https://"):
+                    try:
+                        await bot.set_chat_menu_button(
+                            menu_button=types.MenuButtonWebApp(
+                                text="🚗 Mini App",
+                                web_app=types.WebAppInfo(url=WEBAPP_URL)
+                            )
+                        )
+                        print(f"[OK] Кнопка меню Mini App успешно привязана к {WEBAPP_URL}", flush=True)
+                    except Exception as e:
+                        logging.warning(f"[WARN] Ошибка установки кнопки WebApp через API: {e}")
+                else:
+                    print(f"[INFO] WEBAPP_URL ({WEBAPP_URL}) использует HTTP. Telegram требует HTTPS для встроенных WebApp.", flush=True)
+        except Exception as e:
+            print(f"[WARN] Ошибка инициализации Telegram бота: {e}", flush=True)
+
+    # 🚀 ВЕБ-СЕРВЕР ЗАПУСКАЕТСЯ ВСЕГДА на 0.0.0.0:PORT (Гарантирует прохождение Health Check Amvera)
     web_app = create_web_app(bot)
     runner = web.AppRunner(web_app)
     await runner.setup()
-    port = int(os.getenv("PORT", "8080"))
     site = web.TCPSite(runner, "0.0.0.0", port)
     await site.start()
-    print(f"[OK] Mini App сервер запущен на http://0.0.0.0:{port}", flush=True)
+    print(f"[OK] Mini App веб-сервер успешно слушает http://0.0.0.0:{port}", flush=True)
 
-    print("Бот успешно запущен!", flush=True)
-    await dp.start_polling(bot)
+    if bot:
+        print("[OK] Telegram бот запущен и готов к работе!", flush=True)
+        await dp.start_polling(bot)
+    else:
+        print("⚠️ BOT_TOKEN не указан в переменных окружения Amvera! Сервер работает в режиме Mini App. Укажите BOT_TOKEN в настройках Amvera для включения бота.", flush=True)
+        while True:
+            await asyncio.sleep(3600)
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -69,14 +69,14 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Ambient gradient — dark blue + warm orange */
+/* Ambient gradient — warm orange top-left + orange bottom-right */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 55% 38% at 15% 8%,  rgba(59, 130, 246, 0.14) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 35% at 88% 82%, rgba(249, 115, 22, 0.12) 0%, transparent 65%);
+    radial-gradient(ellipse 55% 42% at 12% 6%,  rgba(249, 115, 22, 0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 35% at 88% 82%, rgba(249, 115, 22, 0.14) 0%, transparent 65%);
   pointer-events: none;
   z-index: 0;
 }
@@ -241,8 +241,8 @@ body {
 /* ── Home Tab ───────────────────────────────────────────── */
 .home-hero-card {
   padding: 24px 20px;
-  background: linear-gradient(145deg, rgba(123,47,255,0.18) 0%, rgba(247,37,133,0.12) 100%);
-  border: 1px solid rgba(247, 37, 133, 0.25);
+  background: linear-gradient(145deg, rgba(249,115,22,0.14) 0%, rgba(234,88,12,0.08) 100%);
+  border: 1px solid rgba(249, 115, 22, 0.28);
   border-radius: var(--r-xl);
   text-align: center;
 }
@@ -254,8 +254,8 @@ body {
   letter-spacing: 0.8px;
   text-transform: uppercase;
   color: var(--accent);
-  background: rgba(247, 37, 133, 0.12);
-  border: 1px solid rgba(247, 37, 133, 0.28);
+  background: rgba(249, 115, 22, 0.14);
+  border: 1px solid rgba(249, 115, 22, 0.30);
   border-radius: var(--r-pill);
   padding: 4px 12px;
   margin-bottom: 12px;
@@ -316,15 +316,19 @@ body {
 }
 
 .home-square-card {
-  padding: 18px 14px;
+  padding: 16px 14px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
   cursor: pointer;
   border-radius: var(--r-lg);
-  transition: transform var(--fast) var(--ease), border-color var(--fast) var(--ease);
-  aspect-ratio: 1 / 1;
+  transition: transform var(--fast) var(--ease), border-color var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
+  aspect-ratio: 1.1 / 1;
   justify-content: flex-end;
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border);
 }
 
 .home-square-card:active {
@@ -334,14 +338,19 @@ body {
 .square-card-icon {
   font-size: 28px;
   line-height: 1;
+  position: relative;
+  z-index: 1;
 }
 
 .square-card-img {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  flex: 1;
-  border-radius: 10px;
+  height: 100%;
+  z-index: 0;
+  margin: 0;
+  border-radius: var(--r-lg);
   overflow: hidden;
-  margin-bottom: 4px;
 }
 
 .square-card-img img {
@@ -349,20 +358,34 @@ body {
   height: 100%;
   object-fit: cover;
   display: block;
-  border-radius: 10px;
+  opacity: 0.28;
+  filter: brightness(0.9) contrast(1.1);
+  transition: opacity var(--fast) var(--ease), transform var(--mid) var(--ease);
+}
+
+.home-square-card:hover .square-card-img img,
+.home-square-card:active .square-card-img img {
+  opacity: 0.45;
+  transform: scale(1.06);
 }
 
 .square-card-title {
   font-size: 13px;
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 1.35;
   color: var(--text-primary);
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
 }
 
 .square-card-price {
   font-size: 13px;
   font-weight: 800;
   color: var(--accent);
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
 }
 
 /* ── Section Hero ───────────────────────────────────────── */
@@ -502,7 +525,7 @@ body {
 
 .form-input:focus, .glass-input:focus {
   border-color: var(--accent);
-  background: rgba(247, 37, 133, 0.06);
+  background: rgba(249, 115, 22, 0.08);
 }
 
 .form-input::placeholder, .glass-input::placeholder {
@@ -556,7 +579,7 @@ body {
 }
 
 .accordion-category.open {
-  border-color: rgba(247, 37, 133, 0.30);
+  border-color: rgba(249, 115, 22, 0.35);
 }
 
 .accordion-header {
@@ -617,7 +640,7 @@ body {
 }
 
 .subservice-item.selected {
-  background: rgba(247, 37, 133, 0.10);
+  background: rgba(249, 115, 22, 0.12);
 }
 
 .subservice-checkbox-label {
@@ -688,8 +711,8 @@ body {
 .selected-summary-box {
   padding: 14px 16px;
   border-radius: var(--r-lg);
-  border: 1px solid rgba(247, 37, 133, 0.28);
-  background: rgba(247, 37, 133, 0.08);
+  border: 1px solid rgba(249, 115, 22, 0.30);
+  background: rgba(249, 115, 22, 0.10);
 }
 
 .selected-summary-title {
@@ -747,7 +770,7 @@ body {
 }
 
 .slot-item.active {
-  background: rgba(247, 37, 133, 0.14);
+  background: rgba(249, 115, 22, 0.16);
   border-color: var(--accent);
   color: var(--accent);
   font-weight: 800;
@@ -792,8 +815,8 @@ body {
   justify-content: space-between;
   padding: 14px 16px;
   border-radius: var(--r-lg);
-  background: linear-gradient(135deg, rgba(247,37,133,0.10) 0%, rgba(123,47,255,0.10) 100%);
-  border: 1px solid rgba(247, 37, 133, 0.25);
+  background: linear-gradient(135deg, rgba(249,115,22,0.12) 0%, rgba(234,88,12,0.06) 100%);
+  border: 1px solid rgba(249, 115, 22, 0.30);
 }
 
 .total-price-label {
@@ -941,7 +964,7 @@ body {
 }
 
 .pill:active, .pill.active {
-  background: rgba(247, 37, 133, 0.14);
+  background: rgba(249, 115, 22, 0.16);
   border-color: var(--accent);
   color: var(--accent);
   font-weight: 800;
@@ -961,12 +984,12 @@ body {
   align-items: flex-end;
   justify-content: space-around;
   padding: 10px 14px 12px;
-  background: rgba(10, 8, 20, 0.88);
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 28px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.55), 0 0 0 0.5px rgba(255,255,255,0.06);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
   z-index: 50;
 }
 
@@ -992,26 +1015,31 @@ body {
 }
 
 .nav-svg {
-  width: 22px;
-  height: 22px;
-  stroke: rgba(255,255,255,0.38);
-  transition: stroke var(--fast) var(--ease);
+  width: 24px;
+  height: 24px;
+  stroke: rgba(255, 255, 255, 0.85);
+  transition: stroke var(--fast) var(--ease), filter var(--fast) var(--ease);
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.6));
 }
 
 .nav-item.active .nav-svg {
   stroke: var(--accent);
+  filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.8));
 }
 
 .nav-label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.3px;
-  color: rgba(255,255,255,0.38);
-  transition: color var(--fast) var(--ease);
+  color: rgba(255, 255, 255, 0.85);
+  transition: color var(--fast) var(--ease), text-shadow var(--fast) var(--ease);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
 }
 
 .nav-item.active .nav-label {
   color: var(--accent);
+  font-weight: 800;
+  text-shadow: 0 0 8px rgba(249, 115, 22, 0.6);
 }
 
 /* Center booking button */
@@ -1030,9 +1058,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--accent-glow), 0 4px 16px rgba(0,0,0,0.4);
+  box-shadow: var(--accent-glow), 0 4px 18px rgba(0, 0, 0, 0.5);
   transition: transform var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
-  border: 3px solid rgba(255,255,255,0.15);
+  border: 3px solid rgba(255, 255, 255, 0.35);
 }
 
 .nav-item-main:active .nav-main-circle {

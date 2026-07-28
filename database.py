@@ -183,19 +183,29 @@ def get_admin_stats() -> dict:
             "rejected": rejected
         }
 
-def mark_master_bookings_unavailable(master_name: str, reason: str = "") -> list:
-    """Пометить все активные записи к конкретному мастеру как 'Мастер недоступен (Нужен перенос)'"""
+def mark_master_bookings_unavailable(master_name: str, target_date: str = "", reason: str = "") -> list:
+    """Пометить все активные записи к конкретному мастеру на конкретную дату как '⚠️ Мастер недоступен (Нужен перенос)'"""
     affected = []
     with get_connection() as conn:
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
-        # Находим все записи, где в slot содержится имя мастера
-        cursor.execute("""
+        query = """
             SELECT id, user_id, user_name, problem, car_model, slot, phone
             FROM bookings
-            WHERE slot LIKE ? AND status IN ('На рассмотрении', 'Одобрена', 'Активна')
-        """, (f"%{master_name}%",))
+            WHERE status IN ('На рассмотрении', 'Одобрена', 'Активна')
+        """
+        params = []
+
+        if master_name and master_name != "all":
+            query += " AND slot LIKE ?"
+            params.append(f"%{master_name}%")
+            
+        if target_date:
+            query += " AND slot LIKE ?"
+            params.append(f"%{target_date}%")
+
+        cursor.execute(query, params)
         rows = cursor.fetchall()
         
         comment = reason or "Мастер временно недоступен. Пожалуйста, выберите другого мастера или дату."

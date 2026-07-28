@@ -283,6 +283,7 @@ async def handle_admin_master_reschedule(request: web.Request):
 
     admin_id = data.get("admin_id")
     master_name = data.get("master_name", "").strip()
+    target_date = data.get("target_date", "").strip()
     reason = data.get("reason", "").strip()
 
     if not admin_id or not check_is_admin(int(admin_id)):
@@ -290,7 +291,7 @@ async def handle_admin_master_reschedule(request: web.Request):
     if not master_name:
         return web.json_response({"error": "Укажите имя мастера"}, status=400)
 
-    affected_bookings = mark_master_bookings_unavailable(master_name, reason)
+    affected_bookings = mark_master_bookings_unavailable(master_name, target_date, reason)
 
     bot: Bot = request.app.get("bot")
     if bot and affected_bookings:

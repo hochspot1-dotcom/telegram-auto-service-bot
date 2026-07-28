@@ -776,7 +776,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Day Selection Click Handlers
+    // Day Selection Click Handlers — Swaps calendar view for time slots view!
     container.querySelectorAll(".cal-day:not(.past):not(.empty)").forEach(cell => {
       cell.addEventListener("click", () => {
         const y = parseInt(cell.dataset.year);
@@ -787,9 +787,38 @@ document.addEventListener("DOMContentLoaded", () => {
         selectedDateLabel = `${d} ${MONTH_NAMES_RU_GENITIVE[m]} ${y}`;
 
         renderFullMonthCalendar();
-        renderSlotsForMasterAndDate();
+        openSlotsViewForDate();
       });
     });
+  }
+
+  function openSlotsViewForDate() {
+    const calendarGroup = document.getElementById("calendar-step-group");
+    const slotsGroup = document.getElementById("slots-step-group");
+    const dateBadge = document.getElementById("slots-date-badge");
+
+    if (dateBadge) {
+      dateBadge.textContent = `📅 ${selectedDateLabel}`;
+    }
+
+    renderSlotsForMasterAndDate();
+
+    if (calendarGroup) calendarGroup.classList.add("hidden");
+    if (slotsGroup) slotsGroup.classList.remove("hidden");
+  }
+
+  function showCalendarView() {
+    const calendarGroup = document.getElementById("calendar-step-group");
+    const slotsGroup = document.getElementById("slots-step-group");
+
+    if (calendarGroup) calendarGroup.classList.remove("hidden");
+    if (slotsGroup) slotsGroup.classList.add("hidden");
+  }
+
+  // Bind "← Изменить дату" button
+  const changeDateBtn = document.getElementById("change-date-btn");
+  if (changeDateBtn) {
+    changeDateBtn.addEventListener("click", showCalendarView);
   }
 
   function renderSlotsForMasterAndDate() {
@@ -842,7 +871,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadSlots() {
     renderMasters();
     renderFullMonthCalendar();
-    renderSlotsForMasterAndDate();
+    showCalendarView();
   }
 
   // User Profile loading

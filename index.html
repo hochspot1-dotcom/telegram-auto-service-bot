@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=32.0" />
+  <link rel="stylesheet" href="style.css?v=33.0" />
 </head>
 <body>
   <div id="app">
@@ -332,27 +332,53 @@
           </div>
         </div>
 
-        <!-- Master Unavailability Management Card for Admin -->
+        <!-- Master & Date Off-Duty Management Card for Admin -->
         <div class="glass-card admin-master-tool-card">
-          <div class="tool-card-title">⚠️ Управление сменами мастеров (Отгул / Больничный)</div>
-          <p class="tool-card-desc">Отмените смену мастера. Все клиенты с активными записями к нему сразу получат Telegram-уведомление с кнопкой быстрой смены мастера/даты.</p>
+          <div class="tool-card-title">👨‍🔧 Управление сменами мастеров (Отгул / Больничный)</div>
+          <p class="tool-card-desc">Укажите мастера и дату его отсутствия. Все записи на этот день будут сброшены с предложением клиенту выбрать другого мастера или время.</p>
 
+          <!-- 1. Master Selector Chips -->
           <div class="form-group">
-            <label class="form-label" for="adm-master-select">Выберите мастера:</label>
-            <select id="adm-master-select" class="form-input glass-input">
-              <option value="Алексей Смирнов">Алексей Смирнов (Старший механик)</option>
-              <option value="Дмитрий Ковалев">Дмитрий Ковалев (Диагност-электрик)</option>
-              <option value="Игорь Соколов">Игорь Соколов (Ходовая часть)</option>
-            </select>
+            <label class="form-label">1. Выберите мастера:</label>
+            <div class="adm-masters-grid" id="adm-masters-selector">
+              <div class="adm-master-chip active" data-master="Алексей Смирнов">
+                <span class="chip-avatar">👨‍🔧</span>
+                <div class="chip-info">
+                  <div class="chip-name">Алексей Смирнов</div>
+                  <div class="chip-role">Старший механик</div>
+                </div>
+              </div>
+              <div class="adm-master-chip" data-master="Дмитрий Ковалев">
+                <span class="chip-avatar">⚡</span>
+                <div class="chip-info">
+                  <div class="chip-name">Дмитрий Ковалев</div>
+                  <div class="chip-role">Диагност-электрик</div>
+                </div>
+              </div>
+              <div class="adm-master-chip" data-master="Игорь Соколов">
+                <span class="chip-avatar">🛞</span>
+                <div class="chip-info">
+                  <div class="chip-name">Игорь Соколов</div>
+                  <div class="chip-role">Ходовая часть</div>
+                </div>
+              </div>
+            </div>
           </div>
 
+          <!-- 2. Date Selector -->
           <div class="form-group">
-            <label class="form-label" for="adm-master-reason">Причина (отобразится клиентам):</label>
-            <input type="text" id="adm-master-reason" class="form-input glass-input" placeholder="Например: Больничный мастера / Аварийное переключение смены" />
+            <label class="form-label" for="adm-off-date">2. Укажите дату отсутствия:</label>
+            <input type="date" id="adm-off-date" class="form-input glass-input date-input" />
+          </div>
+
+          <!-- 3. Reason Input -->
+          <div class="form-group">
+            <label class="form-label" for="adm-master-reason">3. Причина (отобразится клиентам):</label>
+            <input type="text" id="adm-master-reason" class="form-input glass-input" placeholder="Например: Больничный мастера / Отгул" value="Больничный мастера" />
           </div>
 
           <button type="button" id="adm-trigger-reschedule-btn" class="admin-btn admin-btn-reject glow-btn">
-            <span>⚠️ Снять мастера и уведомить клиентов</span>
+            <span>⚠️ Снять мастера на выбранную дату и уведомить клиентов</span>
           </button>
         </div>
 
@@ -448,6 +474,6 @@
     <div id="toast" class="toast hidden glass-toast"></div>
   </div>
 
-  <script src="app.js?v=32.0"></script>
+  <script src="app.js?v=33.0"></script>
 </body>
 </html>

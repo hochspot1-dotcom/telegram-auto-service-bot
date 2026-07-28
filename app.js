@@ -1430,22 +1430,55 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Admin Master Unavailability Trigger Handler
+  // Admin Master & Date Selection Logic
+  let selectedAdmMaster = "Алексей Смирнов";
+
+  const admMasterSelector = document.getElementById("adm-masters-selector");
+  if (admMasterSelector) {
+    admMasterSelector.querySelectorAll(".adm-master-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        admMasterSelector.querySelectorAll(".adm-master-chip").forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
+        selectedAdmMaster = chip.dataset.master;
+      });
+    });
+  }
+
+  // Set default date picker value to today
+  const admOffDateInput = document.getElementById("adm-off-date");
+  if (admOffDateInput && !admOffDateInput.value) {
+    const todayStr = new Date().toISOString().split("T")[0];
+    admOffDateInput.value = todayStr;
+  }
+
   const admTriggerRescheduleBtn = document.getElementById("adm-trigger-reschedule-btn");
   if (admTriggerRescheduleBtn) {
     admTriggerRescheduleBtn.addEventListener("click", async () => {
-      const masterSelect = document.getElementById("adm-master-select");
       const reasonInput = document.getElementById("adm-master-reason");
-
-      const masterName = masterSelect ? masterSelect.value : "";
+      const rawDate = admOffDateInput ? admOffDateInput.value : "";
       const reason = reasonInput ? reasonInput.value.trim() : "";
 
-      if (!masterName) {
+      let formattedDateTarget = "";
+      if (rawDate) {
+        const [year, monthStr, dayStr] = rawDate.split("-");
+        const monthIdx = parseInt(monthStr, 10) - 1;
+        const day = parseInt(dayStr, 10);
+        if (MONTH_NAMES_RU_GENITIVE[monthIdx]) {
+          formattedDateTarget = `${day} ${MONTH_NAMES_RU_GENITIVE[monthIdx]}`;
+        }
+      }
+
+      if (!selectedAdmMaster) {
         showToast("⚠️ Выберите мастера!");
         return;
       }
+      if (!rawDate) {
+        showToast("⚠️ Укажите дату отсутствия мастера!");
+        return;
+      }
 
-      if (!confirm(`Отменить смену мастера "${masterName}" и уведомить всех записанных клиентов?`)) {
+      const dateNotice = formattedDateTarget ? `на ${formattedDateTarget}` : "";
+      if (!confirm(`Отменить смену мастера "${selectedAdmMaster}" ${dateNotice} и уведомить всех записанных клиентов?`)) {
         return;
       }
 
@@ -1458,15 +1491,15 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             admin_id: userId,
-            master_name: masterName,
+            master_name: selectedAdmMaster,
+            target_date: formattedDateTarget,
             reason: reason
           })
         });
 
         const data = await res.json();
         if (res.ok && data.success) {
-          showToast(`✅ Записи к мастеру "${masterName}" помечены (затронуто ${data.affected_count} записей)!`);
-          if (reasonInput) reasonInput.value = "";
+          showToast(`✅ Записи к мастеру "${selectedAdmMaster}" ${dateNotice} отменены (затронуто ${data.affected_count} клиентов)!`);
           loadAdminBookings(currentAdminFilter);
         } else {
           showToast("⚠️ " + (data.error || "Ошибка смены мастера"));
@@ -1475,7 +1508,7 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast("⚠️ Ошибка соединения с сервером");
       } finally {
         admTriggerRescheduleBtn.disabled = false;
-        admTriggerRescheduleBtn.innerHTML = "<span>⚠️ Снять мастера и уведомить клиентов</span>";
+        admTriggerRescheduleBtn.innerHTML = "<span>⚠️ Снять мастера на выбранную дату и уведомить клиентов</span>";
       }
     });
   }

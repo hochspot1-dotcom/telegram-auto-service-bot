@@ -399,7 +399,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const isChecked = selectedProblemsSet.has(m.title);
         return `
           <div class="subservice-item ${isChecked ? 'selected' : ''}" data-title="${m.title}">
-            <label class="subservice-checkbox-label" onclick="event.stopPropagation();">
+            <label class="subservice-checkbox-label">
               <input type="checkbox" class="subservice-checkbox" ${isChecked ? 'checked' : ''} data-title="${m.title}" />
               <span class="subservice-title">${m.title}</span>
             </label>
@@ -422,7 +422,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const isChecked = selectedProblemsSet.has(item.title);
                 return `
                   <div class="subservice-item ${isChecked ? 'selected' : ''}" data-title="${item.title}">
-                    <label class="subservice-checkbox-label" onclick="event.stopPropagation();">
+                    <label class="subservice-checkbox-label">
                       <input type="checkbox" class="subservice-checkbox" ${isChecked ? 'checked' : ''} data-title="${item.title}" />
                       <span class="subservice-title">${item.title}</span>
                     </label>
@@ -456,18 +456,36 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Bind subservice checkboxes
+    // Bind subservice checkboxes — use change event on checkbox as source of truth
     container.querySelectorAll(".subservice-item").forEach(itemEl => {
       itemEl.addEventListener("click", (e) => {
         e.stopPropagation();
         const title = itemEl.dataset.title;
-        if (title) {
-          toggleProblemSelection(title);
-          const checkbox = itemEl.querySelector(".subservice-checkbox");
-          const isChecked = selectedProblemsSet.has(title);
-          if (checkbox) checkbox.checked = isChecked;
-          itemEl.classList.toggle("selected", isChecked);
+        if (!title) return;
+
+        const checkbox = itemEl.querySelector(".subservice-checkbox");
+        if (!checkbox) return;
+
+        // If click landed on checkbox or its label, the browser already toggled checkbox.checked.
+        // If click was on price or row padding, we need to manually toggle.
+        const throughLabel = !!e.target.closest('label');
+        const onCheckbox   = e.target === checkbox;
+
+        if (!throughLabel && !onCheckbox) {
+          // Manual toggle for clicks on the price tag or row bg
+          checkbox.checked = !checkbox.checked;
         }
+
+        // Sync Set with current checkbox state (browser may have already toggled)
+        if (checkbox.checked) {
+          selectedProblemsSet.add(title);
+        } else {
+          selectedProblemsSet.delete(title);
+        }
+
+        itemEl.classList.toggle("selected", checkbox.checked);
+        updateEstimatedTotalPrice();
+        renderSelectedSummary();
       });
     });
 

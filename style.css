@@ -5,27 +5,27 @@
 
 :root {
   /* ── Palette ── */
-  --bg-deep:       #07070f;
-  --bg-layer:      #0d0d1a;
+  --bg-deep:       #07090f;
+  --bg-layer:      #0c1018;
 
   /* Glass surfaces */
-  --glass-1:       rgba(255, 255, 255, 0.06);
-  --glass-2:       rgba(255, 255, 255, 0.10);
+  --glass-1:       rgba(255, 255, 255, 0.05);
+  --glass-2:       rgba(255, 255, 255, 0.09);
   --glass-3:       rgba(255, 255, 255, 0.14);
-  --glass-border:  rgba(255, 255, 255, 0.12);
-  --glass-border-accent: rgba(247, 37, 133, 0.45);
+  --glass-border:  rgba(255, 255, 255, 0.10);
+  --glass-border-accent: rgba(249, 115, 22, 0.45);
 
-  /* Accents */
-  --accent:        #f72585;
-  --accent-2:      #7b2fff;
-  --accent-grad:   linear-gradient(135deg, #f72585 0%, #7b2fff 100%);
-  --accent-glow:   0 0 24px rgba(247, 37, 133, 0.45);
-  --accent-glow-sm: 0 0 14px rgba(247, 37, 133, 0.30);
+  /* Accents — Electric Orange + Steel Blue */
+  --accent:        #f97316;
+  --accent-2:      #3b82f6;
+  --accent-grad:   linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  --accent-glow:   0 0 24px rgba(249, 115, 22, 0.45);
+  --accent-glow-sm: 0 0 14px rgba(249, 115, 22, 0.32);
 
   /* Text */
   --text-primary:  #ffffff;
-  --text-second:   rgba(255, 255, 255, 0.60);
-  --text-muted:    rgba(255, 255, 255, 0.35);
+  --text-second:   rgba(255, 255, 255, 0.58);
+  --text-muted:    rgba(255, 255, 255, 0.32);
 
   /* Status */
   --success:       #22c55e;
@@ -69,14 +69,14 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Ambient gradient background */
+/* Ambient gradient — dark blue + warm orange */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 60% 40% at 20% 10%, rgba(123, 47, 255, 0.18) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 35% at 85% 80%, rgba(247, 37, 133, 0.14) 0%, transparent 65%);
+    radial-gradient(ellipse 55% 38% at 15% 8%,  rgba(59, 130, 246, 0.14) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 35% at 88% 82%, rgba(249, 115, 22, 0.12) 0%, transparent 65%);
   pointer-events: none;
   z-index: 0;
 }
@@ -334,6 +334,22 @@ body {
 .square-card-icon {
   font-size: 28px;
   line-height: 1;
+}
+
+.square-card-img {
+  width: 100%;
+  flex: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.square-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 10px;
 }
 
 .square-card-title {

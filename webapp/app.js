@@ -58,34 +58,45 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentAdminFilter = "all";
   let pendingAdminAction = null;
 
-  // Auto-fill phone from Telegram on load
+  // Persistent Phone Autofill & Initial Telegram Contact Request
   const phoneInputEl = document.getElementById("phone-number");
-  const tgPhone = tg?.initDataUnsafe?.user?.phone_number || "";
-  if (tgPhone && phoneInputEl) {
-    phoneInputEl.value = "+" + tgPhone.replace(/\D/g, "");
+
+  function initAutoPhoneRequest() {
+    const savedPhone = localStorage.getItem("user_phone_saved");
+    const tgPhone = tg?.initDataUnsafe?.user?.phone_number || "";
+
+    if (savedPhone && phoneInputEl) {
+      phoneInputEl.value = savedPhone;
+      return;
+    }
+
+    if (tgPhone && phoneInputEl) {
+      const formatted = "+" + tgPhone.replace(/\D/g, "");
+      localStorage.setItem("user_phone_saved", formatted);
+      phoneInputEl.value = formatted;
+      return;
+    }
+
+    // First time launch: request phone via Telegram WebApp API if supported
+    if (tg && typeof tg.requestContact === "function" && !localStorage.getItem("tg_contact_requested")) {
+      localStorage.setItem("tg_contact_requested", "true");
+      tg.requestContact((sent, event) => {
+        if (sent && event && event.responseUnsafe && event.responseUnsafe.contact) {
+          const num = "+" + event.responseUnsafe.contact.phone_number.replace(/\D/g, "");
+          localStorage.setItem("user_phone_saved", num);
+          if (phoneInputEl) phoneInputEl.value = num;
+          showToast("✅ Номер телефона получен из Telegram!");
+        }
+      });
+    }
   }
 
-  // Telegram Contact Share button handler
-  const tgSharePhoneBtn = document.getElementById("tg-share-phone-btn");
-  if (tgSharePhoneBtn && phoneInputEl) {
-    tgSharePhoneBtn.addEventListener("click", () => {
-      if (tg && typeof tg.requestContact === "function") {
-        tg.requestContact((sent, event) => {
-          if (sent && event && event.responseUnsafe && event.responseUnsafe.contact) {
-            const num = event.responseUnsafe.contact.phone_number;
-            phoneInputEl.value = "+" + num.replace(/\D/g, "");
-            showToast("✅ Номер получен из Telegram!");
-          } else {
-            showToast("✏️ Введите номер вручную");
-            phoneInputEl.removeAttribute("readonly");
-            phoneInputEl.focus();
-          }
-        });
-      } else {
-        // Fallback for browser testing
-        showToast("✏️ Введите номер телефона в поле");
-        phoneInputEl.removeAttribute("readonly");
-        phoneInputEl.focus();
+  initAutoPhoneRequest();
+
+  if (phoneInputEl) {
+    phoneInputEl.addEventListener("input", () => {
+      if (phoneInputEl.value.trim()) {
+        localStorage.setItem("user_phone_saved", phoneInputEl.value.trim());
       }
     });
   }
@@ -113,9 +124,36 @@ document.addEventListener("DOMContentLoaded", () => {
   checkAdminStatus();
 
 
-  // Floating Navbar Tab switching
+  // Floating Navbar Tab switching & Liquid Blob animation
   const navItems = document.querySelectorAll(".nav-item");
   const tabContents = document.querySelectorAll(".tab-content");
+  const navBlobPill = document.getElementById("nav-blob-pill");
+  const mainNav = document.getElementById("main-nav");
+
+  function updateNavBlobPosition() {
+    if (!navBlobPill || !mainNav) return;
+    const activeNav = mainNav.querySelector(".nav-item.active");
+    if (!activeNav) {
+      navBlobPill.style.opacity = "0";
+      return;
+    }
+
+    // Skip blob overlay for center action button if it's the main circular button
+    if (activeNav.classList.contains("nav-item-main")) {
+      navBlobPill.style.opacity = "0";
+      return;
+    }
+
+    const navRect = mainNav.getBoundingClientRect();
+    const activeRect = activeNav.getBoundingClientRect();
+
+    const left = activeRect.left - navRect.left;
+    const width = activeRect.width;
+
+    navBlobPill.style.opacity = "1";
+    navBlobPill.style.transform = `translateX(${left}px)`;
+    navBlobPill.style.width = `${width}px`;
+  }
 
   function switchTab(tabName) {
     navItems.forEach(item => {
@@ -125,6 +163,8 @@ document.addEventListener("DOMContentLoaded", () => {
       content.classList.toggle("active", content.id === `tab-${tabName}`);
     });
 
+    updateNavBlobPosition();
+
     if (tabName === "profile") {
       loadUserProfile();
     } else if (tabName === "booking") {
@@ -133,6 +173,9 @@ document.addEventListener("DOMContentLoaded", () => {
       loadAdminBookings(currentAdminFilter);
     }
   }
+
+  window.addEventListener("resize", updateNavBlobPosition);
+  setTimeout(updateNavBlobPosition, 100);
 
   navItems.forEach(item => {
     item.addEventListener("click", () => {

@@ -863,15 +863,67 @@ body {
   font-weight: 800;
 }
 
+/* ── Calendar Date Picker Bar ────────────────────────────── */
+.calendar-dates-bar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px 8px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.calendar-dates-bar::-webkit-scrollbar { display: none; }
+
+.date-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: var(--r-md);
+  background: var(--glass-1);
+  border: 1px solid var(--glass-border);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all var(--fast) var(--ease);
+  min-width: 82px;
+}
+
+.date-pill-num {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.date-pill-lbl {
+  font-size: 11px;
+  color: var(--text-second);
+  font-weight: 600;
+  margin-top: 1px;
+}
+
+.date-pill.active {
+  background: rgba(249, 115, 22, 0.16);
+  border-color: var(--accent);
+  box-shadow: var(--accent-glow-sm);
+}
+
+.date-pill.active .date-pill-num,
+.date-pill.active .date-pill-lbl {
+  color: var(--accent);
+  font-weight: 800;
+}
+
 /* ── Time Slots ─────────────────────────────────────────── */
 .slots-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
 }
 
 .slot-item {
-  padding: 11px 10px;
+  padding: 11px 8px;
   background: var(--glass-1);
   border: 1px solid var(--glass-border);
   border-radius: var(--r-md);
@@ -881,6 +933,27 @@ body {
   text-align: center;
   cursor: pointer;
   transition: all var(--fast) var(--ease);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.slot-item.busy {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+
+.busy-tag {
+  font-size: 9px;
+  color: var(--danger);
+  text-decoration: none;
+  font-weight: 800;
+  margin-left: 2px;
 }
 
 .slot-item.active {
@@ -899,6 +972,26 @@ body {
 
 .phone-input-wrapper .form-input {
   flex: 1;
+}
+
+.tg-phone-btn {
+  padding: 11px 13px;
+  border-radius: var(--r-md);
+  border: none;
+  background: var(--accent-grad);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: var(--font);
+  box-shadow: var(--accent-glow-sm);
+  transition: all var(--fast) var(--ease);
+}
+
+.tg-phone-btn:active {
+  transform: scale(0.96);
+  box-shadow: none;
 }
 
 .edit-phone-btn {
@@ -922,30 +1015,32 @@ body {
   border-color: var(--accent);
 }
 
-/* ── Total Price Badge ───────────────────────────────────── */
+/* ── Total Price Badge (Single Line Clean Layout) ────────── */
 .total-price-badge {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   padding: 14px 16px;
   border-radius: var(--r-lg);
   background: linear-gradient(135deg, rgba(249,115,22,0.12) 0%, rgba(234,88,12,0.06) 100%);
   border: 1px solid rgba(249, 115, 22, 0.30);
+  white-space: nowrap;
 }
 
 .total-price-label {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-second);
+  white-space: nowrap;
 }
 
 .total-price-value {
-  font-size: 18px;
-  font-weight: 800;
-  background: var(--accent-grad);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--accent);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* ── Privacy ─────────────────────────────────────────────── */

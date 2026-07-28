@@ -59,10 +59,35 @@ document.addEventListener("DOMContentLoaded", () => {
   let pendingAdminAction = null;
 
   // Auto-fill phone from Telegram on load
-  const tgPhone = tg?.initDataUnsafe?.user?.phone_number || "";
   const phoneInputEl = document.getElementById("phone-number");
+  const tgPhone = tg?.initDataUnsafe?.user?.phone_number || "";
   if (tgPhone && phoneInputEl) {
     phoneInputEl.value = "+" + tgPhone.replace(/\D/g, "");
+  }
+
+  // Telegram Contact Share button handler
+  const tgSharePhoneBtn = document.getElementById("tg-share-phone-btn");
+  if (tgSharePhoneBtn && phoneInputEl) {
+    tgSharePhoneBtn.addEventListener("click", () => {
+      if (tg && typeof tg.requestContact === "function") {
+        tg.requestContact((sent, event) => {
+          if (sent && event && event.responseUnsafe && event.responseUnsafe.contact) {
+            const num = event.responseUnsafe.contact.phone_number;
+            phoneInputEl.value = "+" + num.replace(/\D/g, "");
+            showToast("✅ Номер получен из Telegram!");
+          } else {
+            showToast("✏️ Введите номер вручную");
+            phoneInputEl.removeAttribute("readonly");
+            phoneInputEl.focus();
+          }
+        });
+      } else {
+        // Fallback for browser testing
+        showToast("✏️ Введите номер телефона в поле");
+        phoneInputEl.removeAttribute("readonly");
+        phoneInputEl.focus();
+      }
+    });
   }
 
   async function checkAdminStatus() {
@@ -538,39 +563,69 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
-  // Masters Dataset & Time Slots Loading
+  // Calendar & Slot Availability Data
+  function generateUpcomingDays() {
+    const daysRu = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
+    const monthsRu = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
+    const days = [];
+    const today = new Date();
+
+    for (let offset = 0; offset < 6; offset++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + offset);
+      const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      let label = offset === 0 ? "Сегодня" : (offset === 1 ? "Завтра" : `${daysRu[d.getDay()]}, ${d.getDate()} ${monthsRu[d.getMonth()]}`);
+      days.push({
+        key: dateKey,
+        label: label,
+        shortDay: daysRu[d.getDay()],
+        dayNum: d.getDate()
+      });
+    }
+    return days;
+  }
+
+  const UPCOMING_DAYS = generateUpcomingDays();
+  let selectedDateKey = UPCOMING_DAYS[0].key;
+  let selectedDateLabel = UPCOMING_DAYS[0].label;
+
+  // Master schedule matrix: time slots with free/busy status
+  const DAILY_TIME_SLOTS = ["09:00", "10:30", "12:00", "13:30", "15:00", "16:30", "18:00"];
+
+  const BUSY_SLOTS_MAP = {
+    "master_alexey": { "09:00": true, "13:30": true },
+    "master_dmitry": { "10:30": true, "16:30": true },
+    "master_igor":   { "12:00": true, "18:00": true }
+  };
+
   const MASTERS_DATA = [
     {
       id: "master_any",
       name: "🌟 Любой свободный мастер",
       role: "Ближайшее доступное время",
       avatar: "👨‍🔧",
-      badge: "⚡ Быстрый выбор",
-      slots: ["Завтра 10:00", "Завтра 12:00", "Завтра 14:00", "Завтра 16:00", "Послезавтра 11:00", "Послезавтра 15:00"]
+      badge: "⚡ Быстрый выбор"
     },
     {
       id: "master_alexey",
       name: "Алексей Смирнов",
       role: "Старший механик (Двигатель и ТО)",
       avatar: "👨‍🔧",
-      badge: "Опыт 12 лет",
-      slots: ["Завтра 10:00", "Завтра 14:00", "Послезавтра 11:00"]
+      badge: "Опыт 12 лет"
     },
     {
       id: "master_dmitry",
       name: "Дмитрий Ковалев",
       role: "Диагност-автоэлектрик",
       avatar: "⚡",
-      badge: "Опыт 9 лет",
-      slots: ["Завтра 12:00", "Завтра 16:00", "Послезавтра 15:00"]
+      badge: "Опыт 9 лет"
     },
     {
       id: "master_igor",
       name: "Игорь Соколов",
       role: "Мастер по ходовой части",
       avatar: "🛞",
-      badge: "Опыт 8 лет",
-      slots: ["Завтра 10:00", "Завтра 16:00", "Послезавтра 11:00", "Послезавтра 15:00"]
+      badge: "Опыт 8 лет"
     }
   ];
 
@@ -604,49 +659,86 @@ document.addEventListener("DOMContentLoaded", () => {
           selectedMasterId = master.id;
           selectedMasterName = master.name;
           renderMasters();
-          renderSlotsForMaster(master);
+          renderSlotsForMasterAndDate();
         }
       });
     });
   }
 
-  function renderSlotsForMaster(master) {
+  function renderCalendarDates() {
+    const container = document.getElementById("calendar-dates-container");
+    if (!container) return;
+
+    container.innerHTML = UPCOMING_DAYS.map(d => {
+      const isSelected = d.key === selectedDateKey;
+      return `
+        <div class="date-pill ${isSelected ? 'active' : ''}" data-date-key="${d.key}" data-date-label="${d.label}">
+          <span class="date-pill-num">${d.dayNum}</span>
+          <span class="date-pill-lbl">${d.label}</span>
+        </div>
+      `;
+    }).join("");
+
+    container.querySelectorAll(".date-pill").forEach(pill => {
+      pill.addEventListener("click", () => {
+        selectedDateKey = pill.dataset.dateKey;
+        selectedDateLabel = pill.dataset.dateLabel;
+        renderCalendarDates();
+        renderSlotsForMasterAndDate();
+      });
+    });
+  }
+
+  function renderSlotsForMasterAndDate() {
     const container = document.getElementById("slots-container");
     const label = document.getElementById("slots-header-label");
     if (!container) return;
 
     if (label) {
-      label.textContent = `Свободное время (${master.name}):`;
+      label.textContent = `Время записи на ${selectedDateLabel} (${selectedMasterName}):`;
     }
 
-    const slots = master.slots || [];
-    if (slots.length === 0) {
-      container.innerHTML = `<div class="info-card glass-card"><p style="text-align:center;">У данного мастера нет свободных окон на ближайшие дни.</p></div>`;
-      selectedSlot = "";
-      return;
-    }
+    const busyMap = BUSY_SLOTS_MAP[selectedMasterId] || {};
+    let firstAvailableFound = false;
 
-    selectedSlot = slots[0];
+    container.innerHTML = DAILY_TIME_SLOTS.map((time) => {
+      const isBusy = !!busyMap[time];
+      let isSelected = false;
 
-    container.innerHTML = slots.map((s, idx) => `
-      <div class="slot-item ${idx === 0 ? 'active' : ''}" data-slot="${s}">
-        📅 ${s}
-      </div>
-    `).join("");
+      if (!isBusy && !firstAvailableFound) {
+        isSelected = true;
+        firstAvailableFound = true;
+        selectedSlot = `${selectedDateLabel} в ${time}`;
+      }
 
-    container.querySelectorAll(".slot-item").forEach(item => {
+      if (isBusy) {
+        return `
+          <div class="slot-item busy disabled" title="Окно занято">
+            🔒 ${time} <small class="busy-tag">Занято</small>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="slot-item ${isSelected ? 'active' : ''}" data-time="${time}">
+          📅 ${time}
+        </div>
+      `;
+    }).join("");
+
+    container.querySelectorAll(".slot-item:not(.busy)").forEach(item => {
       item.addEventListener("click", () => {
         container.querySelectorAll(".slot-item").forEach(i => i.classList.remove("active"));
         item.classList.add("active");
-        selectedSlot = item.dataset.slot;
+        selectedSlot = `${selectedDateLabel} в ${item.dataset.time}`;
       });
     });
   }
 
   async function loadSlots() {
     renderMasters();
-    const defaultMaster = MASTERS_DATA.find(m => m.id === selectedMasterId) || MASTERS_DATA[0];
-    renderSlotsForMaster(defaultMaster);
+    renderCalendarDates();
+    renderSlotsForMasterAndDate();
   }
 
   // User Profile loading

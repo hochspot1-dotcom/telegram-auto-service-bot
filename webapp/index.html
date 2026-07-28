@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=18.0" />
+  <link rel="stylesheet" href="style.css?v=19.0" />
 </head>
 <body>
   <div id="app">
@@ -155,9 +155,16 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label" id="slots-header-label">Свободное время мастера:</label>
+              <label class="form-label">Выберите дату записи:</label>
+              <div class="calendar-dates-bar" id="calendar-dates-container">
+                <!-- Date pills rendered via JS -->
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" id="slots-header-label">Свободное и занятое время на выбранную дату:</label>
               <div class="slots-grid" id="slots-container">
-                <!-- Slots rendered via JS -->
+                <!-- Time slots rendered via JS -->
               </div>
             </div>
 
@@ -205,11 +212,14 @@
               </div>
             </div>
 
-            <!-- Phone number with Edit pencil icon -->
+            <!-- Phone number with Telegram share & Edit pencil button -->
             <div class="form-group">
               <label class="form-label" for="phone-number">Ваш телефон для связи:</label>
               <div class="phone-input-wrapper">
                 <input type="tel" id="phone-number" class="form-input glass-input" placeholder="+7 (999) 000-00-00" readonly required />
+                <button type="button" id="tg-share-phone-btn" class="tg-phone-btn glow-btn" title="Запросить номер из Telegram">
+                  📱 Запросить из Telegram
+                </button>
                 <button type="button" id="edit-phone-btn" class="edit-phone-btn" title="Нажмите, чтобы изменить номер">
                   ✏️
                 </button>
@@ -400,6 +410,6 @@
     <div id="toast" class="toast hidden glass-toast"></div>
   </div>
 
-  <script src="app.js?v=18.0"></script>
+  <script src="app.js?v=19.0"></script>
 </body>
 </html>

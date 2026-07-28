@@ -133,13 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateNavBlobPosition() {
     if (!navBlobPill || !mainNav) return;
     const activeNav = mainNav.querySelector(".nav-item.active");
-    if (!activeNav) {
-      navBlobPill.style.opacity = "0";
-      return;
-    }
-
-    // Skip blob overlay for center action button if it's the main circular button
-    if (activeNav.classList.contains("nav-item-main")) {
+    if (!activeNav || activeNav.classList.contains("nav-item-main")) {
       navBlobPill.style.opacity = "0";
       return;
     }
@@ -147,8 +141,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const navRect = mainNav.getBoundingClientRect();
     const activeRect = activeNav.getBoundingClientRect();
 
-    const left = activeRect.left - navRect.left;
-    const width = activeRect.width;
+    const left = activeRect.left - navRect.left + 4;
+    const width = activeRect.width - 8;
 
     navBlobPill.style.opacity = "1";
     navBlobPill.style.transform = `translateX(${left}px)`;

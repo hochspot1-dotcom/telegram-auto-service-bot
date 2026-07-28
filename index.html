@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=23.0" />
+  <link rel="stylesheet" href="style.css?v=24.0" />
 </head>
 <body>
   <div id="app">
@@ -154,17 +154,28 @@
               </div>
             </div>
 
-            <div class="form-group">
-              <label class="form-label">Выберите дату записи:</label>
+            <!-- 2. Date Selection (Calendar View) -->
+            <div class="form-group" id="calendar-step-group">
+              <label class="form-label">Выберите дату записи на календаре:</label>
               <div class="full-calendar-card glass-card" id="full-calendar-widget">
                 <!-- Full month calendar widget rendered via JS -->
               </div>
             </div>
 
-            <div class="form-group">
-              <label class="form-label" id="slots-header-label">Свободное и занятое время на выбранную дату:</label>
-              <div class="slots-grid" id="slots-container">
-                <!-- Time slots rendered via JS -->
+            <!-- 3. Time Slots View (Swaps with calendar when date is chosen) -->
+            <div class="form-group hidden" id="slots-step-group">
+              <div class="slots-view-header">
+                <button type="button" class="change-date-btn" id="change-date-btn">
+                  <span>← Изменить дату</span>
+                </button>
+                <span class="slots-selected-date-badge" id="slots-date-badge">28 июля</span>
+              </div>
+
+              <label class="form-label" id="slots-header-label">Выберите свободное время:</label>
+              <div class="slots-card glass-card">
+                <div class="slots-grid" id="slots-container">
+                  <!-- Time slots rendered via JS -->
+                </div>
               </div>
             </div>
 
@@ -413,6 +424,6 @@
     <div id="toast" class="toast hidden glass-toast"></div>
   </div>
 
-  <script src="app.js?v=23.0"></script>
+  <script src="app.js?v=24.0"></script>
 </body>
 </html>

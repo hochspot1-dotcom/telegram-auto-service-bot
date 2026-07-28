@@ -978,6 +978,50 @@ body {
   border-color: rgba(249, 115, 22, 0.4);
 }
 
+/* ── Time Slots View (Swaps with Calendar) ────────────────── */
+.slots-view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.change-date-btn {
+  padding: 8px 14px;
+  border-radius: var(--r-md);
+  background: var(--glass-2);
+  border: 1px solid var(--glass-border);
+  color: var(--text-second);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all var(--fast) var(--ease);
+}
+
+.change-date-btn:active {
+  background: rgba(249, 115, 22, 0.16);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.slots-selected-date-badge {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--accent);
+  background: rgba(249, 115, 22, 0.12);
+  border: 1px solid rgba(249, 115, 22, 0.30);
+  border-radius: var(--r-pill);
+  padding: 4px 12px;
+}
+
+.slots-card {
+  padding: 16px;
+  border-radius: var(--r-lg);
+  background: var(--glass-1);
+  border: 1px solid var(--glass-border);
+}
+
 /* ── Time Slots ─────────────────────────────────────────── */
 .slots-grid {
   display: grid;

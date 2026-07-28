@@ -1425,6 +1425,11 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         showToast("⚠️ " + (data.error || "Ошибка выполнения"));
       }
+    } catch (e) {
+      showToast("⚠️ Ошибка соединения с сервером");
+    }
+  }
+
   // Admin Master Unavailability Trigger Handler
   const admTriggerRescheduleBtn = document.getElementById("adm-trigger-reschedule-btn");
   if (admTriggerRescheduleBtn) {

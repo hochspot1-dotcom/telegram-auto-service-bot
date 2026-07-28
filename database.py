@@ -182,3 +182,43 @@ def get_admin_stats() -> dict:
             "approved": approved,
             "rejected": rejected
         }
+
+def mark_master_bookings_unavailable(master_name: str, reason: str = "") -> list:
+    """Пометить все активные записи к конкретному мастеру как 'Мастер недоступен (Нужен перенос)'"""
+    affected = []
+    with get_connection() as conn:
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        # Находим все записи, где в slot содержится имя мастера
+        cursor.execute("""
+            SELECT id, user_id, user_name, problem, car_model, slot, phone
+            FROM bookings
+            WHERE slot LIKE ? AND status IN ('На рассмотрении', 'Одобрена', 'Активна')
+        """, (f"%{master_name}%",))
+        rows = cursor.fetchall()
+        
+        comment = reason or "Мастер временно недоступен. Пожалуйста, выберите другого мастера или дату."
+        
+        for r in rows:
+            affected.append(dict(r))
+            cursor.execute("""
+                UPDATE bookings
+                SET status = '⚠️ Мастер недоступен (Нужен перенос)', comment = ?
+                WHERE id = ?
+            """, (comment, r["id"]))
+            
+        conn.commit()
+    return affected
+
+def reschedule_booking(booking_id: int, user_id: int, new_slot: str) -> bool:
+    """Перенос клиентом своей записи на нового мастера / другое время"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE bookings
+            SET slot = ?, status = 'На рассмотрении (Перенесена)', comment = 'Клиент перенес запись на новое время'
+            WHERE id = ? AND user_id = ?
+        """, (new_slot, booking_id, user_id))
+        conn.commit()
+        return cursor.rowcount > 0

@@ -9,7 +9,8 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from database import (
     add_booking, get_user_bookings, get_user_stats, 
     cancel_booking_by_id, get_booking_by_id,
-    get_all_bookings, get_admin_stats, delete_booking_by_id
+    get_all_bookings, get_admin_stats, delete_booking_by_id,
+    mark_master_bookings_unavailable, reschedule_booking
 )
 
 routes = web.RouteTableDef()
@@ -270,6 +271,77 @@ async def handle_admin_action(request: web.Request):
     
     await process_moderator_decision(bot, booking_id, new_status, comment)
     return web.json_response({"success": True, "status": new_status})
+
+
+@routes.post("/api/admin/master/reschedule")
+async def handle_admin_master_reschedule(request: web.Request):
+    """Снять мастера со смены и отправить клиентам предложение выбрать другого мастера"""
+    try:
+        data = await request.json()
+    except Exception:
+        return web.json_response({"error": "Invalid JSON"}, status=400)
+
+    admin_id = data.get("admin_id")
+    master_name = data.get("master_name", "").strip()
+    reason = data.get("reason", "").strip()
+
+    if not admin_id or not check_is_admin(int(admin_id)):
+        return web.json_response({"error": "Forbidden"}, status=403)
+    if not master_name:
+        return web.json_response({"error": "Укажите имя мастера"}, status=400)
+
+    affected_bookings = mark_master_bookings_unavailable(master_name, reason)
+
+    bot: Bot = request.app.get("bot")
+    if bot and affected_bookings:
+        for b in affected_bookings:
+            client_id = b["user_id"]
+            booking_id = b["id"]
+            reason_str = f"\n💬 <b>Причина:</b> <i>{reason}</i>" if reason else ""
+
+            msg = (
+                f"⚠️ <b>ВНИМАНИЕ по вашей записи №{booking_id}!</b>\n\n"
+                f"К сожалению, выбранный специалист (<b>{master_name}</b>) временно недоступен.{reason_str}\n\n"
+                f"• <b>Услуга:</b> {b['problem']}\n"
+                f"• <b>Автомобиль:</b> {b['car_model']}\n"
+                f"• <b>Текущее время:</b> {b['slot']}\n\n"
+                "Пожалуйста, выберите другого мастера или другое удобное время."
+            )
+
+            builder = InlineKeyboardBuilder()
+            builder.button(text="🔄 Выбрать другого мастера/время", callback_data=f"reschedule_{booking_id}")
+            builder.button(text="❌ Отменить запись", callback_data=f"cancel_b_{booking_id}")
+            builder.adjust(1, 1)
+
+            try:
+                await bot.send_message(client_id, msg, parse_mode="HTML", reply_markup=builder.as_markup())
+            except Exception as e:
+                logging.error(f"Не удалось отправить сообщение о переносе клиенту {client_id}: {e}")
+
+    return web.json_response({
+        "success": True,
+        "affected_count": len(affected_bookings)
+    })
+
+@routes.post("/api/booking/reschedule")
+async def handle_client_reschedule(request: web.Request):
+    """Перенос клиентом своей записи на нового мастера / время"""
+    try:
+        data = await request.json()
+    except Exception:
+        return web.json_response({"error": "Invalid JSON"}, status=400)
+
+    booking_id = data.get("booking_id")
+    user_id = data.get("user_id")
+    new_slot = data.get("new_slot", "").strip()
+
+    if not booking_id or not user_id or not new_slot:
+        return web.json_response({"error": "Отсутствуют обязательные параметры"}, status=400)
+
+    success = reschedule_booking(int(booking_id), int(user_id), new_slot)
+    if success:
+        return web.json_response({"success": True})
+    return web.json_response({"error": "Не удалось перенести запись"}, status=400)
 
 
 @web.middleware

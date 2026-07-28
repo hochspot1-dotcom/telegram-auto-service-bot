@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=27.0" />
+  <link rel="stylesheet" href="style.css?v=28.0" />
 </head>
 <body>
   <div id="app">
@@ -332,6 +332,30 @@
           </div>
         </div>
 
+        <!-- Master Unavailability Management Card for Admin -->
+        <div class="glass-card admin-master-tool-card">
+          <div class="tool-card-title">⚠️ Управление сменами мастеров (Отгул / Больничный)</div>
+          <p class="tool-card-desc">Отмените смену мастера. Все клиенты с активными записями к нему сразу получат Telegram-уведомление с кнопкой быстрой смены мастера/даты.</p>
+
+          <div class="form-group">
+            <label class="form-label" for="adm-master-select">Выберите мастера:</label>
+            <select id="adm-master-select" class="form-input glass-input">
+              <option value="Алексей Смирнов">Алексей Смирнов (Старший механик)</option>
+              <option value="Дмитрий Ковалев">Дмитрий Ковалев (Диагност-электрик)</option>
+              <option value="Игорь Соколов">Игорь Соколов (Ходовая часть)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="adm-master-reason">Причина (отобразится клиентам):</label>
+            <input type="text" id="adm-master-reason" class="form-input glass-input" placeholder="Например: Больничный мастера / Аварийное переключение смены" />
+          </div>
+
+          <button type="button" id="adm-trigger-reschedule-btn" class="admin-btn admin-btn-reject glow-btn">
+            <span>⚠️ Снять мастера и уведомить клиентов</span>
+          </button>
+        </div>
+
         <div class="admin-filters-bar">
           <div class="pills-grid" id="admin-status-pills">
             <div class="pill active" data-status="all">Все записи</div>
@@ -424,6 +448,6 @@
     <div id="toast" class="toast hidden glass-toast"></div>
   </div>
 
-  <script src="app.js?v=27.0"></script>
+  <script src="app.js?v=28.0"></script>
 </body>
 </html>

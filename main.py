@@ -972,11 +972,41 @@ async def adm_comment_received(message: types.Message, state: FSMContext, bot: B
         try:
             fake_msg = await bot.send_message(message.chat.id, "Обработка...", reply_markup=types.ReplyKeyboardRemove())
             fake_msg.message_id = admin_msg_id
-            fake_cb = FakeCallback(fake_msg)
-        except Exception:
-            pass
-
     await process_moderator_decision(bot, booking_id, new_status=new_status, comment=comment_text, callback=fake_cb)
+
+# Обработка кнопки "Перенести запись" от клиента
+@dp.callback_query(F.data.startswith("reschedule_"))
+async def client_reschedule_inline_handler(callback: types.CallbackQuery):
+    await callback.answer()
+    booking_id = callback.data.split("_")[1]
+    
+    web_app_url = os.getenv("WEBAPP_URL", "https://hochspot1-dotcom.github.io/telegram-auto-service-bot")
+    builder = InlineKeyboardBuilder()
+    builder.button(text="🚀 Открыть Mini App для выбора мастера", web_app=types.WebAppInfo(url=web_app_url))
+    builder.adjust(1)
+    
+    await callback.message.reply(
+        f"<b>🔄 Перенос записи №{booking_id}:</b>\n\n"
+        "Нажмите кнопку ниже, чтобы открыть Mini App и выбрать нового специалиста или удобную дату!",
+        parse_mode="HTML",
+        reply_markup=builder.as_markup()
+    )
+
+# Обработка отмены записи клиентом через кнопку в сообщении
+@dp.callback_query(F.data.startswith("cancel_b_"))
+async def client_cancel_inline_handler(callback: types.CallbackQuery):
+    await callback.answer()
+    booking_id = int(callback.data.split("_")[2])
+    
+    success = cancel_booking_by_id(booking_id, callback.from_user.id)
+    if success:
+        await callback.message.edit_text(
+            f"<b>❌ Запись №{booking_id} отменена по вашему запросу.</b>\n\n"
+            "Вы всегда можете оформить новую запись в любое время!",
+            parse_mode="HTML"
+        )
+    else:
+        await callback.message.answer("⚠️ Не удалось отменить запись или она уже отменена.")
 
 # Финальное подтверждение записи клиентом
 @dp.callback_query(F.data == "confirm_booking")

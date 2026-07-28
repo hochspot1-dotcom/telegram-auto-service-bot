@@ -1070,32 +1070,36 @@ body {
   border-color: var(--accent);
 }
 
-/* ── Total Price Badge (Single Line Clean Layout) ────────── */
+/* ── Total Price Badge (Responsive Mobile-Safe Layout) ────── */
 .total-price-badge {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 14px 16px;
+  gap: 8px;
+  padding: 12px 14px;
   border-radius: var(--r-lg);
   background: linear-gradient(135deg, rgba(249,115,22,0.12) 0%, rgba(234,88,12,0.06) 100%);
   border: 1px solid rgba(249, 115, 22, 0.30);
-  white-space: nowrap;
+  flex-wrap: wrap;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .total-price-label {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--text-second);
-  white-space: nowrap;
+  flex: 1 1 auto;
+  line-height: 1.3;
 }
 
 .total-price-value {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 900;
   color: var(--accent);
   white-space: nowrap;
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 /* ── Privacy ─────────────────────────────────────────────── */
@@ -1260,16 +1264,18 @@ body {
 /* Liquid Blob Capsule Pill for sliding active tab transition */
 .nav-blob-pill {
   position: absolute;
-  top: 6px;
-  bottom: 6px;
+  top: 0;
+  bottom: 0;
   left: 0;
+  height: 38px;
+  margin: auto 0;
   background: rgba(249, 115, 22, 0.16);
   border: 1px solid rgba(249, 115, 22, 0.40);
-  border-radius: 20px;
+  border-radius: 14px;
   pointer-events: none;
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.35s ease, opacity 0.25s ease;
+  transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.3s ease, opacity 0.2s ease;
   z-index: 0;
-  box-shadow: inset 0 0 14px rgba(249, 115, 22, 0.25), 0 0 14px rgba(249, 115, 22, 0.2);
+  box-shadow: inset 0 0 10px rgba(249, 115, 22, 0.2);
 }
 
 /* Sidebar nav items */

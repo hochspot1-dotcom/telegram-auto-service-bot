@@ -1070,36 +1070,45 @@ body {
   border-color: var(--accent);
 }
 
-/* ── Total Price Badge (Responsive Mobile-Safe Layout) ────── */
-.total-price-badge {
+/* ── Total Price Card (Premium Stacked Design) ──────────── */
+.total-price-card {
+  padding: 14px 18px;
+  border-radius: var(--r-lg);
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.14) 0%, rgba(234, 88, 12, 0.06) 100%);
+  border: 1px solid rgba(249, 115, 22, 0.32);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  width: 100%;
+}
+
+.total-price-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 12px 14px;
-  border-radius: var(--r-lg);
-  background: linear-gradient(135deg, rgba(249,115,22,0.12) 0%, rgba(234,88,12,0.06) 100%);
-  border: 1px solid rgba(249, 115, 22, 0.30);
-  flex-wrap: wrap;
-  width: 100%;
-  box-sizing: border-box;
+  gap: 6px;
+}
+
+.total-price-icon {
+  font-size: 14px;
+  line-height: 1;
 }
 
 .total-price-label {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-second);
-  flex: 1 1 auto;
-  line-height: 1.3;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
 }
 
 .total-price-value {
-  font-size: 15px;
+  font-size: 22px;
   font-weight: 900;
   color: var(--accent);
-  white-space: nowrap;
-  flex-shrink: 0;
-  margin-left: auto;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
 }
 
 /* ── Privacy ─────────────────────────────────────────────── */
@@ -1267,15 +1276,15 @@ body {
   top: 0;
   bottom: 0;
   left: 0;
-  height: 38px;
+  height: 48px;
   margin: auto 0;
   background: rgba(249, 115, 22, 0.16);
   border: 1px solid rgba(249, 115, 22, 0.40);
-  border-radius: 14px;
+  border-radius: 18px;
   pointer-events: none;
   transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.3s ease, opacity 0.2s ease;
   z-index: 0;
-  box-shadow: inset 0 0 10px rgba(249, 115, 22, 0.2);
+  box-shadow: inset 0 0 12px rgba(249, 115, 22, 0.25);
 }
 
 /* Sidebar nav items */

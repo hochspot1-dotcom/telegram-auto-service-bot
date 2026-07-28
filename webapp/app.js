@@ -141,12 +141,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const navRect = mainNav.getBoundingClientRect();
     const activeRect = activeNav.getBoundingClientRect();
 
-    const left = activeRect.left - navRect.left + 4;
-    const width = activeRect.width - 8;
+    // Compact width capsule centered over tab item
+    const targetWidth = Math.min(activeRect.width - 20, 64);
+    const left = activeRect.left - navRect.left + (activeRect.width - targetWidth) / 2;
 
     navBlobPill.style.opacity = "1";
     navBlobPill.style.transform = `translateX(${left}px)`;
-    navBlobPill.style.width = `${width}px`;
+    navBlobPill.style.width = `${targetWidth}px`;
   }
 
   function switchTab(tabName) {

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=22.0" />
+  <link rel="stylesheet" href="style.css?v=23.0" />
 </head>
 <body>
   <div id="app">
@@ -223,10 +223,13 @@
               </div>
             </div>
 
-            <!-- Total Estimated Price Badge -->
-            <div class="total-price-badge glass-card" id="total-price-box">
-              <span class="total-price-label">💰 Итоговая ориентировочная стоимость:</span>
-              <span class="total-price-value" id="total-price-val">от 0 ₽</span>
+            <!-- Premium Total Price Card -->
+            <div class="total-price-card glass-card" id="total-price-box">
+              <div class="total-price-header">
+                <span class="total-price-icon">💰</span>
+                <span class="total-price-label">Ориентировочная стоимость</span>
+              </div>
+              <div class="total-price-value" id="total-price-val">от 0 ₽</div>
             </div>
 
             <!-- Privacy Policy Checkbox (UNCHECKED by default) -->
@@ -410,6 +413,6 @@
     <div id="toast" class="toast hidden glass-toast"></div>
   </div>
 
-  <script src="app.js?v=22.0"></script>
+  <script src="app.js?v=23.0"></script>
 </body>
 </html>

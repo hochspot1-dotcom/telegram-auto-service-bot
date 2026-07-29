@@ -261,13 +261,14 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   POPULAR WORK CARDS (Spacious, Generous Height & Perfect Text Layout)
+   POPULAR WORK CARDS (Aesthetic Minimal Layout)
    ═══════════════════════════════════════════════════════════ */
 
 .af-section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-top: 4px;
 }
 
 .af-section-title {
@@ -277,19 +278,13 @@ body {
   letter-spacing: -0.3px;
 }
 
-.af-section-sub {
-  font-size: 13px;
-  color: var(--gray-3);
-  font-weight: 600;
-}
-
 .af-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
 }
 
-/* Larger, comfortable cards with proper typography spacing */
+/* Spacious, clean cards with proper typography spacing */
 .af-service-card {
   background: var(--bg-card);
   border-radius: var(--r-lg);
@@ -438,17 +433,36 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 4px;
 }
 
 .af-back-cat-btn {
-  padding: 8px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
   background: var(--bg-pill);
   border: none;
   border-radius: var(--r-pill);
   color: var(--dark);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
+  font-family: var(--font-main);
   cursor: pointer;
+  transition: transform 0.15s var(--spring), background 0.15s var(--ease);
+}
+
+.af-back-cat-btn:active {
+  transform: scale(0.95);
+  background: var(--gray-6);
+}
+
+.af-cat-header-badge {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--dark);
+  text-align: right;
 }
 
 .af-service-check-row {
@@ -461,32 +475,38 @@ body {
   border: 1.5px solid transparent;
   box-shadow: var(--shadow-sm);
   cursor: pointer;
-  transition: all 0.15s var(--ease);
+  user-select: none;
+  transition: transform 0.15s var(--spring), border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+
+.af-service-check-row:active {
+  transform: scale(0.98);
 }
 
 .af-service-check-row.selected {
   background: #ffffff;
   border-color: var(--green);
-  box-shadow: 0 4px 14px rgba(52, 199, 89, 0.12);
+  box-shadow: 0 4px 16px rgba(52, 199, 89, 0.14);
 }
 
 .af-service-check-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .af-checkbox-badge {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   border: 2px solid var(--gray-4);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 13px;
   color: transparent;
   transition: all 0.15s var(--ease);
+  flex-shrink: 0;
 }
 
 .af-service-check-row.selected .af-checkbox-badge {
@@ -500,12 +520,14 @@ body {
   font-size: 15px;
   font-weight: 700;
   color: var(--dark);
+  line-height: 1.3;
 }
 
 .af-service-tag-price {
   font-size: 14px;
   font-weight: 800;
   color: var(--dark);
+  white-space: nowrap;
 }
 
 /* ═══════════════════════════════════════════════════════════

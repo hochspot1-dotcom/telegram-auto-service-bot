@@ -8,12 +8,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=54.0" />
+  <link rel="stylesheet" href="style.css?v=55.0" />
 </head>
 <body>
 
   <!-- ══════════════════════════════════════════════
-       WELCOME ONBOARDING SCREEN (Light iOS Style)
+       WELCOME ONBOARDING SCREEN (Hand Phone Request)
        ══════════════════════════════════════════════ -->
   <div id="triton-onboarding-screen" class="af-onboarding-overlay hidden">
     <div style="display:flex;justify-content:flex-end;">
@@ -29,7 +29,10 @@
     </div>
 
     <div>
-      <button type="button" class="af-next-circle" id="onboarding-next-btn">➔</button>
+      <button type="button" class="af-hand-phone-btn" id="onboarding-next-btn">
+        <span>📲 Предоставить номер</span>
+        <span style="font-size:18px;">🖐️</span>
+      </button>
     </div>
   </div>
 
@@ -55,11 +58,11 @@
     <main class="content">
 
       <!-- ════════════════════════════════════════
-           🏠 TAB 1: ГЛАВНАЯ (Promo Carousel + Frosted Glass Cards)
+           🏠 TAB 1: ГЛАВНАЯ (Top Slider Images Only + Clean Minimal Work Cards)
            ════════════════════════════════════════ -->
       <section id="tab-home" class="tab-content active">
 
-        <!-- 1. Auto-Sliding Promo Banner Carousel -->
+        <!-- 1. Top Auto-Sliding Promo Carousel (Images Only Here) -->
         <div class="af-carousel-wrapper" id="home-promo-carousel">
           <div class="af-carousel-track" id="carousel-track">
 
@@ -106,62 +109,54 @@
           <span class="af-section-sub">Все услуги ➔</span>
         </div>
 
-        <!-- 3. 2-Column Work Cards with Frosted White Glass Text Container -->
+        <!-- 3. 2-Column Clean Text Cards (Images removed per user request) -->
         <div class="af-grid-2">
 
           <!-- Card 1: Diagnostic -->
-          <div class="af-service-card-full" style="background-image: url('images/diag.jpg');" data-tab="booking" data-step="1">
-            <div class="af-card-content-glass">
-              <div class="af-card-top-info">
-                <div class="af-card-title">Компьютерная диагностика</div>
-                <div class="af-card-sub">Электрика · 30 мин</div>
-              </div>
-              <div class="af-card-bottom">
-                <span class="af-card-price">1 000 ₽</span>
-                <button class="af-card-btn">Записаться</button>
-              </div>
+          <div class="af-service-card" data-tab="booking" data-step="1">
+            <div>
+              <div class="af-service-title">Компьютерная диагностика</div>
+              <div class="af-service-sub">Электрика · 30 мин</div>
+            </div>
+            <div class="af-service-bottom">
+              <span class="af-service-price">1 000 ₽</span>
+              <button class="af-service-btn">Записаться ➔</button>
             </div>
           </div>
 
           <!-- Card 2: Oil Change -->
-          <div class="af-service-card-full" style="background-image: url('images/oil.jpg');" data-tab="booking" data-step="1">
-            <div class="af-card-content-glass">
-              <div class="af-card-top-info">
-                <div class="af-card-title">Замена масла и фильтра</div>
-                <div class="af-card-sub">Двигатель · 45 мин</div>
-              </div>
-              <div class="af-card-bottom">
-                <span class="af-card-price">1 500 ₽</span>
-                <button class="af-card-btn">Записаться</button>
-              </div>
+          <div class="af-service-card" data-tab="booking" data-step="1">
+            <div>
+              <div class="af-service-title">Замена масла и фильтра</div>
+              <div class="af-service-sub">Двигатель · 45 мин</div>
+            </div>
+            <div class="af-service-bottom">
+              <span class="af-service-price">1 500 ₽</span>
+              <button class="af-service-btn">Записаться ➔</button>
             </div>
           </div>
 
           <!-- Card 3: Suspension -->
-          <div class="af-service-card-full" style="background-image: url('images/susp.jpg');" data-tab="booking" data-step="1">
-            <div class="af-card-content-glass">
-              <div class="af-card-top-info">
-                <div class="af-card-title">Диагностика ходовой</div>
-                <div class="af-card-sub">Подвеска · 40 мин</div>
-              </div>
-              <div class="af-card-bottom">
-                <span class="af-card-price">1 000 ₽</span>
-                <button class="af-card-btn">Записаться</button>
-              </div>
+          <div class="af-service-card" data-tab="booking" data-step="1">
+            <div>
+              <div class="af-service-title">Диагностика ходовой</div>
+              <div class="af-service-sub">Подвеска · 40 мин</div>
+            </div>
+            <div class="af-service-bottom">
+              <span class="af-service-price">1 000 ₽</span>
+              <button class="af-service-btn">Записаться ➔</button>
             </div>
           </div>
 
           <!-- Card 4: AC -->
-          <div class="af-service-card-full" style="background-image: url('images/ac.jpg');" data-tab="booking" data-step="1">
-            <div class="af-card-content-glass">
-              <div class="af-card-top-info">
-                <div class="af-card-title">Заправка кондиционера</div>
-                <div class="af-card-sub">Климат · 35 мин</div>
-              </div>
-              <div class="af-card-bottom">
-                <span class="af-card-price">2 000 ₽</span>
-                <button class="af-card-btn">Записаться</button>
-              </div>
+          <div class="af-service-card" data-tab="booking" data-step="1">
+            <div>
+              <div class="af-service-title">Заправка кондиционера</div>
+              <div class="af-service-sub">Климат · 35 мин</div>
+            </div>
+            <div class="af-service-bottom">
+              <span class="af-service-price">2 000 ₽</span>
+              <button class="af-service-btn">Записаться ➔</button>
             </div>
           </div>
 
@@ -433,6 +428,6 @@
     <div id="toast" class="glass-toast hidden"></div>
   </div>
 
-  <script src="app.js?v=54.0"></script>
+  <script src="app.js?v=55.0"></script>
 </body>
 </html>

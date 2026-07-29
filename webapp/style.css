@@ -157,7 +157,7 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   AUTO-SLIDING PROMO BANNER CAROUSEL
+   AUTO-SLIDING PROMO BANNER CAROUSEL (Top Images Slider Only)
    ═══════════════════════════════════════════════════════════ */
 
 .af-carousel-wrapper {
@@ -166,6 +166,7 @@ body {
   border-radius: var(--r-lg);
   overflow: hidden;
   box-shadow: var(--shadow-md);
+  cursor: pointer;
 }
 
 .af-carousel-track {
@@ -182,16 +183,20 @@ body {
   background-position: center;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 12px;
-  cursor: pointer;
+  transition: transform 0.18s var(--spring);
+}
+
+.af-carousel-slide:active {
+  transform: scale(0.97);
 }
 
 /* Soft Frosted White Glass Panel for Promo Banner */
 .af-slide-glass-panel {
   position: relative;
   z-index: 2;
-  background: rgba(255, 255, 255, 0.90);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-radius: var(--r-md);
@@ -202,7 +207,6 @@ body {
   color: var(--dark);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.6);
-  margin-top: auto;
 }
 
 .af-slide-tag {
@@ -257,7 +261,7 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   POPULAR WORK CARDS (Soft Frosted White Blur Background for 100% Text Readability)
+   POPULAR WORK CARDS (Clean Minimal Text Cards — No Photos)
    ═══════════════════════════════════════════════════════════ */
 
 .af-section-header {
@@ -273,89 +277,80 @@ body {
   letter-spacing: -0.3px;
 }
 
+.af-section-sub {
+  font-size: 13px;
+  color: var(--gray-3);
+  font-weight: 500;
+}
+
 .af-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
 
-.af-service-card-full {
-  position: relative;
-  height: 185px;
+/* Clean Minimal White Cards matching user request */
+.af-service-card {
+  background: var(--bg-card);
   border-radius: var(--r-lg);
-  overflow: hidden;
-  background-size: cover;
-  background-position: center;
-  box-shadow: var(--shadow-md);
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  height: 130px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0, 0, 0, 0.04);
   cursor: pointer;
-  transition: transform 0.18s var(--spring);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 8px;
+  transition: transform 0.18s var(--spring), box-shadow 0.18s var(--ease);
 }
 
-.af-service-card-full:active { transform: scale(0.97); }
-
-/* Frosted White Glass Chip Container for text separation */
-.af-card-content-glass {
-  position: relative;
-  z-index: 2;
-  background: rgba(255, 255, 255, 0.90);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-radius: var(--r-md);
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+.af-service-card:active {
+  transform: scale(0.96);
+  box-shadow: var(--shadow-md);
 }
 
-.af-card-top-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.af-card-title {
+.af-service-title {
   font-size: 15px;
   font-weight: 800;
-  line-height: 1.25;
   color: var(--dark);
+  line-height: 1.25;
 }
 
-.af-card-sub {
-  font-size: 11px;
+.af-service-sub {
+  font-size: 12px;
   color: var(--gray-2);
-  font-weight: 600;
-}
-
-.af-card-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4px;
+  font-weight: 500;
   margin-top: 2px;
 }
 
-.af-card-price {
-  font-size: 15px;
+.af-service-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.af-service-price {
+  font-size: 16px;
   font-weight: 800;
   color: var(--dark);
 }
 
-.af-card-btn {
-  padding: 6px 12px;
+.af-service-btn {
+  padding: 7px 13px;
   background: var(--dark);
   color: #ffffff;
   border-radius: var(--r-pill);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 700;
   border: none;
   cursor: pointer;
-  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s var(--spring);
+}
+
+.af-service-btn:active {
+  transform: scale(0.92);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -754,6 +749,7 @@ body {
   font-weight: 800;
 }
 
+/* Onboarding Modal with Hand Phone Request Button */
 .af-onboarding-overlay {
   position: fixed;
   inset: 0;
@@ -807,20 +803,28 @@ body {
   max-width: 280px;
 }
 
-.af-next-circle {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
+.af-hand-phone-btn {
+  width: 100%;
+  max-width: 320px;
+  padding: 16px 24px;
+  border-radius: var(--r-pill);
   background: var(--dark);
   color: #ffffff;
-  font-size: 22px;
+  font-size: 15px;
+  font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 10px;
   border: none;
   cursor: pointer;
   box-shadow: var(--shadow-md);
   margin: 0 auto;
+  transition: transform 0.18s var(--spring);
+}
+
+.af-hand-phone-btn:active {
+  transform: scale(0.95);
 }
 
 .modal-overlay {

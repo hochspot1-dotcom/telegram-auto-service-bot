@@ -207,12 +207,36 @@ document.addEventListener("DOMContentLoaded", () => {
   if (privacyAgreeCheckbox && submitBookingBtn) {
     submitBookingBtn.disabled = !privacyAgreeCheckbox.checked;
 
-    privacyAgreeCheckbox.addEventListener("change", () => {
-      submitBookingBtn.disabled = !privacyAgreeCheckbox.checked;
+  // Triton Hub & Action Widgets Handlers
+  const quickBookingBanner = document.getElementById("triton-quick-booking-banner");
+  if (quickBookingBanner) {
+    quickBookingBanner.addEventListener("click", () => {
+      switchTab("booking");
+      goToStep(2);
     });
   }
 
+  const widgetBookings = document.getElementById("triton-widget-bookings");
+  if (widgetBookings) {
+    widgetBookings.addEventListener("click", () => {
+      switchTab("profile");
+    });
+  }
 
+  const widgetMasters = document.getElementById("triton-widget-masters");
+  if (widgetMasters) {
+    widgetMasters.addEventListener("click", () => {
+      switchTab("booking");
+      goToStep(2);
+    });
+  }
+
+  document.querySelectorAll(".triton-hub-card").forEach(card => {
+    card.addEventListener("click", () => {
+      switchTab("booking");
+      goToStep(1);
+    });
+  });
 
   // Services Categories & Subservices Tree
   const SERVICE_CATEGORIES = [

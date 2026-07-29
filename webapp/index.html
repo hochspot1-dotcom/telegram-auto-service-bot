@@ -8,42 +8,86 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=34.0" />
+  <link rel="stylesheet" href="style.css?v=35.0" />
 </head>
 <body>
   <div id="app">
-    <!-- Header -->
-    <header class="header glass-card">
-      <div class="brand">
-        <div class="logo-box">
-          <span class="logo-icon">🚗</span>
+    <!-- Triton Top Profile Header -->
+    <header class="header triton-header">
+      <div class="triton-user-profile">
+        <div class="user-avatar-circle">
+          <span>👨‍🔧</span>
         </div>
-        <div class="brand-text">
-          <h1>Автосервис<span class="brand-accent">.Pro</span></h1>
-          <p id="user-greeting">Добро пожаловать!</p>
-        </div>
+        <span class="user-handle-name" id="user-greeting">Клиент</span>
       </div>
-      <div class="status-indicator">
-        <span class="status-dot"></span>
-        <span class="status-text">Открыто</span>
+      <div class="triton-status-pill">
+        <span class="pill-dot"></span>
+        <span class="pill-status-text">Открыто</span>
       </div>
     </header>
 
     <!-- Main Content Area -->
     <main class="content">
 
-      <!-- 🏠 Tab: Home -->
+      <!-- 🏠 Tab: Home (Triton Dashboard Layout) -->
       <section id="tab-home" class="tab-content active">
-        <div class="home-hero-card glass-card">
-          <div class="hero-badge">⚡ Профессиональный Автосервис</div>
-          <h2>Приветствуем в Автосервис.Pro!</h2>
-          <p>Быстрая и удобная запись на ремонт и ТО без очередей. Выберите удобный день и время за пару кликов.</p>
-          <button class="home-cta-btn glow-btn" id="home-start-booking-btn">
-            <span>🚀 Записаться на обслуживание ➔</span>
-          </button>
+        <!-- 1. Triton Hero Banner Card -->
+        <div class="triton-hero-card">
+          <div class="hero-content">
+            <div class="hero-tag">Автосервис.Pro</div>
+            <h2>Запись на ТО в 1 клик!</h2>
+            <p>Быстрый выбор мастера и удобного времени без очередей</p>
+            <button class="triton-white-btn" id="home-start-booking-btn">
+              <span>Записаться</span>
+            </button>
+          </div>
+          <div class="hero-3d-graphic">
+            <span class="graphic-emoji">🏎️</span>
+          </div>
         </div>
 
-        <!-- 4 Static Popular Square Cards (2x2 Grid) -->
+        <!-- 2. Triton Primary Action Pill -->
+        <div class="triton-action-banner" id="triton-quick-booking-banner">
+          <span>🚀 Выбрать свободного мастера и время</span>
+        </div>
+
+        <!-- 3. Triton 2-Column Quick Hub Widgets -->
+        <div class="triton-grid-2col">
+          <div class="triton-hub-card" data-cat="cat_electric">
+            <div class="hub-icon">🛒</div>
+            <div class="hub-title">Услуги</div>
+            <div class="hub-sub">Каталог работ</div>
+          </div>
+          <div class="triton-hub-card" data-cat="cat_to">
+            <div class="hub-icon">🛠️</div>
+            <div class="hub-title">Мой Гараж</div>
+            <div class="hub-sub">Марка и госномер</div>
+          </div>
+        </div>
+
+        <!-- 4. Triton 2x2 Feature Widgets (Bookings & Masters) -->
+        <div class="triton-grid-2col">
+          <div class="triton-feature-widget" id="triton-widget-bookings">
+            <div class="widget-icon-stack">
+              <span class="widget-check">✅</span>
+              <span class="widget-check">☑️</span>
+            </div>
+            <div class="widget-title">Ваши Записи</div>
+            <div class="widget-desc">Статус и отмены</div>
+          </div>
+
+          <div class="triton-feature-widget" id="triton-widget-masters">
+            <div class="widget-avatars-stack">
+              <span class="avatar-stacked">👨‍🔧</span>
+              <span class="avatar-stacked">⚡</span>
+              <span class="avatar-stacked">🛞</span>
+            </div>
+            <div class="widget-title">Специалисты</div>
+            <div class="widget-desc">Опыт 12 лет</div>
+          </div>
+        </div>
+
+        <!-- Popular Services Section -->
         <div class="home-section-title">
           <h3>💡 Популярные услуги и стоимость</h3>
         </div>
@@ -474,6 +518,6 @@
     <div id="toast" class="toast hidden glass-toast"></div>
   </div>
 
-  <script src="app.js?v=34.0"></script>
+  <script src="app.js?v=35.0"></script>
 </body>
 </html>

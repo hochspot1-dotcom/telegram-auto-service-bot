@@ -356,112 +356,154 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   LARGE CATEGORY BLOCKS (Services Tab - Big Rectangles)
+   BIG ROUNDED RECTANGLE CATEGORY CARDS (Services Step 1)
    ═══════════════════════════════════════════════════════════ */
 
-.af-category-blocks-container {
+.af-category-grid {
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
-.af-category-block {
+/* Big Rounded Rectangle Category Card */
+.af-cat-card {
   background: var(--bg-card);
   border-radius: var(--r-lg);
-  padding: 20px;
+  padding: 20px 22px;
   box-shadow: var(--shadow-sm);
-  border: 1px solid rgba(0,0,0,0.04);
+  border: 1px solid rgba(0, 0, 0, 0.04);
   display: flex;
-  flex-direction: column;
-  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
   cursor: pointer;
   transition: transform 0.18s var(--spring), box-shadow 0.18s var(--ease);
 }
 
-.af-category-block:active {
-  transform: scale(0.98);
+.af-cat-card:active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-md);
 }
 
-.af-category-block-header {
+.af-cat-card-left {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 16px;
 }
 
-.af-category-block-title-box {
+.af-cat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: var(--bg-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.af-cat-info {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.af-category-block-title {
-  font-size: 17px;
+.af-cat-title {
+  font-size: 16px;
   font-weight: 800;
   color: var(--dark);
   line-height: 1.25;
 }
 
-.af-category-block-count {
-  font-size: 12px;
+.af-cat-count {
+  font-size: 13px;
   font-weight: 600;
   color: var(--gray-3);
 }
 
-.af-category-arrow {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--bg-pill);
+.af-cat-arrow {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--gray-3);
+}
+
+/* Sub-Services Category Page List */
+.af-subservices-container {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  color: var(--dark);
-  transition: transform 0.2s var(--ease);
-}
-
-.af-category-block.expanded .af-category-arrow {
-  transform: rotate(180deg);
-  background: var(--dark);
-  color: #ffffff;
-}
-
-.af-category-items-list {
-  display: none;
   flex-direction: column;
-  gap: 10px;
-  padding-top: 12px;
-  border-top: 1px solid var(--bg-pill);
+  gap: 14px;
 }
 
-.af-category-block.expanded .af-category-items-list {
-  display: flex;
-}
-
-.af-service-row-item {
+.af-subservices-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 14px;
+}
+
+.af-back-cat-btn {
+  padding: 8px 14px;
   background: var(--bg-pill);
-  border-radius: var(--r-md);
+  border: none;
+  border-radius: var(--r-pill);
+  color: var(--dark);
+  font-size: 13px;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.15s var(--ease);
 }
 
-.af-service-row-item.selected {
-  background: rgba(52, 199, 89, 0.12);
-  border: 1px solid var(--green);
+.af-service-check-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  background: var(--bg-card);
+  border-radius: var(--r-md);
+  border: 1.5px solid transparent;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: all 0.15s var(--ease);
 }
 
-.af-service-row-title {
-  font-size: 14px;
+.af-service-check-row.selected {
+  background: #ffffff;
+  border-color: var(--green);
+  box-shadow: 0 4px 14px rgba(52, 199, 89, 0.12);
+}
+
+.af-service-check-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.af-checkbox-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--gray-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: transparent;
+  transition: all 0.15s var(--ease);
+}
+
+.af-service-check-row.selected .af-checkbox-badge {
+  background: var(--green);
+  border-color: var(--green);
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.af-service-name {
+  font-size: 15px;
   font-weight: 700;
   color: var(--dark);
 }
 
-.af-service-row-price {
-  font-size: 13px;
+.af-service-tag-price {
+  font-size: 14px;
   font-weight: 800;
   color: var(--dark);
 }

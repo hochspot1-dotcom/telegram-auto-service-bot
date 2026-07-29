@@ -254,7 +254,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const SERVICE_CATEGORIES = [
     {
       id: "cat_engine",
-      title: "🔧 Двигатель и выхлопная система",
+      icon: "🔧",
+      title: "Двигатель и выхлопная система",
+      sub: "Диагностика, ГРМ, масло, выхлоп",
       items: [
         { title: "Замена моторного масла и фильтра", price: "от 1 500 ₽" },
         { title: "Компьютерная диагностика двигателя", price: "от 1 000 ₽" },
@@ -266,7 +268,9 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "cat_chassis",
-      title: "🛞 Подвеска и тормозная система",
+      icon: "🛞",
+      title: "Подвеска и тормозная система",
+      sub: "Колодки, диски, амортизаторы, шиномонтаж",
       items: [
         { title: "Замена тормозных колодок (пара)", price: "от 1 500 ₽" },
         { title: "Замена тормозных дисков", price: "от 2 500 ₽" },
@@ -278,7 +282,9 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "cat_electric",
-      title: "⚡ Электрика и автоэлектроника",
+      icon: "⚡",
+      title: "Электрика и автоэлектроника",
+      sub: "Диагностика, АКБ, стартер, сигнализация",
       items: [
         { title: "Полная компьютерная диагностика", price: "от 1 000 ₽" },
         { title: "Замена генератора / стартера", price: "от 2 500 ₽" },
@@ -289,7 +295,9 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "cat_to",
-      title: "🛢 Регулярное ТО и масляный сервис",
+      icon: "🛢",
+      title: "Регулярное ТО и масляный сервис",
+      sub: "Комплексное ТО, замена жидкостей",
       items: [
         { title: "Комплексное ТО (масло + 3 фильтра)", price: "от 3 500 ₽" },
         { title: "Замена масла в АКПП / МКПП", price: "от 3 000 ₽" },
@@ -299,7 +307,9 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "cat_climate",
-      title: "❄️ Климат и кондиционер",
+      icon: "❄️",
+      title: "Климат и кондиционер",
+      sub: "Заправка, дезинфекция, радиаторы",
       items: [
         { title: "Диагностика и заправка кондиционера", price: "от 2 000 ₽" },
         { title: "Антибактериальная чистка кондиционера", price: "от 1 500 ₽" },
@@ -310,6 +320,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const selectedProblemsSet = new Set();
   const customCategoryInputs = {};
+
+  let activeCategoryId = null;
+
+  const catOverviewView = document.getElementById("cat-overview-view");
+  const catSubservicesView = document.getElementById("cat-subservices-view");
+  const categoriesCardsContainer = document.getElementById("categories-cards-container");
+  const subservicesListContainer = document.getElementById("subservices-list-container");
+  const selectedCatTitleBadge = document.getElementById("selected-cat-title-badge");
+  const backToCategoriesBtn = document.getElementById("back-to-categories-btn");
+  const wizardSearchInput = document.getElementById("wizard-search-input");
 
   function updateEstimatedTotalPrice() {
     const priceValEl = document.getElementById("total-price-val");
@@ -348,109 +368,147 @@ document.addEventListener("DOMContentLoaded", () => {
 
     summaryEl.innerHTML = `
       <div class="af-card" style="margin-top:8px;">
-        <div style="font-size:12px;font-weight:800;color:var(--green);">✅ Выбранные работы (${items.length}):</div>
+        <div style="font-size:13px;font-weight:800;color:var(--green);">✅ Выбранные услуги (${items.length}):</div>
         <ul style="font-size:13px;color:var(--dark);padding-left:18px;margin-top:4px;">
-          ${items.map(i => `<li style="margin-bottom:2px;">${i}</li>`).join("")}
+          ${items.map(i => `<li style="margin-bottom:3px;">${i}</li>`).join("")}
         </ul>
       </div>
     `;
   }
 
-  const wizardSearchInput = document.getElementById("wizard-search-input");
+  function renderCategoryCardsOverview(query = "") {
+    if (!categoriesCardsContainer) return;
+    const filterQuery = query.toLowerCase().trim();
 
-  function renderLargeCategoryBlocks(filterQuery = "") {
-    const container = document.getElementById("category-blocks-wrapper");
-    if (!container) return;
-    const query = filterQuery.toLowerCase().trim();
+    categoriesCardsContainer.innerHTML = SERVICE_CATEGORIES.map(cat => {
+      const matchQuery = !filterQuery ||
+        cat.title.toLowerCase().includes(filterQuery) ||
+        cat.items.some(i => i.title.toLowerCase().includes(filterQuery));
 
-    container.innerHTML = SERVICE_CATEGORIES.map(cat => {
-      const itemsMatching = cat.items.filter(item => {
-        if (!query) return true;
-        return item.title.toLowerCase().includes(query) || cat.title.toLowerCase().includes(query);
-      });
+      if (!matchQuery) return "";
 
-      if (query && itemsMatching.length === 0) return "";
-
-      const customVal = customCategoryInputs[cat.id] || "";
-      const isExpanded = query.length > 0;
+      const countSelected = cat.items.filter(i => selectedProblemsSet.has(i.title)).length;
+      const badgeText = countSelected > 0 ? ` · Выбрано: ${countSelected}` : "";
 
       return `
-        <div class="af-category-block ${isExpanded ? 'expanded' : ''}" data-cat-id="${cat.id}">
-          <div class="af-category-block-header">
-            <div class="af-category-block-title-box">
-              <div class="af-category-block-title">${cat.title}</div>
-              <div class="af-category-block-count">${cat.items.length} услуг · нажмите для выбора</div>
-            </div>
-            <div class="af-category-arrow">▼</div>
-          </div>
-          <div class="af-category-items-list">
-            ${cat.items.map(item => {
-              const isChecked = selectedProblemsSet.has(item.title);
-              return `
-                <div class="af-service-row-item ${isChecked ? 'selected' : ''}" data-title="${item.title}">
-                  <span class="af-service-row-title">${item.title}</span>
-                  <span class="af-service-row-price">${item.price}</span>
-                </div>
-              `;
-            }).join("")}
-            <div onclick="event.stopPropagation();" style="margin-top:4px;">
-              <input
-                type="text"
-                class="af-input custom-cat-input"
-                data-cat-id="${cat.id}"
-                placeholder="Другая проблема в этой категории..."
-                value="${customVal}"
-              />
+        <div class="af-cat-card" data-cat-id="${cat.id}">
+          <div class="af-cat-card-left">
+            <div class="af-cat-icon">${cat.icon}</div>
+            <div class="af-cat-info">
+              <div class="af-cat-title">${cat.title}</div>
+              <div class="af-cat-count">${cat.items.length} услуг${badgeText}</div>
             </div>
           </div>
+          <div class="af-cat-arrow">➔</div>
         </div>
       `;
     }).join("");
 
-    container.querySelectorAll(".af-category-block").forEach(block => {
-      block.addEventListener("click", (e) => {
-        if (e.target.closest(".af-service-row-item") || e.target.closest(".custom-cat-input")) return;
-        block.classList.toggle("expanded");
+    categoriesCardsContainer.querySelectorAll(".af-cat-card").forEach(card => {
+      card.addEventListener("click", () => {
+        const id = card.dataset.catId;
+        openCategorySubservices(id);
       });
     });
+  }
 
-    container.querySelectorAll(".af-service-row-item").forEach(rowEl => {
-      rowEl.addEventListener("click", (e) => {
-        e.stopPropagation();
+  function openCategorySubservices(catId) {
+    const cat = SERVICE_CATEGORIES.find(c => c.id === catId);
+    if (!cat) return;
+
+    activeCategoryId = catId;
+
+    if (selectedCatTitleBadge) {
+      selectedCatTitleBadge.textContent = `${cat.icon} ${cat.title}`;
+    }
+
+    renderSubservicesList(cat);
+
+    if (catOverviewView) catOverviewView.classList.add("hidden");
+    if (catSubservicesView) catSubservicesView.classList.remove("hidden");
+  }
+
+  function renderSubservicesList(cat) {
+    if (!subservicesListContainer) return;
+
+    const customVal = customCategoryInputs[cat.id] || "";
+
+    subservicesListContainer.innerHTML = `
+      ${cat.items.map(item => {
+        const isChecked = selectedProblemsSet.has(item.title);
+        return `
+          <div class="af-service-check-row ${isChecked ? 'selected' : ''}" data-title="${item.title}">
+            <div class="af-service-check-left">
+              <div class="af-checkbox-badge">${isChecked ? '✓' : ''}</div>
+              <span class="af-service-name">${item.title}</span>
+            </div>
+            <span class="af-service-tag-price">${item.price}</span>
+          </div>
+        `;
+      }).join("")}
+
+      <div class="af-card" style="margin-top:4px;">
+        <label class="af-label">Или опишите проблему своими словами:</label>
+        <input
+          type="text"
+          id="custom-cat-input-field"
+          class="af-input"
+          placeholder="Например: Стук справа при повороте руля..."
+          value="${customVal}"
+        />
+      </div>
+    `;
+
+    subservicesListContainer.querySelectorAll(".af-service-check-row").forEach(rowEl => {
+      rowEl.addEventListener("click", () => {
         const title = rowEl.dataset.title;
         if (!title) return;
 
         if (selectedProblemsSet.has(title)) {
           selectedProblemsSet.delete(title);
           rowEl.classList.remove("selected");
+          rowEl.querySelector(".af-checkbox-badge").textContent = "";
         } else {
           selectedProblemsSet.add(title);
           rowEl.classList.add("selected");
+          rowEl.querySelector(".af-checkbox-badge").textContent = "✓";
         }
 
         updateEstimatedTotalPrice();
         renderSelectedSummary();
+        renderCategoryCardsOverview(wizardSearchInput ? wizardSearchInput.value : "");
       });
     });
 
-    container.querySelectorAll(".custom-cat-input").forEach(input => {
-      input.addEventListener("input", (e) => {
-        e.stopPropagation();
-        const catId = input.dataset.catId;
-        customCategoryInputs[catId] = input.value;
+    const customInput = document.getElementById("custom-cat-input-field");
+    if (customInput) {
+      customInput.addEventListener("input", (e) => {
+        customCategoryInputs[cat.id] = e.target.value;
         renderSelectedSummary();
       });
-      input.addEventListener("click", (e) => e.stopPropagation());
-    });
-
-    renderSelectedSummary();
+    }
   }
 
-  renderLargeCategoryBlocks();
+  function showCategoriesOverview() {
+    activeCategoryId = null;
+    if (catOverviewView) catOverviewView.classList.remove("hidden");
+    if (catSubservicesView) catSubservicesView.classList.add("hidden");
+    renderCategoryCardsOverview(wizardSearchInput ? wizardSearchInput.value : "");
+  }
+
+  if (backToCategoriesBtn) {
+    backToCategoriesBtn.addEventListener("click", showCategoriesOverview);
+  }
+
+  renderCategoryCardsOverview();
 
   if (wizardSearchInput) {
     wizardSearchInput.addEventListener("input", (e) => {
-      renderLargeCategoryBlocks(e.target.value);
+      const val = e.target.value.trim();
+      if (val.length > 0) {
+        showCategoriesOverview();
+      }
+      renderCategoryCardsOverview(val);
     });
   }
 
@@ -1019,7 +1077,7 @@ document.addEventListener("DOMContentLoaded", () => {
         bookingForm.reset();
         selectedProblemsSet.clear();
         Object.keys(customCategoryInputs).forEach(k => delete customCategoryInputs[k]);
-        renderLargeCategoryBlocks();
+        showCategoriesOverview();
         goToStep(1);
         setTimeout(() => {
           switchTab("bookings-list");

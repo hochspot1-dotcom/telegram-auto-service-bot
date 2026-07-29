@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=56.0" />
+  <link rel="stylesheet" href="style.css?v=57.0" />
 </head>
 <body>
 
@@ -109,7 +109,7 @@
           <span class="af-section-sub">Все услуги ➔</span>
         </div>
 
-        <!-- 3. 2-Column Spacious Work Cards (Spacious Height & Proper Text Spacing) -->
+        <!-- 3. 2-Column Spacious Work Cards -->
         <div class="af-grid-2">
 
           <!-- Card 1: Diagnostic -->
@@ -165,13 +165,13 @@
       </section>
 
       <!-- ════════════════════════════════════════
-           🏷 TAB 2: УСЛУГИ / БРОНИРОВАНИЕ (Large Category Rectangles)
+           🏷 TAB 2: УСЛУГИ / БРОНИРОВАНИЕ (Big Rectangles & Subservices Navigation)
            ════════════════════════════════════════ -->
       <section id="tab-booking" class="tab-content">
 
         <div class="af-card">
           <h2 style="font-size:17px;font-weight:800;color:var(--dark);">📅 Онлайн-запись</h2>
-          <p style="font-size:13px;color:var(--gray-3);">Выберите категорию, услугу, мастера и дату</p>
+          <p style="font-size:13px;color:var(--gray-3);">Выберите категорию, добавьте услуги и выберите время</p>
         </div>
 
         <!-- Wizard Step Bar -->
@@ -184,17 +184,30 @@
 
         <form id="booking-form" style="display:flex;flex-direction:column;gap:16px;">
 
-          <!-- Step 1: Large Category Blocks -->
+          <!-- Step 1: Big Rounded Rectangles Categories -->
           <div class="wizard-step-content active" id="form-step-1">
-            <div class="af-form-group">
-              <label class="af-label">Категории автоуслуг:</label>
-              <input type="text" id="wizard-search-input" class="af-input" placeholder="🔍 Поиск услуги (ГРМ, масло, подвеска)..." />
+
+            <!-- Level 1 View: Main Categories Cards -->
+            <div id="cat-overview-view" class="af-form-group">
+              <label class="af-label">Выберите категорию услуг:</label>
+              <input type="text" id="wizard-search-input" class="af-input" placeholder="🔍 Быстрый поиск услуги (ГРМ, масло, колодки)..." />
               
-              <!-- Large Rectangular Category Blocks -->
-              <div id="category-blocks-wrapper" class="af-category-blocks-container"></div>
-              
-              <div id="selected-summary"></div>
+              <!-- Container for Big Rectangle Category Cards -->
+              <div id="categories-cards-container" class="af-category-grid" style="margin-top:6px;"></div>
             </div>
+
+            <!-- Level 2 View: Subservices of Selected Category -->
+            <div id="cat-subservices-view" class="af-form-group hidden">
+              <div class="af-subservices-header">
+                <button type="button" id="back-to-categories-btn" class="af-back-cat-btn">← Все категории</button>
+                <span id="selected-cat-title-badge" style="font-size:14px;font-weight:800;color:var(--dark);"></span>
+              </div>
+              
+              <div id="subservices-list-container" class="af-subservices-container" style="margin-top:6px;"></div>
+            </div>
+
+            <!-- Summary of Selected Services -->
+            <div id="selected-summary"></div>
 
             <button type="button" class="af-btn-primary" id="to-step-2-btn">
               Далее: Выбор мастера и времени ➔
@@ -431,6 +444,6 @@
     <div id="toast" class="glass-toast hidden"></div>
   </div>
 
-  <script src="app.js?v=56.0"></script>
+  <script src="app.js?v=57.0"></script>
 </body>
 </html>

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=55.0" />
+  <link rel="stylesheet" href="style.css?v=57.0" />
 </head>
 <body>
 
@@ -58,11 +58,11 @@
     <main class="content">
 
       <!-- ════════════════════════════════════════
-           🏠 TAB 1: ГЛАВНАЯ (Top Slider Images Only + Clean Minimal Work Cards)
+           🏠 TAB 1: ГЛАВНАЯ (Top Slider + Larger Popular Work Cards)
            ════════════════════════════════════════ -->
       <section id="tab-home" class="tab-content active">
 
-        <!-- 1. Top Auto-Sliding Promo Carousel (Images Only Here) -->
+        <!-- 1. Top Auto-Sliding Promo Carousel -->
         <div class="af-carousel-wrapper" id="home-promo-carousel">
           <div class="af-carousel-track" id="carousel-track">
 
@@ -109,7 +109,7 @@
           <span class="af-section-sub">Все услуги ➔</span>
         </div>
 
-        <!-- 3. 2-Column Clean Text Cards (Images removed per user request) -->
+        <!-- 3. 2-Column Spacious Work Cards -->
         <div class="af-grid-2">
 
           <!-- Card 1: Diagnostic -->
@@ -165,13 +165,13 @@
       </section>
 
       <!-- ════════════════════════════════════════
-           🏷 TAB 2: УСЛУГИ / БРОНИРОВАНИЕ
+           🏷 TAB 2: УСЛУГИ / БРОНИРОВАНИЕ (Big Rectangles & Subservices Navigation)
            ════════════════════════════════════════ -->
       <section id="tab-booking" class="tab-content">
 
         <div class="af-card">
-          <h2 style="font-size:16px;font-weight:800;color:var(--dark);">📅 Онлайн-запись</h2>
-          <p style="font-size:13px;color:var(--gray-3);">Выберите услугу, специалиста и удобное время</p>
+          <h2 style="font-size:17px;font-weight:800;color:var(--dark);">📅 Онлайн-запись</h2>
+          <p style="font-size:13px;color:var(--gray-3);">Выберите категорию, добавьте услуги и выберите время</p>
         </div>
 
         <!-- Wizard Step Bar -->
@@ -182,19 +182,35 @@
           <div class="af-step-pill" id="wizard-step-ind-4">4. Итог</div>
         </div>
 
-        <form id="booking-form" style="display:flex;flex-direction:column;gap:12px;">
+        <form id="booking-form" style="display:flex;flex-direction:column;gap:16px;">
 
-          <!-- Step 1: Services Tree -->
+          <!-- Step 1: Big Rounded Rectangles Categories -->
           <div class="wizard-step-content active" id="form-step-1">
-            <div class="af-form-group">
-              <label class="af-label">Выбор работы или проблемы:</label>
-              <input type="text" id="wizard-search-input" class="af-input" placeholder="Поиск услуги (ГРМ, масло, подвеска)..." />
-              <div id="category-pills" class="af-accordion"></div>
-              <div id="selected-summary"></div>
+
+            <!-- Level 1 View: Main Categories Cards -->
+            <div id="cat-overview-view" class="af-form-group">
+              <label class="af-label">Выберите категорию услуг:</label>
+              <input type="text" id="wizard-search-input" class="af-input" placeholder="🔍 Быстрый поиск услуги (ГРМ, масло, колодки)..." />
+              
+              <!-- Container for Big Rectangle Category Cards -->
+              <div id="categories-cards-container" class="af-category-grid" style="margin-top:6px;"></div>
             </div>
 
+            <!-- Level 2 View: Subservices of Selected Category -->
+            <div id="cat-subservices-view" class="af-form-group hidden">
+              <div class="af-subservices-header">
+                <button type="button" id="back-to-categories-btn" class="af-back-cat-btn">← Все категории</button>
+                <span id="selected-cat-title-badge" style="font-size:14px;font-weight:800;color:var(--dark);"></span>
+              </div>
+              
+              <div id="subservices-list-container" class="af-subservices-container" style="margin-top:6px;"></div>
+            </div>
+
+            <!-- Summary of Selected Services -->
+            <div id="selected-summary"></div>
+
             <button type="button" class="af-btn-primary" id="to-step-2-btn">
-              Далее: Мастер и время ➔
+              Далее: Выбор мастера и времени ➔
             </button>
           </div>
 
@@ -202,7 +218,7 @@
           <div class="wizard-step-content hidden" id="form-step-2">
             <div class="af-form-group">
               <label class="af-label">Выберите мастера:</label>
-              <div id="masters-container" style="display:flex;flex-direction:column;gap:8px;"></div>
+              <div id="masters-container" style="display:flex;flex-direction:column;gap:10px;"></div>
             </div>
 
             <div class="af-form-group" id="calendar-step-group">
@@ -212,8 +228,8 @@
 
             <div class="af-form-group hidden" id="slots-step-group">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                <button type="button" class="af-btn-secondary" id="change-date-btn" style="padding:6px 12px;font-size:12px;">← Изменить дату</button>
-                <span style="font-size:13px;font-weight:700;color:var(--dark);" id="slots-date-badge">28 ИЮЛЯ</span>
+                <button type="button" class="af-btn-secondary" id="change-date-btn" style="padding:8px 14px;font-size:13px;">← Изменить дату</button>
+                <span style="font-size:14px;font-weight:800;color:var(--dark);" id="slots-date-badge">28 ИЮЛЯ</span>
               </div>
               <label class="af-label" id="slots-header-label">Свободное время:</label>
               <div class="af-card">
@@ -221,7 +237,7 @@
               </div>
             </div>
 
-            <div style="display:grid;grid-template-columns:auto 1fr;gap:8px;">
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:10px;">
               <button type="button" class="af-btn-secondary" id="back-to-step-1-btn">← Назад</button>
               <button type="button" class="af-btn-primary" id="to-step-3-btn">Далее: Данные авто ➔</button>
             </div>
@@ -239,7 +255,7 @@
               <input type="text" id="car-number" class="af-input" placeholder="А000АА180" maxlength="12" style="text-transform:uppercase;" />
             </div>
 
-            <div style="display:grid;grid-template-columns:auto 1fr;gap:8px;">
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:10px;">
               <button type="button" class="af-btn-secondary" id="back-to-step-2-btn">← Назад</button>
               <button type="button" class="af-btn-primary" id="to-step-4-btn">Далее: Проверка ➔</button>
             </div>
@@ -256,21 +272,21 @@
               <label class="af-label" for="phone-number">Телефон для связи:</label>
               <div style="display:flex;gap:8px;">
                 <input type="tel" id="phone-number" class="af-input" placeholder="+7 (999) 000-00-00" readonly required style="flex:1;" />
-                <button type="button" id="edit-phone-btn" class="af-btn-secondary" style="padding:10px 14px;">✏️</button>
+                <button type="button" id="edit-phone-btn" class="af-btn-secondary" style="padding:12px 16px;">✏️</button>
               </div>
             </div>
 
-            <div class="af-card" id="total-price-box" style="display:flex;align-items:center;justify-content:space-between;">
+            <div class="af-card" id="total-price-box" style="display:flex;align-items:center;justify-content:space-between;padding:18px;">
               <span class="af-label">Ориентировочно:</span>
-              <span style="font-size:18px;font-weight:800;color:var(--dark);" id="total-price-val">от 0 ₽</span>
+              <span style="font-size:20px;font-weight:800;color:var(--dark);" id="total-price-val">от 0 ₽</span>
             </div>
 
-            <div style="display:flex;align-items:center;gap:8px;padding:4px;">
-              <input type="checkbox" id="privacy-agree" style="width:18px;height:18px;accent-color:var(--dark);cursor:pointer;" />
-              <span style="font-size:12px;color:var(--gray-2);">Согласен с <a href="#" id="privacy-link" style="color:var(--dark);font-weight:600;">Политикой конфиденциальности</a></span>
+            <div style="display:flex;align-items:center;gap:10px;padding:4px;">
+              <input type="checkbox" id="privacy-agree" style="width:20px;height:20px;accent-color:var(--dark);cursor:pointer;" />
+              <span style="font-size:12.5px;color:var(--gray-2);">Согласен с <a href="#" id="privacy-link" style="color:var(--dark);font-weight:700;">Политикой конфиденциальности</a></span>
             </div>
 
-            <div style="display:grid;grid-template-columns:auto 1fr;gap:8px;">
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:10px;">
               <button type="button" class="af-btn-secondary" id="back-to-step-3-btn">← Назад</button>
               <button type="submit" class="af-btn-primary" id="submit-booking-btn" disabled>
                 🚀 Подтвердить запись
@@ -288,7 +304,7 @@
         <div class="af-section-header">
           <h2 class="af-section-title">Мои записи</h2>
         </div>
-        <div id="user-bookings-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+        <div id="user-bookings-list" style="display:flex;flex-direction:column;gap:12px;"></div>
       </section>
 
       <!-- ════════════════════════════════════════
@@ -296,26 +312,26 @@
            ════════════════════════════════════════ -->
       <section id="tab-profile" class="tab-content">
 
-        <div class="af-card" style="display:flex;align-items:center;gap:14px;">
-          <div class="af-user-avatar" style="width:52px;height:52px;font-size:26px;">👤</div>
+        <div class="af-card" style="display:flex;align-items:center;gap:16px;padding:20px;">
+          <div class="af-user-avatar" style="width:56px;height:56px;font-size:28px;">👤</div>
           <div>
-            <div style="font-size:16px;font-weight:800;" id="profile-name">Клиент</div>
-            <div style="font-size:12px;color:var(--gray-3);" id="profile-phone">Телефон: Не указан</div>
+            <div style="font-size:17px;font-weight:800;" id="profile-name">Клиент</div>
+            <div style="font-size:13px;color:var(--gray-3);margin-top:2px;" id="profile-phone">Телефон: Не указан</div>
           </div>
         </div>
 
-        <div class="af-grid-2" style="grid-template-columns:1fr 1fr 1fr;">
-          <div class="af-card" style="text-align:center;padding:12px 6px;">
-            <div style="font-size:20px;font-weight:800;color:var(--dark);" id="stat-active">0</div>
-            <div style="font-size:10px;color:var(--gray-3);font-weight:700;">АКТИВНЫХ</div>
+        <div class="af-grid-2" style="grid-template-columns:1fr 1fr 1fr;gap:10px;">
+          <div class="af-card" style="text-align:center;padding:14px 6px;">
+            <div style="font-size:22px;font-weight:800;color:var(--dark);" id="stat-active">0</div>
+            <div style="font-size:10px;color:var(--gray-3);font-weight:800;">АКТИВНЫХ</div>
           </div>
-          <div class="af-card" style="text-align:center;padding:12px 6px;">
-            <div style="font-size:20px;font-weight:800;color:var(--dark);" id="stat-total">0</div>
-            <div style="font-size:10px;color:var(--gray-3);font-weight:700;">ВСЕГО</div>
+          <div class="af-card" style="text-align:center;padding:14px 6px;">
+            <div style="font-size:22px;font-weight:800;color:var(--dark);" id="stat-total">0</div>
+            <div style="font-size:10px;color:var(--gray-3);font-weight:800;">ВСЕГО</div>
           </div>
-          <div class="af-card" style="text-align:center;padding:12px 6px;">
-            <div style="font-size:20px;font-weight:800;color:var(--red);" id="stat-cancelled">0</div>
-            <div style="font-size:10px;color:var(--gray-3);font-weight:700;">ОТКЛОНЕНО</div>
+          <div class="af-card" style="text-align:center;padding:14px 6px;">
+            <div style="font-size:22px;font-weight:800;color:var(--red);" id="stat-cancelled">0</div>
+            <div style="font-size:10px;color:var(--gray-3);font-weight:800;">ОТКЛОНЕНО</div>
           </div>
         </div>
 
@@ -324,9 +340,9 @@
         </button>
 
         <!-- Admin Moderation Container -->
-        <div id="admin-panel-section" class="hidden" style="display:flex;flex-direction:column;gap:12px;">
+        <div id="admin-panel-section" class="hidden" style="display:flex;flex-direction:column;gap:14px;">
           <div class="af-card">
-            <h3 style="font-size:15px;font-weight:800;">👨‍🔧 Управление сменами мастеров</h3>
+            <h3 style="font-size:16px;font-weight:800;">👨‍🔧 Управление сменами мастеров</h3>
             <p style="font-size:12px;color:var(--gray-3);">Снятие мастера со смены с предложением перезаписи клиентам</p>
 
             <div class="af-form-group">
@@ -428,6 +444,6 @@
     <div id="toast" class="glass-toast hidden"></div>
   </div>
 
-  <script src="app.js?v=55.0"></script>
+  <script src="app.js?v=57.0"></script>
 </body>
 </html>

@@ -79,7 +79,7 @@ body {
 
 .hidden { display: none !important; }
 
-/* ── Header Bar (Reference Top Header) ───────────────────────── */
+/* ── Header Bar ─────────────────────────────────────────────── */
 .af-header {
   display: flex;
   align-items: center;
@@ -157,110 +157,112 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   AUTOFRIENDS UI COMPONENTS (Reference Match)
+   AUTO-SLIDING PROMO BANNER CAROUSEL
    ═══════════════════════════════════════════════════════════ */
 
-/* Segmented Control Bar (Reference Image Segmented Pills) */
-.af-segmented-bar {
+.af-carousel-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.af-carousel-track {
   display: flex;
-  background: var(--bg-pill);
-  padding: 4px;
-  border-radius: var(--r-md);
+  transition: transform 0.4s var(--ease);
+  width: 100%;
+}
+
+.af-carousel-slide {
+  min-width: 100%;
+  height: 180px;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px;
+  cursor: pointer;
+}
+
+/* Dimmed dark overlay for readability */
+.af-carousel-slide::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.35) 100%);
+  z-index: 1;
+}
+
+.af-slide-content {
+  position: relative;
+  z-index: 2;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.af-slide-tag {
+  align-self: flex-start;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+  border-radius: var(--r-pill);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.af-slide-title-box {
+  display: flex;
+  flex-direction: column;
   gap: 4px;
 }
 
-.af-segmented-btn {
-  flex: 1;
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: none;
-  background: transparent;
-  color: var(--gray-2);
+.af-slide-title {
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.af-slide-sub {
   font-size: 13px;
-  font-weight: 600;
-  font-family: var(--font-main);
-  cursor: pointer;
-  transition: all 0.18s var(--ease);
-  text-align: center;
+  opacity: 0.88;
 }
 
-.af-segmented-btn.active {
-  background: var(--bg-card);
-  color: var(--dark);
-  box-shadow: var(--shadow-sm);
-  font-weight: 700;
-}
-
-/* Search Bar (Reference Search Bar) */
-.af-search-box {
+/* Carousel Indicators (Dots) */
+.af-carousel-dots {
+  position: absolute;
+  bottom: 10px;
+  right: 14px;
   display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
-  background: var(--bg-pill);
-  border-radius: var(--r-md);
+  gap: 6px;
+  z-index: 3;
 }
 
-.af-search-icon {
-  font-size: 16px;
-  color: var(--gray-3);
-  display: flex;
-  align-items: center;
+.af-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  transition: all 0.25s var(--ease);
 }
 
-.af-search-input {
-  width: 100%;
-  background: transparent;
-  border: none;
-  outline: none;
-  font-size: 14px;
-  font-weight: 500;
-  font-family: var(--font-main);
-  color: var(--dark);
+.af-dot.active {
+  width: 18px;
+  border-radius: 4px;
+  background: #ffffff;
 }
 
-.af-search-input::placeholder { color: var(--gray-3); }
+/* ═══════════════════════════════════════════════════════════
+   POPULAR WORK CARDS (Full Bleed Background + Dark Overlay)
+   ═══════════════════════════════════════════════════════════ */
 
-/* Quick Filter Pills Row (Reference Filter Chips) */
-.af-pills-row {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 2px;
-}
-
-.af-pill-chip {
-  padding: 8px 14px;
-  background: var(--bg-pill);
-  border-radius: var(--r-pill);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--gray-1);
-  white-space: nowrap;
-  cursor: pointer;
-  border: 1px solid transparent;
-  transition: all 0.15s var(--ease);
-}
-
-.af-pill-chip.active {
-  background: var(--dark);
-  color: #ffffff;
-}
-
-/* Cards Base */
-.af-card {
-  background: var(--bg-card);
-  border-radius: var(--r-lg);
-  padding: 16px;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid rgba(0,0,0,0.04);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  position: relative;
-}
-
-/* Section Title */
 .af-section-header {
   display: flex;
   align-items: center;
@@ -274,91 +276,118 @@ body {
   letter-spacing: -0.3px;
 }
 
-.af-section-sub {
-  font-size: 13px;
-  color: var(--gray-3);
+.af-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Full-background dimmed card matching user request */
+.af-service-card-full {
+  position: relative;
+  height: 165px;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.18s var(--spring);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.af-service-card-full:active { transform: scale(0.97); }
+
+/* Dimmed dark overlay so text pops out clearly */
+.af-service-card-full::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.85) 100%);
+  z-index: 1;
+  transition: opacity 0.2s var(--ease);
+}
+
+.af-service-card-full:hover::before {
+  background: linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.78) 100%);
+}
+
+.af-card-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: #ffffff;
+}
+
+.af-card-top-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.af-card-title {
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #ffffff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+}
+
+.af-card-sub {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 500;
 }
 
-/* Featured Hero Card with Full-Bleed Real Photo + Floating Action (+) Button */
-.af-hero-card {
-  background: var(--bg-card);
-  border-radius: var(--r-lg);
-  padding: 14px;
-  box-shadow: var(--shadow-md);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.af-hero-banner-img {
-  width: 100%;
-  height: 170px;
-  border-radius: var(--r-md);
-  position: relative;
-  overflow: hidden;
-}
-
-.af-hero-banner-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.af-hero-floating-btn {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--dark);
-  color: #ffffff;
-  font-size: 22px;
+.af-card-bottom {
   display: flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: var(--shadow-md);
+  justify-content: space-between;
+  gap: 4px;
+  margin-top: auto;
+}
+
+.af-card-price {
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+}
+
+.af-card-btn {
+  padding: 6px 12px;
+  background: #ffffff;
+  color: var(--dark);
+  border-radius: var(--r-pill);
+  font-size: 11px;
+  font-weight: 800;
   border: none;
   cursor: pointer;
-  transition: transform 0.18s var(--spring);
-  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
-.af-hero-floating-btn:active { transform: scale(0.90); }
+/* ═══════════════════════════════════════════════════════════
+   BOOKING WIZARD STEPS & COMMON COMPONENTS
+   ═══════════════════════════════════════════════════════════ */
 
-.af-hero-info {
+.af-card {
+  background: var(--bg-card);
+  border-radius: var(--r-lg);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0,0,0,0.04);
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 10px;
+  position: relative;
 }
 
-.af-hero-title {
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--dark);
-}
-
-.af-hero-badge-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.af-badge-check {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--green);
-  background: rgba(52, 199, 89, 0.12);
-  padding: 3px 8px;
-  border-radius: var(--r-pill);
-}
-
-/* Primary Dark Button (Reference Buttons) */
 .af-btn-primary {
   width: 100%;
   padding: 14px 20px;
@@ -403,86 +432,6 @@ body {
 
 .af-btn-secondary:active { background: var(--gray-6); }
 
-/* ── 2-Column Product / Service Cards Grid (Real Photos Full Bleed) ── */
-.af-grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.af-service-card {
-  background: var(--bg-card);
-  border-radius: var(--r-lg);
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid rgba(0,0,0,0.03);
-  cursor: pointer;
-  transition: transform 0.18s var(--spring);
-}
-
-.af-service-card:active { transform: scale(0.97); }
-
-/* Full-bleed real photo box covering the entire rectangular container */
-.af-service-img {
-  width: 100%;
-  height: 110px;
-  border-radius: var(--r-md);
-  overflow: hidden;
-  position: relative;
-  background: var(--bg-pill);
-}
-
-.af-service-img img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.af-service-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--dark);
-  line-height: 1.25;
-}
-
-.af-service-sub {
-  font-size: 12px;
-  color: var(--gray-3);
-}
-
-.af-service-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: auto;
-  padding-top: 4px;
-}
-
-.af-service-price {
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--dark);
-}
-
-.af-service-btn {
-  padding: 6px 12px;
-  background: var(--dark);
-  color: #ffffff;
-  border-radius: var(--r-pill);
-  font-size: 11px;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   BOOKING WIZARD STEPS
-   ═══════════════════════════════════════════════════════════ */
-
 .af-wizard-bar {
   display: flex;
   background: var(--bg-pill);
@@ -508,11 +457,8 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
-.af-step-pill.completed {
-  color: var(--green);
-}
+.af-step-pill.completed { color: var(--green); }
 
-/* Accordion & Checkboxes (Clean iOS Style) */
 .af-accordion {
   display: flex;
   flex-direction: column;
@@ -575,7 +521,6 @@ body {
   color: var(--gray-2);
 }
 
-/* Form Inputs */
 .af-form-group {
   display: flex;
   flex-direction: column;
@@ -610,7 +555,6 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
-/* Masters Cards */
 .af-master-card {
   display: flex;
   align-items: center;
@@ -650,7 +594,6 @@ body {
   color: var(--gray-3);
 }
 
-/* Light Calendar */
 .af-calendar-card {
   background: var(--bg-card);
   border-radius: var(--r-lg);
@@ -667,10 +610,7 @@ body {
   justify-content: space-between;
 }
 
-.af-cal-title {
-  font-size: 15px;
-  font-weight: 800;
-}
+.af-cal-title { font-size: 15px; font-weight: 800; }
 
 .af-cal-btn {
   width: 32px;
@@ -714,7 +654,6 @@ body {
 .af-cal-day.today { border: 2px solid var(--dark); }
 .af-cal-day.selected { background: var(--dark); color: #ffffff; }
 
-/* Time slots */
 .af-slots-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -742,7 +681,6 @@ body {
   pointer-events: none;
 }
 
-/* Order summary card */
 .af-summary-card {
   background: var(--bg-card);
   border-radius: var(--r-lg);
@@ -762,10 +700,7 @@ body {
 .af-summary-lbl { color: var(--gray-3); font-weight: 600; }
 .af-summary-val { color: var(--dark); font-weight: 700; }
 
-/* ═══════════════════════════════════════════════════════════
-   BOTTOM NAVIGATION BAR (SVG Format Icons)
-   ═══════════════════════════════════════════════════════════ */
-
+/* Bottom Nav Bar */
 .af-navbar {
   position: fixed;
   bottom: 0;
@@ -832,10 +767,6 @@ body {
   color: var(--dark);
   font-weight: 800;
 }
-
-/* ═══════════════════════════════════════════════════════════
-   ONBOARDING MODAL (Clean Light iOS Welcome)
-   ═══════════════════════════════════════════════════════════ */
 
 .af-onboarding-overlay {
   position: fixed;
@@ -906,7 +837,6 @@ body {
   margin: 0 auto;
 }
 
-/* Modals & Toasts */
 .modal-overlay {
   position: fixed;
   inset: 0;

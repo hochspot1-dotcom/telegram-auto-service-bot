@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=52.0" />
+  <link rel="stylesheet" href="style.css?v=53.0" />
 </head>
 <body>
 
@@ -55,101 +55,119 @@
     <main class="content">
 
       <!-- ════════════════════════════════════════
-           🏠 TAB 1: ГЛАВНАЯ (Reference Image Layout)
+           🏠 TAB 1: ГЛАВНАЯ (Promo Carousel + Full Background Darkened Work Cards)
            ════════════════════════════════════════ -->
       <section id="tab-home" class="tab-content active">
 
-        <!-- 1. Top Segmented Filter Pills -->
-        <div class="af-segmented-bar" id="home-category-segmented">
-          <button class="af-segmented-btn active" data-filter="all">Все услуги</button>
-          <button class="af-segmented-btn" data-filter="to">ТО и Масло</button>
-          <button class="af-segmented-btn" data-filter="diag">Диагностика</button>
-        </div>
+        <!-- 1. Auto-Sliding Promo Banner Carousel -->
+        <div class="af-carousel-wrapper" id="home-promo-carousel">
+          <div class="af-carousel-track" id="carousel-track">
 
-        <!-- 2. Search Bar (Reference Search Bar) -->
-        <div class="af-search-box">
-          <span class="af-search-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          </span>
-          <input type="text" id="home-search-input" class="af-search-input" placeholder="Марка, модель авто или услуга..." />
-        </div>
-
-        <!-- 3. Quick Filter Chips Row (Reference Filter Pills) -->
-        <div class="af-pills-row">
-          <div class="af-pill-chip active">🎛 Все параметры</div>
-          <div class="af-pill-chip">⚡ В наличии свободные мастера</div>
-          <div class="af-pill-chip">🛡 С гарантией</div>
-        </div>
-
-        <!-- 4. Featured Hero Service Card with Real Photo + Floating (+) Button -->
-        <div class="af-hero-card" id="home-hero-card">
-          <div class="af-hero-banner-img">
-            <img src="images/hero.jpg" alt="Комплексное ТО" />
-            <button class="af-hero-floating-btn" id="hero-floating-plus-btn">+</button>
-          </div>
-          <div class="af-hero-info">
-            <div class="af-hero-title">Комплексное ТО и Диагностика</div>
-            <div class="af-hero-badge-row">
-              <span class="af-badge-check">✔ Без очереди</span>
-              <span style="font-size:12px;color:var(--gray-3);">гарантия 12 месяцев</span>
+            <!-- Slide 1 -->
+            <div class="af-carousel-slide" style="background-image: url('images/hero.jpg');" data-tab="booking" data-step="1">
+              <div class="af-slide-content">
+                <span class="af-slide-tag">🔥 АКЦИЯ МЕСЯЦА</span>
+                <div class="af-slide-title-box">
+                  <h2 class="af-slide-title">Комплексное ТО со скидкой 15%</h2>
+                  <p class="af-slide-sub">Замена масла + 3 фильтра с гарантией 12 месяцев</p>
+                </div>
+              </div>
             </div>
+
+            <!-- Slide 2 -->
+            <div class="af-carousel-slide" style="background-image: url('images/susp.jpg');" data-tab="booking" data-step="1">
+              <div class="af-slide-content">
+                <span class="af-slide-tag">⚡ СПЕЦПРЕДЛОЖЕНИЕ</span>
+                <div class="af-slide-title-box">
+                  <h2 class="af-slide-title">Бесплатная диагностика подвески</h2>
+                  <p class="af-slide-sub">При ремонте ходовой части от 3 000 ₽</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="af-carousel-slide" style="background-image: url('images/ac.jpg');" data-tab="booking" data-step="1">
+              <div class="af-slide-content">
+                <span class="af-slide-tag">❄️ КЛИМАТ СЕРВИС</span>
+                <div class="af-slide-title-box">
+                  <h2 class="af-slide-title">Заправка кондиционера за 1 990 ₽</h2>
+                  <p class="af-slide-sub">Полная антибактериальная обработка системы</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Carousel Dots -->
+          <div class="af-carousel-dots">
+            <span class="af-dot active" data-index="0"></span>
+            <span class="af-dot" data-index="1"></span>
+            <span class="af-dot" data-index="2"></span>
           </div>
         </div>
 
-        <!-- 5. Section Header -->
+        <!-- 2. Section Header -->
         <div class="af-section-header">
           <h2 class="af-section-title">Популярные работы</h2>
-          <span class="af-section-sub">Смотреть все</span>
+          <span class="af-section-sub">Все услуги ➔</span>
         </div>
 
-        <!-- 6. 2-Column Services Grid (Full Bleed Real Generated Photos) -->
+        <!-- 3. 2-Column Full-Bleed Dimmed Work Cards (Text is crystal clear on dark photo overlay) -->
         <div class="af-grid-2">
 
-          <div class="af-service-card" data-tab="booking" data-step="1">
-            <div class="af-service-img">
-              <img src="images/diag.jpg" alt="Компьютерная диагностика" />
-            </div>
-            <div class="af-service-title">Компьютерная диагностика</div>
-            <div class="af-service-sub">Электрика · 30 мин</div>
-            <div class="af-service-bottom">
-              <span class="af-service-price">1 000 ₽</span>
-              <button class="af-service-btn">Записаться</button>
-            </div>
-          </div>
-
-          <div class="af-service-card" data-tab="booking" data-step="1">
-            <div class="af-service-img">
-              <img src="images/oil.jpg" alt="Замена масла и фильтра" />
-            </div>
-            <div class="af-service-title">Замена масла и фильтра</div>
-            <div class="af-service-sub">Двигатель · 45 мин</div>
-            <div class="af-service-bottom">
-              <span class="af-service-price">1 500 ₽</span>
-              <button class="af-service-btn">Записаться</button>
+          <!-- Card 1: Diagnostic -->
+          <div class="af-service-card-full" style="background-image: url('images/diag.jpg');" data-tab="booking" data-step="1">
+            <div class="af-card-content">
+              <div class="af-card-top-info">
+                <div class="af-card-title">Компьютерная диагностика</div>
+                <div class="af-card-sub">Электрика · 30 мин</div>
+              </div>
+              <div class="af-card-bottom">
+                <span class="af-card-price">1 000 ₽</span>
+                <button class="af-card-btn">Записаться</button>
+              </div>
             </div>
           </div>
 
-          <div class="af-service-card" data-tab="booking" data-step="1">
-            <div class="af-service-img">
-              <img src="images/susp.jpg" alt="Диагностика ходовой" />
-            </div>
-            <div class="af-service-title">Диагностика ходовой</div>
-            <div class="af-service-sub">Подвеска · 40 мин</div>
-            <div class="af-service-bottom">
-              <span class="af-service-price">1 000 ₽</span>
-              <button class="af-service-btn">Записаться</button>
+          <!-- Card 2: Oil Change -->
+          <div class="af-service-card-full" style="background-image: url('images/oil.jpg');" data-tab="booking" data-step="1">
+            <div class="af-card-content">
+              <div class="af-card-top-info">
+                <div class="af-card-title">Замена масла и фильтра</div>
+                <div class="af-card-sub">Двигатель · 45 мин</div>
+              </div>
+              <div class="af-card-bottom">
+                <span class="af-card-price">1 500 ₽</span>
+                <button class="af-card-btn">Записаться</button>
+              </div>
             </div>
           </div>
 
-          <div class="af-service-card" data-tab="booking" data-step="1">
-            <div class="af-service-img">
-              <img src="images/ac.jpg" alt="Заправка кондиционера" />
+          <!-- Card 3: Suspension -->
+          <div class="af-service-card-full" style="background-image: url('images/susp.jpg');" data-tab="booking" data-step="1">
+            <div class="af-card-content">
+              <div class="af-card-top-info">
+                <div class="af-card-title">Диагностика ходовой</div>
+                <div class="af-card-sub">Подвеска · 40 мин</div>
+              </div>
+              <div class="af-card-bottom">
+                <span class="af-card-price">1 000 ₽</span>
+                <button class="af-card-btn">Записаться</button>
+              </div>
             </div>
-            <div class="af-service-title">Заправка кондиционера</div>
-            <div class="af-service-sub">Климат · 35 мин</div>
-            <div class="af-service-bottom">
-              <span class="af-service-price">2 000 ₽</span>
-              <button class="af-service-btn">Записаться</button>
+          </div>
+
+          <!-- Card 4: AC -->
+          <div class="af-service-card-full" style="background-image: url('images/ac.jpg');" data-tab="booking" data-step="1">
+            <div class="af-card-content">
+              <div class="af-card-top-info">
+                <div class="af-card-title">Заправка кондиционера</div>
+                <div class="af-card-sub">Климат · 35 мин</div>
+              </div>
+              <div class="af-card-bottom">
+                <span class="af-card-price">2 000 ₽</span>
+                <button class="af-card-btn">Записаться</button>
+              </div>
             </div>
           </div>
 
@@ -421,6 +439,6 @@
     <div id="toast" class="glass-toast hidden"></div>
   </div>
 
-  <script src="app.js?v=52.0"></script>
+  <script src="app.js?v=53.0"></script>
 </body>
 </html>

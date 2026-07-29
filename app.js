@@ -49,6 +49,51 @@ document.addEventListener("DOMContentLoaded", () => {
   let pendingAdminAction = null;
   let activeRescheduleBookingId = null;
 
+  // Auto-Sliding Carousel Controller
+  const carouselTrack = document.getElementById("carousel-track");
+  const dots = document.querySelectorAll(".af-dot");
+  let currentSlide = 0;
+  const totalSlides = 3;
+  let autoSlideTimer = null;
+
+  function updateCarousel(slideIndex) {
+    currentSlide = (slideIndex + totalSlides) % totalSlides;
+    if (carouselTrack) {
+      carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+    }
+    dots.forEach((dot, idx) => {
+      dot.classList.toggle("active", idx === currentSlide);
+    });
+  }
+
+  function startAutoSlide() {
+    stopAutoSlide();
+    autoSlideTimer = setInterval(() => {
+      updateCarousel(currentSlide + 1);
+    }, 4000);
+  }
+
+  function stopAutoSlide() {
+    if (autoSlideTimer) clearInterval(autoSlideTimer);
+  }
+
+  dots.forEach(dot => {
+    dot.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const idx = parseInt(dot.dataset.index, 10);
+      updateCarousel(idx);
+      startAutoSlide();
+    });
+  });
+
+  if (carouselTrack) {
+    startAutoSlide();
+    carouselTrack.addEventListener("mouseenter", stopAutoSlide);
+    carouselTrack.addEventListener("mouseleave", startAutoSlide);
+    carouselTrack.addEventListener("touchstart", stopAutoSlide);
+    carouselTrack.addEventListener("touchend", startAutoSlide);
+  }
+
   // Onboarding Screen Handler
   const onboardingOverlay = document.getElementById("triton-onboarding-screen");
   const onboardingNextBtn = document.getElementById("onboarding-next-btn");
@@ -184,24 +229,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Home CTA & Floating Plus Button Handlers
-  const homeHeroCard = document.getElementById("home-hero-card");
-  if (homeHeroCard) {
-    homeHeroCard.addEventListener("click", () => {
-      switchTab("booking");
-      goToStep(1);
-    });
-  }
-
-  const heroFloatingPlusBtn = document.getElementById("hero-floating-plus-btn");
-  if (heroFloatingPlusBtn) {
-    heroFloatingPlusBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      switchTab("booking");
-      goToStep(2);
-    });
-  }
-
   document.querySelectorAll("[data-tab]").forEach(card => {
     card.addEventListener("click", () => {
       if (card.classList.contains("af-nav-item")) return;
@@ -209,15 +236,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const step = card.dataset.step ? parseInt(card.dataset.step, 10) : null;
       if (tab) switchTab(tab);
       if (step) goToStep(step);
-    });
-  });
-
-  // Home Segmented Filter Pills Handler
-  const segmentedBtns = document.querySelectorAll("#home-category-segmented .af-segmented-btn");
-  segmentedBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      segmentedBtns.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
     });
   });
 

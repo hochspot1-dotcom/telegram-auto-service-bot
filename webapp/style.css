@@ -810,11 +810,11 @@ body {
   transform: translateX(-50%);
   width: 100%;
   max-width: 540px;
-  height: 68px;
+  height: 72px;
   display: flex;
   align-items: flex-end;
   justify-content: space-around;
-  padding: 0 14px max(10px, env(safe-area-inset-bottom));
+  padding: 0 14px max(8px, env(safe-area-inset-bottom));
   background: transparent;
   z-index: 50;
 }
@@ -881,41 +881,49 @@ body {
   font-weight: 800;
 }
 
-/* Center Elevated Floating Circle Button (FAB) in Curved Notch */
+/* Center Larger Elevated Floating Circle Button (FAB) in Curved Notch */
 .af-nav-center-fab {
   position: relative;
   z-index: 10;
-  top: -18px;
+  top: -20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 0px;
   background: none;
   border: none;
   cursor: pointer;
 }
 
 .af-fab-circle {
-  width: 54px;
-  height: 54px;
+  width: 62px;
+  height: 62px;
   border-radius: 50%;
   background: var(--dark);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 22px rgba(28, 28, 30, 0.32);
+  box-shadow: 0 8px 24px rgba(28, 28, 30, 0.35);
   transition: transform 0.18s var(--spring), background 0.15s var(--ease), box-shadow 0.15s var(--ease);
 }
 
 .af-fab-circle svg {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   stroke: #ffffff;
   fill: none;
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.af-nav-center-fab .af-nav-lbl {
+  position: relative;
+  top: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--gray-3);
 }
 
 .af-nav-center-fab:active .af-fab-circle {
@@ -925,8 +933,8 @@ body {
 
 .af-nav-center-fab.active .af-fab-circle {
   background: var(--dark);
-  box-shadow: 0 10px 26px rgba(28, 28, 30, 0.42);
-  transform: scale(1.08);
+  box-shadow: 0 10px 28px rgba(28, 28, 30, 0.45);
+  transform: scale(1.06);
 }
 
 .af-nav-center-fab.active .af-nav-lbl {

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=58.0" />
+  <link rel="stylesheet" href="style.css?v=59.0" />
 </head>
 <body>
 
@@ -58,7 +58,7 @@
     <main class="content">
 
       <!-- ════════════════════════════════════════
-           🏠 TAB 1: ГЛАВНАЯ (Top Slider + Clean Popular Work Cards)
+           🏠 TAB 1: ГЛАВНАЯ (Hero Slider + Big CTA + Advantages)
            ════════════════════════════════════════ -->
       <section id="tab-home" class="tab-content active">
 
@@ -103,68 +103,37 @@
           </div>
         </div>
 
-        <!-- 2. Section Header (Clean Header) -->
-        <div class="af-section-header">
-          <h2 class="af-section-title">Популярные работы</h2>
-        </div>
+        <!-- 2. Big Action CTA Button -->
+        <button type="button" class="af-home-cta-btn" data-tab="booking" data-step="1">
+          <span>🚀 Записаться на обслуживание</span>
+          <span style="font-size:18px;">➔</span>
+        </button>
 
-        <!-- 3. 2-Column Spacious Work Cards -->
-        <div class="af-grid-2">
-
-          <!-- Card 1: Diagnostic -->
-          <div class="af-service-card" data-tab="booking" data-step="1">
-            <div>
-              <div class="af-service-title">Компьютерная диагностика</div>
-              <div class="af-service-sub">Электрика · 30 мин</div>
-            </div>
-            <div class="af-service-bottom">
-              <span class="af-service-price">1 000 ₽</span>
-              <button class="af-service-btn">Записаться ➔</button>
-            </div>
+        <!-- 3. Service Advantages Cards -->
+        <div class="af-advantages-grid">
+          <div class="af-adv-card">
+            <div class="af-adv-icon">🛠️</div>
+            <div class="af-adv-title">Официальный сервис</div>
+            <div class="af-adv-sub">Сертифицированное оборудование и гарантия на работы 12 месяцев</div>
           </div>
 
-          <!-- Card 2: Oil Change -->
-          <div class="af-service-card" data-tab="booking" data-step="1">
-            <div>
-              <div class="af-service-title">Замена масла и фильтра</div>
-              <div class="af-service-sub">Двигатель · 45 мин</div>
-            </div>
-            <div class="af-service-bottom">
-              <span class="af-service-price">1 500 ₽</span>
-              <button class="af-service-btn">Записаться ➔</button>
-            </div>
+          <div class="af-adv-card">
+            <div class="af-adv-icon">☕</div>
+            <div class="af-adv-title">Зона ожидания и кофейня</div>
+            <div class="af-adv-sub">Комфортная лаунж-зона, свежий кофе и свободный Wi-Fi</div>
           </div>
 
-          <!-- Card 3: Suspension -->
-          <div class="af-service-card" data-tab="booking" data-step="1">
-            <div>
-              <div class="af-service-title">Диагностика ходовой</div>
-              <div class="af-service-sub">Подвеска · 40 мин</div>
-            </div>
-            <div class="af-service-bottom">
-              <span class="af-service-price">1 000 ₽</span>
-              <button class="af-service-btn">Записаться ➔</button>
-            </div>
+          <div class="af-adv-card">
+            <div class="af-adv-icon">⏱️</div>
+            <div class="af-adv-title">Без очередей</div>
+            <div class="af-adv-sub">Прием автомобиля строго по времени вашей онлайн-записи</div>
           </div>
-
-          <!-- Card 4: AC -->
-          <div class="af-service-card" data-tab="booking" data-step="1">
-            <div>
-              <div class="af-service-title">Заправка кондиционера</div>
-              <div class="af-service-sub">Климат · 35 мин</div>
-            </div>
-            <div class="af-service-bottom">
-              <span class="af-service-price">2 000 ₽</span>
-              <button class="af-service-btn">Записаться ➔</button>
-            </div>
-          </div>
-
         </div>
 
       </section>
 
       <!-- ════════════════════════════════════════
-           🏷 TAB 2: УСЛУГИ / БРОНИРОВАНИЕ (Clean Category Cards Navigation)
+           🏷 TAB 2: УСЛУГИ / БРОНИРОВАНИЕ (Clean Navigation & Pixel-Perfect Rows)
            ════════════════════════════════════════ -->
       <section id="tab-booking" class="tab-content">
 
@@ -197,14 +166,14 @@
 
             <!-- Level 2 View: Subservices of Selected Category -->
             <div id="cat-subservices-view" class="af-form-group hidden">
-              <div class="af-subservices-header">
+              <div class="af-subservices-header-box">
                 <button type="button" id="back-to-categories-btn" class="af-back-cat-btn">
                   <span>← Все категории</span>
                 </button>
-                <div id="selected-cat-title-badge" class="af-cat-header-badge"></div>
+                <div id="selected-cat-title-badge" class="af-cat-header-title"></div>
               </div>
               
-              <div id="subservices-list-container" class="af-subservices-container" style="margin-top:6px;"></div>
+              <div id="subservices-list-container" class="af-subservices-container"></div>
             </div>
 
             <!-- Summary of Selected Services -->
@@ -445,6 +414,6 @@
     <div id="toast" class="glass-toast hidden"></div>
   </div>
 
-  <script src="app.js?v=58.0"></script>
+  <script src="app.js?v=59.0"></script>
 </body>
 </html>

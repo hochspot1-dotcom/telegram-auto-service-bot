@@ -260,94 +260,64 @@ body {
   background: var(--dark);
 }
 
-/* ═══════════════════════════════════════════════════════════
-   POPULAR WORK CARDS (Aesthetic Minimal Layout)
-   ═══════════════════════════════════════════════════════════ */
-
-.af-section-header {
+/* Big Hero CTA Button on Home Screen */
+.af-home-cta-btn {
+  width: 100%;
+  padding: 18px 24px;
+  background: var(--dark);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--r-lg);
+  font-size: 16px;
+  font-weight: 800;
+  font-family: var(--font-main);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 4px;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.18s var(--spring), background 0.15s var(--ease);
 }
 
-.af-section-title {
-  font-size: 19px;
-  font-weight: 800;
-  color: var(--dark);
-  letter-spacing: -0.3px;
+.af-home-cta-btn:active {
+  transform: scale(0.97);
+  background: var(--dark-hover);
 }
 
-.af-grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-/* Spacious, clean cards with proper typography spacing */
-.af-service-card {
-  background: var(--bg-card);
-  border-radius: var(--r-lg);
-  padding: 18px 16px;
+/* Advantage Cards Grid on Home Tab */
+.af-advantages-grid {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  min-height: 155px;
+  gap: 12px;
+}
+
+.af-adv-card {
+  background: var(--bg-card);
+  border-radius: var(--r-lg);
+  padding: 18px 20px;
   box-shadow: var(--shadow-sm);
   border: 1px solid rgba(0, 0, 0, 0.04);
-  cursor: pointer;
-  transition: transform 0.18s var(--spring), box-shadow 0.18s var(--ease);
-}
-
-.af-service-card:active {
-  transform: scale(0.96);
-  box-shadow: var(--shadow-md);
-}
-
-.af-service-title {
-  font-size: 15px;
-  font-weight: 800;
-  color: var(--dark);
-  line-height: 1.3;
-  word-break: break-word;
-}
-
-.af-service-sub {
-  font-size: 12px;
-  color: var(--gray-2);
-  font-weight: 500;
-  margin-top: 4px;
-}
-
-.af-service-bottom {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 14px;
+  flex-direction: column;
   gap: 4px;
 }
 
-.af-service-price {
+.af-adv-icon {
+  font-size: 26px;
+  margin-bottom: 4px;
+}
+
+.af-adv-title {
   font-size: 16px;
   font-weight: 800;
   color: var(--dark);
 }
 
-.af-service-btn {
-  padding: 8px 14px;
-  background: var(--dark);
-  color: #ffffff;
-  border-radius: var(--r-pill);
-  font-size: 11px;
-  font-weight: 800;
-  border: none;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: transform 0.15s var(--spring);
-}
-
-.af-service-btn:active {
-  transform: scale(0.92);
+.af-adv-sub {
+  font-size: 13px;
+  color: var(--gray-2);
+  line-height: 1.4;
+  font-weight: 500;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -422,31 +392,31 @@ body {
   color: var(--gray-3);
 }
 
-/* Sub-Services Category Page List */
+/* Sub-Services Category Page List Layout */
 .af-subservices-container {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
-.af-subservices-header {
+.af-subservices-header-box {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding-bottom: 4px;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 8px;
 }
 
 .af-back-cat-btn {
+  align-self: flex-start;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
+  padding: 10px 18px;
   background: var(--bg-pill);
   border: none;
   border-radius: var(--r-pill);
   color: var(--dark);
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 700;
   font-family: var(--font-main);
   cursor: pointer;
@@ -458,17 +428,19 @@ body {
   background: var(--gray-6);
 }
 
-.af-cat-header-badge {
-  font-size: 15px;
+.af-cat-header-title {
+  font-size: 19px;
   font-weight: 800;
   color: var(--dark);
-  text-align: right;
+  letter-spacing: -0.3px;
 }
 
+/* Service Row Layout - Fixed Perfect Alignment & Non-wrapping Price */
 .af-service-check-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   padding: 16px 18px;
   background: var(--bg-card);
   border-radius: var(--r-md);
@@ -493,11 +465,16 @@ body {
   display: flex;
   align-items: center;
   gap: 14px;
+  flex: 1;
+  min-width: 0;
 }
 
+/* Fixed dimensions for perfect circle checkbox */
 .af-checkbox-badge {
   width: 26px;
   height: 26px;
+  min-width: 26px;
+  min-height: 26px;
   border-radius: 50%;
   border: 2px solid var(--gray-4);
   display: flex;
@@ -505,8 +482,8 @@ body {
   justify-content: center;
   font-size: 13px;
   color: transparent;
-  transition: all 0.15s var(--ease);
   flex-shrink: 0;
+  transition: all 0.15s var(--ease);
 }
 
 .af-service-check-row.selected .af-checkbox-badge {
@@ -517,17 +494,23 @@ body {
 }
 
 .af-service-name {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 700;
   color: var(--dark);
-  line-height: 1.3;
+  line-height: 1.35;
+  flex: 1;
+  word-break: break-word;
 }
 
+/* Non-wrapping price badge */
 .af-service-tag-price {
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: 800;
   color: var(--dark);
   white-space: nowrap;
+  flex-shrink: 0;
+  text-align: right;
+  margin-left: 8px;
 }
 
 /* ═══════════════════════════════════════════════════════════

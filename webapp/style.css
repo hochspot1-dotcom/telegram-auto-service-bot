@@ -2148,3 +2148,155 @@ body {
   background: rgba(0, 122, 255, 0.35);
   border-radius: 4px;
 }
+
+/* ── Triton Welcome Onboarding Screen (Screen 1 in Reference) ── */
+.triton-onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: #07090e;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: max(20px, env(safe-area-inset-top)) 24px max(32px, env(safe-area-inset-bottom));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.triton-onboarding-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 30%, rgba(0, 122, 255, 0.25) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 85%, rgba(0, 85, 255, 0.20) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.triton-onboarding-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.triton-onboarding-overlay.closing {
+  opacity: 0;
+  transform: scale(0.98);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.onboarding-top-bar {
+  display: flex;
+  justify-content: flex-start;
+  z-index: 2;
+}
+
+.onboarding-cancel-btn {
+  background: none;
+  border: none;
+  color: #007aff;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: var(--font);
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.onboarding-center-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  z-index: 2;
+  margin: auto 0;
+}
+
+.triton-3d-logo-card {
+  width: 140px;
+  height: 140px;
+  border-radius: 36px;
+  background: linear-gradient(135deg, #0056c6 0%, #007aff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 16px 40px rgba(0, 122, 255, 0.45);
+  margin-bottom: 32px;
+}
+
+.logo-3d-main {
+  font-size: 64px;
+  line-height: 1;
+  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.3));
+}
+
+.floating-tag {
+  position: absolute;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #0052d4;
+  font-size: 14px;
+  font-weight: 800;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tag-top {
+  top: -12px;
+  right: -14px;
+  transform: rotate(12deg);
+}
+
+.tag-bottom {
+  bottom: -10px;
+  left: -14px;
+  transform: rotate(-10deg);
+}
+
+.onboarding-title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.onboarding-subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.70);
+  line-height: 1.5;
+  max-width: 300px;
+}
+
+.onboarding-bottom-action {
+  display: flex;
+  justify-content: center;
+  z-index: 2;
+  margin-top: 24px;
+}
+
+.onboarding-next-circle-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #007aff;
+  border: none;
+  color: #ffffff;
+  font-size: 26px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 30px rgba(0, 122, 255, 0.60);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+  will-change: transform;
+}
+
+.onboarding-next-circle-btn:active {
+  transform: scale(0.90);
+  box-shadow: none;
+}

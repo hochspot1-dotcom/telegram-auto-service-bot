@@ -651,6 +651,15 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
+.af-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%206c6c70' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
 /* Master Cards */
 .af-master-card {
   display: flex;
@@ -801,7 +810,121 @@ body {
 .af-summary-val { color: var(--dark); font-weight: 800; }
 
 /* ═══════════════════════════════════════════════════════════
-   CURVED NOTCHED BOTTOM NAVIGATION BAR (Exact Reference Notch)
+   CENTERED PROFILE & REFINED MODERATOR PANEL
+   ═══════════════════════════════════════════════════════════ */
+
+.af-profile-centered-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px 20px;
+  gap: 6px;
+}
+
+.af-user-avatar-large {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--bg-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin-bottom: 4px;
+}
+
+.af-profile-name-large {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--dark);
+  letter-spacing: -0.3px;
+}
+
+.af-profile-phone-sub {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-3);
+}
+
+.af-grid-3-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+.af-stat-box {
+  text-align: center;
+  padding: 16px 8px;
+}
+
+.af-stat-num {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--dark);
+}
+
+.af-stat-lbl {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--gray-3);
+  margin-top: 2px;
+  letter-spacing: 0.5px;
+}
+
+.af-mod-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.af-mod-badge {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--gray-3);
+  letter-spacing: 0.6px;
+}
+
+.af-mod-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--dark);
+}
+
+.af-mod-desc {
+  font-size: 12.5px;
+  color: var(--gray-2);
+  line-height: 1.4;
+}
+
+.af-admin-filter-bar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 0;
+}
+
+.af-filter-chip {
+  padding: 8px 16px;
+  background: var(--bg-card);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: var(--r-pill);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray-2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s var(--ease);
+}
+
+.af-filter-chip.active {
+  background: var(--dark);
+  color: #ffffff;
+  border-color: var(--dark);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SNUG CURVED NOTCHED BOTTOM NAVIGATION BAR (Exact Baseline Alignment)
    ═══════════════════════════════════════════════════════════ */
 
 .af-navbar {
@@ -837,12 +960,14 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-end;
   gap: 3px;
   background: none;
   border: none;
   cursor: pointer;
   padding: 4px 12px 6px;
   flex: 1;
+  height: 100%;
 }
 
 .af-nav-icon {
@@ -870,6 +995,7 @@ body {
   font-weight: 600;
   color: var(--gray-3);
   transition: color 0.15s var(--ease);
+  line-height: 1.2;
 }
 
 .af-nav-item.active .af-nav-icon {
@@ -882,22 +1008,25 @@ body {
   font-weight: 800;
 }
 
-/* Center Elevated Floating Circle Button (FAB) in Curved Notch */
+/* Center Elevated Floating Circle Button (FAB) in Snug Curved Notch */
 .af-nav-center-fab {
   position: relative;
   z-index: 10;
-  top: -14px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  justify-content: flex-end;
   background: none;
   border: none;
   cursor: pointer;
-  padding-bottom: 2px;
+  padding: 0 12px 6px;
+  flex: 1;
+  height: 100%;
 }
 
 .af-fab-circle {
+  position: absolute;
+  top: -16px;
   width: 58px;
   height: 58px;
   border-radius: 50%;
@@ -924,7 +1053,6 @@ body {
   font-size: 10px;
   font-weight: 600;
   color: var(--gray-3);
-  margin-top: 2px;
 }
 
 .af-nav-center-fab:active .af-fab-circle {

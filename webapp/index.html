@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=62.0" />
+  <link rel="stylesheet" href="style.css?v=63.0" />
 </head>
 <body>
 
@@ -279,30 +279,29 @@
       </section>
 
       <!-- ════════════════════════════════════════
-           👤 TAB 4: ПРОФИЛЬ & МОДЕРАЦИЯ
+           👤 TAB 4: ПРОФИЛЬ & МОДЕРАЦИЯ (Centered Avatar + Refined Moderator Layout)
            ════════════════════════════════════════ -->
       <section id="tab-profile" class="tab-content">
 
-        <div class="af-card" style="display:flex;align-items:center;gap:16px;padding:20px;">
-          <div class="af-user-avatar" style="width:56px;height:56px;font-size:28px;">👤</div>
-          <div>
-            <div style="font-size:17px;font-weight:800;" id="profile-name">Клиент</div>
-            <div style="font-size:13px;color:var(--gray-3);margin-top:2px;" id="profile-phone">Телефон: Не указан</div>
-          </div>
+        <!-- Centered Profile Card: Avatar on Top, Name under Avatar, Phone under Name -->
+        <div class="af-card af-profile-centered-header">
+          <div class="af-user-avatar-large">👤</div>
+          <div class="af-profile-name-large" id="profile-name">Клиент</div>
+          <div class="af-profile-phone-sub" id="profile-phone">Телефон: Не указан</div>
         </div>
 
-        <div class="af-grid-2" style="grid-template-columns:1fr 1fr 1fr;gap:10px;">
-          <div class="af-card" style="text-align:center;padding:14px 6px;">
-            <div style="font-size:22px;font-weight:800;color:var(--dark);" id="stat-active">0</div>
-            <div style="font-size:10px;color:var(--gray-3);font-weight:800;">АКТИВНЫХ</div>
+        <div class="af-grid-3-stats">
+          <div class="af-card af-stat-box">
+            <div class="af-stat-num" id="stat-active">0</div>
+            <div class="af-stat-lbl">АКТИВНЫХ</div>
           </div>
-          <div class="af-card" style="text-align:center;padding:14px 6px;">
-            <div style="font-size:22px;font-weight:800;color:var(--dark);" id="stat-total">0</div>
-            <div style="font-size:10px;color:var(--gray-3);font-weight:800;">ВСЕГО</div>
+          <div class="af-card af-stat-box">
+            <div class="af-stat-num" id="stat-total">0</div>
+            <div class="af-stat-lbl">ВСЕГО</div>
           </div>
-          <div class="af-card" style="text-align:center;padding:14px 6px;">
-            <div style="font-size:22px;font-weight:800;color:var(--red);" id="stat-cancelled">0</div>
-            <div style="font-size:10px;color:var(--gray-3);font-weight:800;">ОТКЛОНЕНО</div>
+          <div class="af-card af-stat-box">
+            <div class="af-stat-num" style="color:var(--red);" id="stat-cancelled">0</div>
+            <div class="af-stat-lbl">ОТКЛОНЕНО</div>
           </div>
         </div>
 
@@ -310,15 +309,18 @@
           🛡 Панель модератора
         </button>
 
-        <!-- Admin Moderation Container -->
-        <div id="admin-panel-section" class="hidden" style="display:flex;flex-direction:column;gap:14px;">
+        <!-- Refined Admin Moderation Panel -->
+        <div id="admin-panel-section" class="hidden" style="display:flex;flex-direction:column;gap:16px;">
           <div class="af-card">
-            <h3 style="font-size:16px;font-weight:800;">👨‍🔧 Управление сменами мастеров</h3>
-            <p style="font-size:12px;color:var(--gray-3);">Снятие мастера со смены с предложением перезаписи клиентам</p>
+            <div class="af-mod-header">
+              <span class="af-mod-badge">👨‍🔧 МОДЕРАЦИЯ СМЕН</span>
+              <h3 class="af-mod-title">Управление мастерами</h3>
+              <p class="af-mod-desc">Снятие мастера со смены с предложением перезаписи клиентам</p>
+            </div>
 
             <div class="af-form-group">
-              <label class="af-label">Мастер:</label>
-              <select id="adm-master-select" class="af-input">
+              <label class="af-label">Выбор мастера:</label>
+              <select id="adm-master-select" class="af-input af-select">
                 <option value="Алексей Смирнов">Алексей Смирнов (Старший механик)</option>
                 <option value="Дмитрий Ковалев">Дмитрий Ковалев (Диагност)</option>
                 <option value="Игорь Соколов">Игорь Соколов (Ходовая)</option>
@@ -331,22 +333,22 @@
             </div>
 
             <div class="af-form-group">
-              <label class="af-label" for="adm-master-reason">Причина:</label>
-              <input type="text" id="adm-master-reason" class="af-input" value="Больничный мастера" />
+              <label class="af-label" for="adm-master-reason">Причина отмены:</label>
+              <input type="text" id="adm-master-reason" class="af-input" value="Больничный мастера" placeholder="Укажите причину..." />
             </div>
 
-            <button type="button" id="adm-trigger-reschedule-btn" class="af-btn-primary" style="background:var(--red);">
+            <button type="button" id="adm-trigger-reschedule-btn" class="af-btn-primary" style="background:var(--red);margin-top:6px;">
               ⚠️ Снять мастера и уведомить клиентов
             </button>
           </div>
 
-          <div class="af-pills-row" id="admin-status-pills">
-            <button type="button" class="af-pill-chip active" data-status="all">Все заявки</button>
-            <button type="button" class="af-pill-chip" data-status="На рассмотрении">⏳ Ожидают</button>
-            <button type="button" class="af-pill-chip" data-status="Одобрена">✅ Одобрены</button>
+          <div class="af-admin-filter-bar" id="admin-status-pills">
+            <button type="button" class="af-filter-chip active" data-status="all">Все заявки</button>
+            <button type="button" class="af-filter-chip" data-status="На рассмотрении">⏳ Ожидают</button>
+            <button type="button" class="af-filter-chip" data-status="Одобрена">✅ Одобрены</button>
           </div>
 
-          <div id="admin-bookings-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+          <div id="admin-bookings-list" style="display:flex;flex-direction:column;gap:12px;"></div>
         </div>
 
       </section>
@@ -354,12 +356,12 @@
     </main>
 
     <!-- ════════════════════════════════════════
-         CURVED NOTCHED BOTTOM NAVIGATION BAR (Exact Ref Notch)
+         CURVED NOTCHED BOTTOM NAVIGATION BAR (Snug Cutout & Exact Baseline Labels)
          ════════════════════════════════════════ -->
     <nav class="af-navbar" id="main-nav">
-      <!-- SVG Curved Notch Background Path -->
+      <!-- SVG Snug Curved Notch Background Path -->
       <svg class="af-navbar-svg" viewBox="0 0 400 70" preserveAspectRatio="none">
-        <path d="M 0,0 L 132,0 C 148,0 158,34 200,34 C 242,34 252,0 268,0 L 400,0 L 400,70 L 0,70 Z" fill="rgba(255, 255, 255, 0.96)"/>
+        <path d="M 0,0 L 158,0 C 170,0 174,32 200,32 C 226,32 230,0 242,0 L 400,0 L 400,70 L 0,70 Z" fill="rgba(255, 255, 255, 0.96)"/>
       </svg>
 
       <!-- 1. Главная -->
@@ -370,7 +372,7 @@
         <span class="af-nav-lbl">Главная</span>
       </button>
 
-      <!-- 2. Услуги (Center Elevated Floating Circle Button in Curved Notch) -->
+      <!-- 2. Услуги (Center Elevated Floating Circle Button in Snug Notch) -->
       <button class="af-nav-item af-nav-center-fab" data-tab="booking" data-step="1">
         <span class="af-fab-circle">
           <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
@@ -412,6 +414,6 @@
     <div id="toast" class="glass-toast hidden"></div>
   </div>
 
-  <script src="app.js?v=62.0"></script>
+  <script src="app.js?v=63.0"></script>
 </body>
 </html>

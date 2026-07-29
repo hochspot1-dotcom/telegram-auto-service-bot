@@ -1071,82 +1071,129 @@ body {
   font-weight: 800;
 }
 
-/* Onboarding Modal with Hand Phone Request Button */
-.af-onboarding-overlay {
+/* ═══════════════════════════════════════════════════════════
+   WELCOME ONBOARDING OVERLAY (Exact Reference Match)
+   ═══════════════════════════════════════════════════════════ */
+
+.af-welcome-overlay {
   position: fixed;
   inset: 0;
-  z-index: 999;
-  background: #ffffff;
-  display: none;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: max(24px, env(safe-area-inset-top)) 24px max(36px, env(safe-area-inset-bottom));
-}
-
-.af-onboarding-overlay.visible {
-  display: flex !important;
-  animation: afFade 0.3s var(--ease) both;
-}
-
-.af-onboard-center {
+  z-index: 9999;
+  background: #0b0e14;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
+  padding: max(48px, env(safe-area-inset-top)) 28px max(50px, env(safe-area-inset-bottom));
+  color: #ffffff;
   text-align: center;
-  margin: auto 0;
+  transition: opacity 0.35s var(--ease), transform 0.35s var(--ease);
 }
 
-.af-onboard-icon {
+.af-welcome-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.98);
+}
+
+.af-welcome-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto 0;
+  max-width: 320px;
+}
+
+.af-welcome-graphic {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin-bottom: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.af-graphic-glow {
+  position: absolute;
+  inset: -10px;
+  border-radius: 40px;
+  background: radial-gradient(circle, rgba(0, 122, 255, 0.45) 0%, rgba(11, 14, 20, 0) 70%);
+  filter: blur(14px);
+}
+
+.af-graphic-img {
+  position: relative;
+  z-index: 2;
   width: 140px;
   height: 140px;
-  border-radius: 32px;
-  overflow: hidden;
-  margin-bottom: 24px;
-  box-shadow: var(--shadow-md);
-}
-
-.af-onboard-icon img {
-  width: 100%;
-  height: 100%;
+  border-radius: 36px;
   object-fit: cover;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-.af-onboard-title {
-  font-size: 24px;
+.af-welcome-title {
+  font-size: 26px;
   font-weight: 800;
-  color: var(--dark);
-  margin-bottom: 8px;
-}
-
-.af-onboard-sub {
-  font-size: 14px;
-  color: var(--gray-3);
-  line-height: 1.45;
-  max-width: 280px;
-}
-
-.af-hand-phone-btn {
-  width: 100%;
-  max-width: 320px;
-  padding: 16px 24px;
-  border-radius: var(--r-pill);
-  background: var(--dark);
   color: #ffffff;
-  font-size: 15px;
+  margin-bottom: 12px;
+  letter-spacing: -0.4px;
+  line-height: 1.25;
+}
+
+.af-welcome-sub {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.af-welcome-action {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.af-arrow-ripple {
+  position: absolute;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 122, 255, 0.35);
+  animation: afPulse 2s infinite var(--ease);
+}
+
+@keyframes afPulse {
+  0% { transform: scale(0.85); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 0.3; }
+  100% { transform: scale(0.85); opacity: 0.8; }
+}
+
+.af-welcome-arrow-btn {
+  position: relative;
+  z-index: 2;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #007aff 0%, #0051a8 100%);
+  color: #ffffff;
+  border: none;
+  font-size: 22px;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  border: none;
   cursor: pointer;
-  box-shadow: var(--shadow-md);
-  margin: 0 auto;
-  transition: transform 0.18s var(--spring);
+  box-shadow: 0 8px 24px rgba(0, 122, 255, 0.45);
+  transition: transform 0.18s var(--spring), box-shadow 0.18s var(--ease);
 }
 
-.af-hand-phone-btn:active {
-  transform: scale(0.95);
+.af-welcome-arrow-btn:active {
+  transform: scale(0.92);
+  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
 }
 
 .modal-overlay {

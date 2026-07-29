@@ -94,44 +94,46 @@ document.addEventListener("DOMContentLoaded", () => {
     carouselTrack.addEventListener("touchend", startAutoSlide);
   }
 
-  // Onboarding Screen Handler
-  const onboardingOverlay = document.getElementById("triton-onboarding-screen");
-  const onboardingNextBtn = document.getElementById("onboarding-next-btn");
-  const onboardingCancelBtn = document.getElementById("onboarding-cancel-btn");
+  // ═══════════════════════════════════════════════════════════
+  // WELCOME SCREEN HANDLER (Always shows on open)
+  // Arrow button requests phone if new user, or proceeds to main menu
+  // ═══════════════════════════════════════════════════════════
+  const welcomeOverlay = document.getElementById("triton-onboarding-screen");
+  const welcomeArrowBtn = document.getElementById("onboarding-next-btn");
 
-  const isOnboarded = localStorage.getItem("af_onboarded");
-  if (!isOnboarded && onboardingOverlay) {
-    onboardingOverlay.classList.add("visible");
+  // Always display welcome screen upon opening app
+  if (welcomeOverlay) {
+    welcomeOverlay.classList.remove("hidden");
   }
 
-  function closeOnboarding() {
-    if (onboardingOverlay) {
-      onboardingOverlay.classList.remove("visible");
-      onboardingOverlay.classList.add("hidden");
+  function closeWelcomeScreen() {
+    if (welcomeOverlay) {
+      welcomeOverlay.classList.add("hidden");
     }
-    localStorage.setItem("af_onboarded", "true");
   }
 
-  if (onboardingNextBtn) {
-    onboardingNextBtn.addEventListener("click", () => {
-      if (tg?.requestContact) {
-        tg.requestContact((sent, response) => {
-          if (sent && response?.responseUnsafe?.contact?.phone_number) {
-            const rawPhone = response.responseUnsafe.contact.phone_number;
-            const formatted = "+" + rawPhone.replace(/\D/g, "");
+  if (welcomeArrowBtn) {
+    welcomeArrowBtn.addEventListener("click", () => {
+      const savedPhone = localStorage.getItem("user_phone_saved");
+
+      // If user hasn't provided phone yet, request contact from Telegram
+      if (!savedPhone && tg && typeof tg.requestContact === "function") {
+        tg.requestContact((sent, event) => {
+          if (sent && event && event.responseUnsafe && event.responseUnsafe.contact) {
+            const raw = event.responseUnsafe.contact.phone_number;
+            const formatted = "+" + raw.replace(/\D/g, "");
             localStorage.setItem("user_phone_saved", formatted);
             const phoneInputEl = document.getElementById("phone-number");
             if (phoneInputEl) phoneInputEl.value = formatted;
             showToast("✅ Номер телефона сохранен!");
           }
+          closeWelcomeScreen();
         });
+      } else {
+        // If user already provided phone or no Telegram contact permission, proceed to main menu
+        closeWelcomeScreen();
       }
-      closeOnboarding();
     });
-  }
-
-  if (onboardingCancelBtn) {
-    onboardingCancelBtn.addEventListener("click", closeOnboarding);
   }
 
   function initAutoPhoneRequest() {
@@ -149,18 +151,6 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("user_phone_saved", formatted);
       phoneInputEl.value = formatted;
       return;
-    }
-
-    if (tg && typeof tg.requestContact === "function" && !localStorage.getItem("tg_contact_requested")) {
-      localStorage.setItem("tg_contact_requested", "true");
-      tg.requestContact((sent, event) => {
-        if (sent && event && event.responseUnsafe && event.responseUnsafe.contact) {
-          const num = "+" + event.responseUnsafe.contact.phone_number.replace(/\D/g, "");
-          localStorage.setItem("user_phone_saved", num);
-          if (phoneInputEl) phoneInputEl.value = num;
-          showToast("✅ Номер телефона сохранен!");
-        }
-      });
     }
   }
 

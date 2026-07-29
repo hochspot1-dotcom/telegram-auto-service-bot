@@ -8,32 +8,35 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=63.0" />
+  <link rel="stylesheet" href="style.css?v=64.0" />
 </head>
 <body>
 
   <!-- ══════════════════════════════════════════════
-       WELCOME ONBOARDING SCREEN (Hand Phone Request)
+       WELCOME ONBOARDING SCREEN (Exact Reference Match)
        ══════════════════════════════════════════════ -->
-  <div id="triton-onboarding-screen" class="af-onboarding-overlay hidden">
-    <div style="display:flex;justify-content:flex-end;">
-      <button type="button" id="onboarding-cancel-btn" style="background:none;border:none;color:var(--gray-3);font-size:14px;font-weight:600;cursor:pointer;">Пропустить</button>
-    </div>
-
-    <div class="af-onboard-center">
-      <div class="af-onboard-icon">
-        <img src="images/hero.jpg" alt="AutoFriends" />
+  <div id="triton-onboarding-screen" class="af-welcome-overlay">
+    
+    <div class="af-welcome-content">
+      <!-- 3D Auto Service Badge -->
+      <div class="af-welcome-graphic">
+        <div class="af-graphic-glow"></div>
+        <img src="images/hero.jpg" alt="AutoFriends Logo" class="af-graphic-img" />
       </div>
-      <h2 class="af-onboard-title">AutoFriends Сервис</h2>
-      <p class="af-onboard-sub">Удобная и быстрая онлайн-запись на ремонт и техническое обслуживание авто</p>
+
+      <!-- Welcome Title & Description -->
+      <h1 class="af-welcome-title">Добро пожаловать в AutoFriends</h1>
+      <p class="af-welcome-sub">Удобная и быстрая онлайн-запись на техническое обслуживание и ремонт авто прямо в Telegram!</p>
     </div>
 
-    <div>
-      <button type="button" class="af-hand-phone-btn" id="onboarding-next-btn">
-        <span>📲 Предоставить номер</span>
-        <span style="font-size:18px;">🖐️</span>
+    <!-- Bottom Circular Arrow Button with Ripple Ring -->
+    <div class="af-welcome-action">
+      <div class="af-arrow-ripple"></div>
+      <button type="button" class="af-welcome-arrow-btn" id="onboarding-next-btn">
+        <span>➔</span>
       </button>
     </div>
+
   </div>
 
   <!-- ══════════════════════════════════════════════
@@ -414,6 +417,6 @@
     <div id="toast" class="glass-toast hidden"></div>
   </div>
 
-  <script src="app.js?v=63.0"></script>
+  <script src="app.js?v=64.0"></script>
 </body>
 </html>

@@ -176,69 +176,65 @@ body {
 
 .af-carousel-slide {
   min-width: 100%;
-  height: 180px;
+  height: 190px;
   position: relative;
   background-size: cover;
   background-position: center;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 16px;
+  padding: 12px;
   cursor: pointer;
 }
 
-/* Dimmed dark overlay for readability */
-.af-carousel-slide::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.35) 100%);
-  z-index: 1;
-}
-
-.af-slide-content {
+/* Soft Frosted White Glass Panel for Promo Banner */
+.af-slide-glass-panel {
   position: relative;
   z-index: 2;
-  color: #ffffff;
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  justify-content: space-between;
+  gap: 4px;
+  color: var(--dark);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  margin-top: auto;
 }
 
 .af-slide-tag {
   align-self: flex-start;
-  padding: 4px 10px;
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(8px);
+  padding: 3px 8px;
+  background: var(--dark);
+  color: #ffffff;
   border-radius: var(--r-pill);
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 10px;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-}
-
-.af-slide-title-box {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  margin-bottom: 2px;
 }
 
 .af-slide-title {
-  font-size: 19px;
+  font-size: 17px;
   font-weight: 800;
+  color: var(--dark);
   line-height: 1.2;
 }
 
 .af-slide-sub {
-  font-size: 13px;
-  opacity: 0.88;
+  font-size: 12px;
+  color: var(--gray-2);
+  font-weight: 600;
 }
 
 /* Carousel Indicators (Dots) */
 .af-carousel-dots {
   position: absolute;
-  bottom: 10px;
+  top: 14px;
   right: 14px;
   display: flex;
   gap: 6px;
@@ -249,18 +245,19 @@ body {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(4px);
   transition: all 0.25s var(--ease);
 }
 
 .af-dot.active {
   width: 18px;
   border-radius: 4px;
-  background: #ffffff;
+  background: var(--dark);
 }
 
 /* ═══════════════════════════════════════════════════════════
-   POPULAR WORK CARDS (Full Bleed Background + Dark Overlay)
+   POPULAR WORK CARDS (Soft Frosted White Blur Background for 100% Text Readability)
    ═══════════════════════════════════════════════════════════ */
 
 .af-section-header {
@@ -282,47 +279,38 @@ body {
   gap: 12px;
 }
 
-/* Full-background dimmed card matching user request */
 .af-service-card-full {
   position: relative;
-  height: 165px;
+  height: 185px;
   border-radius: var(--r-lg);
   overflow: hidden;
   background-size: cover;
   background-position: center;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
   cursor: pointer;
   transition: transform 0.18s var(--spring);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 12px;
+  justify-content: flex-end;
+  padding: 8px;
 }
 
 .af-service-card-full:active { transform: scale(0.97); }
 
-/* Dimmed dark overlay so text pops out clearly */
-.af-service-card-full::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.85) 100%);
-  z-index: 1;
-  transition: opacity 0.2s var(--ease);
-}
-
-.af-service-card-full:hover::before {
-  background: linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.78) 100%);
-}
-
-.af-card-content {
+/* Frosted White Glass Chip Container for text separation */
+.af-card-content-glass {
   position: relative;
   z-index: 2;
-  height: 100%;
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: var(--r-md);
+  padding: 10px 12px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  color: #ffffff;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 .af-card-top-info {
@@ -332,17 +320,16 @@ body {
 }
 
 .af-card-title {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
   line-height: 1.25;
-  color: #ffffff;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+  color: var(--dark);
 }
 
 .af-card-sub {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.85);
-  font-weight: 500;
+  color: var(--gray-2);
+  font-weight: 600;
 }
 
 .af-card-bottom {
@@ -350,30 +337,29 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 4px;
-  margin-top: auto;
+  margin-top: 2px;
 }
 
 .af-card-price {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
-  color: #ffffff;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+  color: var(--dark);
 }
 
 .af-card-btn {
   padding: 6px 12px;
-  background: #ffffff;
-  color: var(--dark);
+  background: var(--dark);
+  color: #ffffff;
   border-radius: var(--r-pill);
   font-size: 11px;
   font-weight: 800;
   border: none;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  box-shadow: var(--shadow-sm);
 }
 
 /* ═══════════════════════════════════════════════════════════
-   BOOKING WIZARD STEPS & COMMON COMPONENTS
+   COMMON COMPONENTS & WIZARD STEPS
    ═══════════════════════════════════════════════════════════ */
 
 .af-card {

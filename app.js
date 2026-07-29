@@ -1,10 +1,6 @@
 // ==========================================
 // НАСТРОЙКА АДРЕСА БЭКЕНДА (Bot API URL)
 // ==========================================
-// Если Mini App размещен на отдельном хостинге (например GitHub Pages, Vercel, Netlify):
-// Укажите здесь HTTPS-адрес хостинга вашего бота (куда вы задеплоили main.py/web_server.py)!
-// Пример: const CONFIG_BACKEND_URL = "https://my-bot-backend.onrender.com";
-// Также можно передавать параметр в URL кнопки WebApp: https://your-miniapp.vercel.app?backend=https://my-bot-backend.onrender.com
 const CONFIG_BACKEND_URL = "https://carservicegorlovka.de1.netrun.io";
 
 function getBackendUrl() {
@@ -16,7 +12,6 @@ function getBackendUrl() {
     return CONFIG_BACKEND_URL.trim().replace(/\/$/, "");
   }
 
-  // Если открыто как локальный файл или через браузер без указывания порт/домена
   if (window.location.protocol === "file:" || window.location.hostname === "") {
     return "";
   }
@@ -34,7 +29,6 @@ document.addEventListener("DOMContentLoaded", () => {
     tg.expand();
   }
 
-  // Current user info (from Telegram or test fallback)
   const tgUser = tg?.initDataUnsafe?.user || {
     id: 123456789,
     first_name: "Посетитель",
@@ -44,7 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const userId = tgUser.id;
   const userName = tgUser.first_name + (tgUser.last_name ? " " + tgUser.last_name : "");
 
-  // Update greeting
   const greetingEl = document.getElementById("user-greeting");
   if (greetingEl) {
     greetingEl.textContent = `Привет, ${userName}!`;
@@ -81,13 +74,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (onboardingNextBtn) {
     onboardingNextBtn.addEventListener("click", () => {
-      // Prompt Telegram phone contact share
       if (tg?.requestContact) {
         tg.requestContact((sent, response) => {
           if (sent && response?.responseUnsafe?.contact?.phone_number) {
             const rawPhone = response.responseUnsafe.contact.phone_number;
             const formatted = "+" + rawPhone.replace(/\D/g, "");
             localStorage.setItem("user_phone_saved", formatted);
+            const phoneInputEl = document.getElementById("phone-number");
             if (phoneInputEl) phoneInputEl.value = formatted;
             showToast("✅ Номер телефона сохранен!");
           }
@@ -104,6 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function initAutoPhoneRequest() {
     const savedPhone = localStorage.getItem("user_phone_saved");
     const tgPhone = tg?.initDataUnsafe?.user?.phone_number || "";
+    const phoneInputEl = document.getElementById("phone-number");
 
     if (savedPhone && phoneInputEl) {
       phoneInputEl.value = savedPhone;
@@ -117,7 +111,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // First time launch: request phone via Telegram WebApp API if supported
     if (tg && typeof tg.requestContact === "function" && !localStorage.getItem("tg_contact_requested")) {
       localStorage.setItem("tg_contact_requested", "true");
       tg.requestContact((sent, event) => {
@@ -133,6 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initAutoPhoneRequest();
 
+  const phoneInputEl = document.getElementById("phone-number");
   if (phoneInputEl) {
     phoneInputEl.addEventListener("input", () => {
       if (phoneInputEl.value.trim()) {
@@ -148,7 +142,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       if (data.is_admin) {
         isAdmin = true;
-        // Show admin button ONLY inside Profile tab
         const adminProfileBtn = document.getElementById("admin-profile-btn");
         if (adminProfileBtn) {
           adminProfileBtn.classList.remove("hidden");
@@ -162,7 +155,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   checkAdminStatus();
-
 
   // Floating Navbar Tab switching & Liquid Blob animation
   const navItems = document.querySelectorAll(".nav-item");
@@ -181,7 +173,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const navRect = mainNav.getBoundingClientRect();
     const activeRect = activeNav.getBoundingClientRect();
 
-    // Compact width capsule centered over tab item
     const targetWidth = Math.min(activeRect.width - 20, 64);
     const left = activeRect.left - navRect.left + (activeRect.width - targetWidth) / 2;
 
@@ -221,30 +212,26 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Home CTA Button Handler
+  // Home CTA Handlers
   const homeStartBookingBtn = document.getElementById("home-start-booking-btn");
   if (homeStartBookingBtn) {
-    homeStartBookingBtn.addEventListener("click", () => {
+    homeStartBookingBtn.addEventListener("click", (e) => {
+      if (!e.target.closest('.tr-hero-play-btn')) {
+        switchTab("booking");
+        goToStep(1);
+      }
+    });
+  }
+
+  const heroPlayBtn = document.getElementById("hero-play-btn");
+  if (heroPlayBtn) {
+    heroPlayBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
       switchTab("booking");
       goToStep(1);
     });
   }
 
-  document.querySelectorAll(".home-square-card").forEach(card => {
-    card.addEventListener("click", () => {
-      switchTab("booking");
-      goToStep(1);
-    });
-  });
-
-  // Privacy Checkbox Enable/Disable Submit Button Handler
-  const privacyAgreeCheckbox = document.getElementById("privacy-agree");
-  const submitBookingBtn = document.getElementById("submit-booking-btn");
-
-  if (privacyAgreeCheckbox && submitBookingBtn) {
-    submitBookingBtn.disabled = !privacyAgreeCheckbox.checked;
-
-  // Triton Hub & Action Widgets Handlers
   const quickBookingBanner = document.getElementById("triton-quick-booking-banner");
   if (quickBookingBanner) {
     quickBookingBanner.addEventListener("click", () => {
@@ -268,12 +255,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  document.querySelectorAll(".triton-hub-card").forEach(card => {
+  document.querySelectorAll(".tr-hub[data-tab], .tr-widget[data-tab]").forEach(card => {
     card.addEventListener("click", () => {
-      switchTab("booking");
-      goToStep(1);
+      const tab = card.dataset.tab;
+      const step = card.dataset.step ? parseInt(card.dataset.step, 10) : null;
+      if (tab) switchTab(tab);
+      if (step) goToStep(step);
     });
   });
+
+  // Privacy Checkbox Handler
+  const privacyAgreeCheckbox = document.getElementById("privacy-agree");
+  const submitBookingBtn = document.getElementById("submit-booking-btn");
+
+  if (privacyAgreeCheckbox && submitBookingBtn) {
+    submitBookingBtn.disabled = !privacyAgreeCheckbox.checked;
+    privacyAgreeCheckbox.addEventListener("change", () => {
+      submitBookingBtn.disabled = !privacyAgreeCheckbox.checked;
+    });
+  }
 
   // Services Categories & Subservices Tree
   const SERVICE_CATEGORIES = [
@@ -339,7 +339,6 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   const selectedProblemsSet = new Set();
-  // Map: catId -> custom problem text entered by user
   const customCategoryInputs = {};
 
   function updateEstimatedTotalPrice() {
@@ -364,7 +363,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Renders summary list of selected problems below the accordion
   function renderSelectedSummary() {
     const summaryEl = document.getElementById("selected-summary");
     if (!summaryEl) return;
@@ -388,114 +386,7 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  function toggleProblemSelection(title) {
-    if (selectedProblemsSet.has(title)) {
-      selectedProblemsSet.delete(title);
-    } else {
-      selectedProblemsSet.add(title);
-    }
-    updateEstimatedTotalPrice();
-    renderSelectedSummary();
-  }
-
-
-  function renderServicesAccordion(filterQuery = "") {
-    const container = document.getElementById("category-pills");
-    if (!container) return;
-
-    const query = filterQuery.toLowerCase().trim();
-
-    if (query) {
-      // Search Results View
-      const matched = [];
-      SERVICE_CATEGORIES.forEach(cat => {
-        cat.items.forEach(item => {
-          if (item.title.toLowerCase().includes(query) || cat.title.toLowerCase().includes(query)) {
-            matched.push({ ...item, catTitle: cat.title });
-          }
-        });
-      });
-
-      if (matched.length === 0) {
-        container.innerHTML = `<div class="info-card glass-card"><p style="text-align: center; color: var(--text-muted);">По вашему запросу «${filterQuery}» ничего не найдено. Попробуйте сформулировать иначе.</p></div>`;
-        return;
-      }
-
-      container.innerHTML = matched.map(m => {
-        const isChecked = selectedProblemsSet.has(m.title);
-        return `
-          <div class="service-card glass-card ${isChecked ? 'selected' : ''}">
-            <div class="service-info">
-              <input type="checkbox" class="subservice-checkbox" ${isChecked ? 'checked' : ''} data-title="${m.title}" />
-              <div>
-                <div class="service-title">${m.title}</div>
-                <div class="service-price">${m.price} (${m.catTitle})</div>
-              </div>
-            </div>
-            <button class="service-action-btn select-subservice-btn" data-title="${m.title}">
-              ${isChecked ? '✓ Выбрано' : '+ Выбрать'}
-            </button>
-          </div>
-        `;
-      }).join("");
-    } else {
-      // Accordion Categories View with Multi-Select Checkboxes
-      container.innerHTML = SERVICE_CATEGORIES.map(cat => `
-        <div class="accordion-category glass-card">
-          <div class="accordion-header">
-            <span>${cat.title}</span>
-            <span class="accordion-arrow">▼</span>
-          </div>
-          <div class="accordion-body">
-            ${cat.items.map(item => {
-              const isChecked = selectedProblemsSet.has(item.title);
-              return `
-                <div class="subservice-item ${isChecked ? 'selected' : ''}" data-title="${item.title}">
-                  <label class="subservice-checkbox-label" onclick="event.stopPropagation();">
-                    <input type="checkbox" class="subservice-checkbox" ${isChecked ? 'checked' : ''} data-title="${item.title}" />
-                    <span class="subservice-title">${item.title}</span>
-                  </label>
-                  <span class="subservice-price">${item.price}</span>
-                </div>
-              `;
-            }).join("")}
-          </div>
-        </div>
-      `).join("");
-    }
-
-    // Bind Accordion Header Click Handlers
-    container.querySelectorAll(".accordion-header").forEach(header => {
-      header.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const parent = header.parentElement;
-        parent.classList.toggle("open");
-      });
-    });
-
-    // Bind Subservice Checkbox Handlers WITHOUT closing accordion!
-    container.querySelectorAll(".subservice-item").forEach(itemEl => {
-      itemEl.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const title = itemEl.dataset.title;
-        if (title) {
-          toggleProblemSelection(title);
-          const checkbox = itemEl.querySelector(".subservice-checkbox");
-          const isChecked = selectedProblemsSet.has(title);
-          if (checkbox) checkbox.checked = isChecked;
-          itemEl.classList.toggle("selected", isChecked);
-        }
-      });
-    });
-
-  } // end renderServicesAccordion
-
-  renderCategoryAccordion();
-
-  // Wizard Step 1 Accordion + Search Setup
   const wizardSearchInput = document.getElementById("wizard-search-input");
-  const customProblemGroup = document.getElementById("custom-problem-group");
-  let selectedCategory = "";
 
   function renderCategoryAccordion(filterQuery = "") {
     const container = document.getElementById("category-pills");
@@ -503,7 +394,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const query = filterQuery.toLowerCase().trim();
 
     if (query) {
-      // Search results: flat list with checkboxes
       const matched = [];
       SERVICE_CATEGORIES.forEach(cat => {
         cat.items.forEach(item => {
@@ -532,7 +422,6 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
       }).join("");
     } else {
-      // Accordion categories view — each has checkboxes + a text input at the bottom
       container.innerHTML = SERVICE_CATEGORIES.map(cat => {
         const customVal = customCategoryInputs[cat.id] || "";
         return `
@@ -569,7 +458,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }).join("");
     }
 
-    // Bind accordion header toggles
     container.querySelectorAll(".accordion-header").forEach(header => {
       header.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -580,7 +468,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Bind subservice checkboxes — use change event on checkbox as source of truth
     container.querySelectorAll(".subservice-item").forEach(itemEl => {
       itemEl.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -590,17 +477,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const checkbox = itemEl.querySelector(".subservice-checkbox");
         if (!checkbox) return;
 
-        // If click landed on checkbox or its label, the browser already toggled checkbox.checked.
-        // If click was on price or row padding, we need to manually toggle.
         const throughLabel = !!e.target.closest('label');
         const onCheckbox   = e.target === checkbox;
 
         if (!throughLabel && !onCheckbox) {
-          // Manual toggle for clicks on the price tag or row bg
           checkbox.checked = !checkbox.checked;
         }
 
-        // Sync Set with current checkbox state (browser may have already toggled)
         if (checkbox.checked) {
           selectedProblemsSet.add(title);
         } else {
@@ -613,7 +496,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Bind custom text inputs per category
     container.querySelectorAll(".custom-cat-input").forEach(input => {
       input.addEventListener("input", (e) => {
         e.stopPropagation();
@@ -635,7 +517,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Car Number Input Auto-Caps
   const carNumberInput = document.getElementById("car-number");
   if (carNumberInput) {
     carNumberInput.addEventListener("input", () => {
@@ -643,7 +524,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Privacy Policy Modal Handlers
   const privacyLink = document.getElementById("privacy-link");
   const privacyModal = document.getElementById("privacy-modal");
   const closePrivacyBtn = document.getElementById("close-privacy-btn");
@@ -661,8 +541,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-
-  // Full Interactive Month Calendar & Time Slots
   const MONTH_NAMES_RU = [
     "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
     "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
@@ -679,7 +557,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedDateObj = new Date(todayObj.getFullYear(), todayObj.getMonth(), todayObj.getDate());
   let selectedDateLabel = `${todayObj.getDate()} ${MONTH_NAMES_RU_GENITIVE[todayObj.getMonth()]} ${todayObj.getFullYear()}`;
 
-  // Daily schedule slots (clean time display)
   const DAILY_TIME_SLOTS = ["09:00", "10:30", "12:00", "13:30", "15:00", "16:30", "18:00"];
 
   const BUSY_SLOTS_MAP = {
@@ -730,13 +607,13 @@ document.addEventListener("DOMContentLoaded", () => {
     container.innerHTML = MASTERS_DATA.map(m => {
       const isSelected = m.id === selectedMasterId;
       return `
-        <div class="master-card glass-card ${isSelected ? 'selected' : ''}" data-master-id="${m.id}">
+        <div class="master-card ${isSelected ? 'selected' : ''}" data-master-id="${m.id}">
           <div class="master-avatar">${m.avatar}</div>
           <div class="master-info">
             <div class="master-name">${m.name}</div>
-            <div class="master-role">${m.role}</div>
+            <div class="master-spec">${m.role}</div>
           </div>
-          <div class="master-badge">${m.badge}</div>
+          <div class="master-rating">${m.badge}</div>
         </div>
       `;
     }).join("");
@@ -763,7 +640,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const lastDayOfMonth = new Date(calendarYear, calendarMonth + 1, 0);
     const totalDays = lastDayOfMonth.getDate();
 
-    // Calculate day offset (Monday = 0, Sunday = 6)
     let startDayOfWeek = firstDayOfMonth.getDay() - 1;
     if (startDayOfWeek === -1) startDayOfWeek = 6;
 
@@ -771,12 +647,10 @@ document.addEventListener("DOMContentLoaded", () => {
                            (calendarYear === todayObj.getFullYear() && calendarMonth <= todayObj.getMonth());
 
     let daysHtml = "";
-    // Empty padding cells for first week
     for (let i = 0; i < startDayOfWeek; i++) {
       daysHtml += `<div class="cal-day empty"></div>`;
     }
 
-    // Days 1..totalDays
     for (let day = 1; day <= totalDays; day++) {
       const cellDate = new Date(calendarYear, calendarMonth, day);
       const isToday = (cellDate.toDateString() === todayObj.toDateString());
@@ -784,7 +658,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const isSelected = (cellDate.toDateString() === selectedDateObj.toDateString());
 
       let classes = "cal-day";
-      if (isPast) classes += " past disabled";
+      if (isPast) classes += " past";
       if (isToday) classes += " today";
       if (isSelected) classes += " selected";
 
@@ -809,7 +683,6 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
 
-    // Month Navigation Handlers
     const prevBtn = document.getElementById("cal-prev-month");
     const nextBtn = document.getElementById("cal-next-month");
 
@@ -837,7 +710,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Day Selection Click Handlers — Swaps calendar view for time slots view!
     container.querySelectorAll(".cal-day:not(.past):not(.empty)").forEach(cell => {
       cell.addEventListener("click", () => {
         const y = parseInt(cell.dataset.year);
@@ -876,7 +748,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (slotsGroup) slotsGroup.classList.add("hidden");
   }
 
-  // Bind "← Изменить дату" button
   const changeDateBtn = document.getElementById("change-date-btn");
   if (changeDateBtn) {
     changeDateBtn.addEventListener("click", showCalendarView);
@@ -904,10 +775,9 @@ document.addEventListener("DOMContentLoaded", () => {
         selectedSlot = `${selectedDateLabel} в ${time}`;
       }
 
-      // Simple line-through grayed out style for occupied slots (no locks, no tags)
       if (isBusy) {
         return `
-          <div class="slot-item busy disabled" title="Время занято">
+          <div class="slot-item booked">
             ${time}
           </div>
         `;
@@ -920,7 +790,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     }).join("");
 
-    container.querySelectorAll(".slot-item:not(.busy)").forEach(item => {
+    container.querySelectorAll(".slot-item:not(.booked)").forEach(item => {
       item.addEventListener("click", () => {
         container.querySelectorAll(".slot-item").forEach(i => i.classList.remove("active"));
         item.classList.add("active");
@@ -935,7 +805,6 @@ document.addEventListener("DOMContentLoaded", () => {
     showCalendarView();
   }
 
-  // User Profile loading
   async function loadUserProfile() {
     try {
       const res = await fetch(`${BACKEND_URL}/api/user/info?user_id=${userId}`);
@@ -947,7 +816,6 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("stat-cancelled").textContent = data.stats.cancelled || 0;
       document.getElementById("profile-phone").textContent = `Телефон: ${data.stats.phone || 'Не указан'}`;
 
-      // Auto-fill phone from profile if not yet set
       if (data.stats.phone && data.stats.phone !== "Не указан") {
         const phoneInput = document.getElementById("phone-number");
         if (phoneInput && !phoneInput.value) {
@@ -972,7 +840,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!container) return;
 
     if (!bookings || bookings.length === 0) {
-      container.innerHTML = `<div class="info-card glass-card"><p style="text-align: center; color: var(--text-muted);">У вас пока нет оформленных записей.</p></div>`;
+      container.innerHTML = `<div class="info-card"><p style="text-align: center; color: var(--text-2);">У вас пока нет оформленных записей.</p></div>`;
       return;
     }
 
@@ -984,7 +852,7 @@ document.addEventListener("DOMContentLoaded", () => {
       let isUnavailable = b.status.includes("недоступен") || b.status.includes("Перенос");
 
       if (isUnavailable) {
-        badgeClass = "badge-warning";
+        badgeClass = "badge-pending";
         statusIcon = "⚠️";
       } else if (b.status === "Одобрена" || b.status === "Активна") {
         badgeClass = "badge-approved";
@@ -997,22 +865,21 @@ document.addEventListener("DOMContentLoaded", () => {
       const isCancelable = ["На рассмотрении", "Одобрена", "Активна"].includes(b.status) || isUnavailable;
 
       return `
-        <div class="booking-card glass-card ${isUnavailable ? 'warning-card' : ''}">
-          <div class="booking-header">
-            <span class="booking-id">Запись №${b.id}</span>
-            <span class="badge ${badgeClass}">${statusIcon} ${b.status}</span>
+        <div class="booking-card" style="${isUnavailable ? 'border-color:rgba(245,158,11,0.38);' : ''}">
+          <div class="booking-card-header">
+            <span class="booking-card-title">Запись №${b.id}</span>
+            <span class="booking-badge ${badgeClass}">${statusIcon} ${b.status}</span>
           </div>
-          <div class="booking-details">
-            <p><strong>Услуга:</strong> ${b.problem}</p>
-            <p><strong>Автомобиль:</strong> ${b.car_model}</p>
-            ${b.car_number ? `<p><strong>Госномер:</strong> ${b.car_number}</p>` : ''}
-            <p><strong>Время:</strong> ${b.slot}</p>
-            ${b.comment ? `<p class="booking-comment-box"><strong>Сообщение автосервиса:</strong> <em>${b.comment}</em></p>` : ''}
+          <div class="booking-card-meta">
+            <div><strong style="color:var(--text-1);">Услуга:</strong> ${b.problem}</div>
+            <div><strong style="color:var(--text-1);">Автомобиль:</strong> ${b.car_model}</div>
+            ${b.car_number ? `<div><strong style="color:var(--text-1);">Госномер:</strong> ${b.car_number}</div>` : ''}
+            <div><strong style="color:var(--text-1);">Время:</strong> ${b.slot}</div>
+            ${b.comment ? `<div style="margin-top:4px;padding:8px 10px;background:rgba(43,126,255,0.07);border-radius:10px;border:1px solid rgba(43,126,255,0.18);"><strong style="color:#2b7eff;">Сообщение:</strong> <em>${b.comment}</em></div>` : ''}
           </div>
-
           <div class="booking-card-actions">
-            ${isUnavailable ? `<button class="reschedule-btn glow-btn" data-id="${b.id}">🔄 Выбрать другого мастера / время</button>` : ''}
-            ${isCancelable ? `<button class="cancel-btn" data-id="${b.id}">Отменить запись</button>` : ''}
+            ${isUnavailable ? `<button class="reschedule-btn" data-id="${b.id}">🔄 Выбрать другого мастера / время</button>` : ''}
+            ${isCancelable ? `<button class="cancel-btn" data-id="${b.id}">Отменить</button>` : ''}
           </div>
         </div>
       `;
@@ -1056,7 +923,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Multi-Step Wizard Logic (4 steps)
   let currentStep = 1;
   const toStep2Btn = document.getElementById("to-step-2-btn");
   const toStep3Btn = document.getElementById("to-step-3-btn");
@@ -1118,7 +984,6 @@ document.addEventListener("DOMContentLoaded", () => {
     `;
   }
 
-  // Phone Edit Pencil Handler
   const editPhoneBtn = document.getElementById("edit-phone-btn");
   const phoneInput = document.getElementById("phone-number");
   const phoneHint = document.getElementById("phone-hint");
@@ -1136,7 +1001,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Step 1 -> Step 2
   if (toStep2Btn) {
     toStep2Btn.addEventListener("click", () => {
       const checkedProblems = Array.from(selectedProblemsSet);
@@ -1159,7 +1023,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Step 2 -> Step 3
   if (toStep3Btn) {
     toStep3Btn.addEventListener("click", () => {
       if (!selectedSlot) {
@@ -1174,7 +1037,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Step 3 -> Step 4
   if (toStep4Btn) {
     toStep4Btn.addEventListener("click", () => {
       const carModel = document.getElementById("car-model").value.trim();
@@ -1192,14 +1054,12 @@ document.addEventListener("DOMContentLoaded", () => {
   if (backToStep2Btn) backToStep2Btn.addEventListener("click", () => goToStep(2));
   if (backToStep3Btn) backToStep3Btn.addEventListener("click", () => goToStep(3));
 
-  // Booking Form Submission
   const bookingForm = document.getElementById("booking-form");
   const submitBtn = document.getElementById("submit-booking-btn");
 
   bookingForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    // Collect all problems (checkboxes + custom text inputs)
     const checkedProblems = Array.from(selectedProblemsSet);
     const customProblems = Object.values(customCategoryInputs).map(v => v.trim()).filter(v => v.length > 0);
     const allProblems = [...checkedProblems, ...customProblems];
@@ -1211,7 +1071,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const customProblemInput = document.getElementById("custom-problem");
       problem = customProblemInput ? customProblemInput.value.trim() : "";
     }
-
 
     const carModel = document.getElementById("car-model").value.trim();
     const carNumber = document.getElementById("car-number") ? document.getElementById("car-number").value.trim().toUpperCase() : "";
@@ -1248,7 +1107,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const targetSlot = `${selectedSlot} (Мастер: ${selectedMasterName})`;
 
-      // If client is rescheduling an existing affected booking
       if (activeRescheduleBookingId) {
         const res = await fetch(`${BACKEND_URL}/api/booking/reschedule`, {
           method: "POST",
@@ -1294,7 +1152,6 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast(`🎉 Заявка №${data.booking_id} успешно создана!`);
         bookingForm.reset();
         selectedProblemsSet.clear();
-        // Clear custom inputs
         Object.keys(customCategoryInputs).forEach(k => delete customCategoryInputs[k]);
         renderCategoryAccordion();
         goToStep(1);
@@ -1302,7 +1159,6 @@ document.addEventListener("DOMContentLoaded", () => {
           switchTab("profile");
         }, 1200);
       } else {
-
         showToast("⚠️ " + (data.error || "Ошибка создания записи"));
       }
     } catch (err) {
@@ -1314,9 +1170,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-
-
-  // Toast Helper
   function showToast(msg) {
     const toast = document.getElementById("toast");
     if (!toast) return;
@@ -1327,9 +1180,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 3500);
   }
 
-  // ==========================================
-  // ADMIN / MODERATION PANEL LOGIC
-  // ==========================================
+  // ADMIN LOGIC
   const adminPills = document.querySelectorAll("#admin-status-pills .pill");
   adminPills.forEach(pill => {
     pill.addEventListener("click", () => {
@@ -1355,7 +1206,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       renderAdminBookings(data.bookings || []);
     } catch (e) {
-      container.innerHTML = `<div class="info-card glass-card"><p style="text-align: center; color: var(--text-muted);">Не удалось загрузить данные модерации</p></div>`;
+      container.innerHTML = `<div class="info-card"><p style="text-align: center; color: var(--text-2);">Не удалось загрузить данные модерации</p></div>`;
     }
   }
 
@@ -1364,7 +1215,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!container) return;
 
     if (!bookings || bookings.length === 0) {
-      container.innerHTML = `<div class="info-card glass-card"><p style="text-align: center; color: var(--text-muted);">Заявок не найдено.</p></div>`;
+      container.innerHTML = `<div class="info-card"><p style="text-align: center; color: var(--text-2);">Заявок не найдено.</p></div>`;
       return;
     }
 
@@ -1384,39 +1235,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const isPending = b.status === "На рассмотрении";
       const actionsHtml = isPending ? `
-        <div class="admin-actions-grid">
+        <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;">
           <button class="admin-btn admin-btn-approve" data-id="${b.id}">✅ Одобрить</button>
           <button class="admin-btn admin-btn-reject" data-id="${b.id}">❌ Отклонить</button>
-          <button class="admin-btn admin-btn-delete" data-id="${b.id}">🗑 Удалить заявку</button>
+          <button class="admin-btn admin-btn-delete" data-id="${b.id}">🗑 Удалить</button>
         </div>
       ` : `
-        <div class="admin-actions-grid">
-          <button class="admin-btn admin-btn-delete" data-id="${b.id}">🗑 Удалить заявку</button>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;">
+          <button class="admin-btn admin-btn-delete" data-id="${b.id}">🗑 Удалить</button>
         </div>
       `;
 
       return `
-        <div class="booking-card glass-card admin-card ${cardClass}">
-          <div class="booking-header">
-            <span class="booking-id">Запись №${b.id}</span>
-            <span class="badge ${badgeClass}">${statusIcon} ${b.status}</span>
+        <div class="booking-card">
+          <div class="booking-card-header">
+            <span class="booking-card-title">Запись №${b.id}</span>
+            <span class="booking-badge ${badgeClass}">${statusIcon} ${b.status}</span>
           </div>
-          <div class="admin-card-user">
+          <div style="font-size:12px;color:var(--text-2);">
             👤 <strong>${b.user_name}</strong> (ID: ${b.user_id}) | 📞 ${b.phone}
           </div>
-          <div class="booking-details">
-            <p><strong>Услуга:</strong> ${b.problem}</p>
-            <p><strong>Автомобиль:</strong> ${b.car_model}</p>
-            ${b.car_number ? `<p><strong>Госномер:</strong> ${b.car_number}</p>` : ''}
-            <p><strong>Время:</strong> ${b.slot}</p>
-            ${b.comment ? `<p><strong>Прим. модератора:</strong> <em>${b.comment}</em></p>` : ''}
+          <div class="booking-card-meta">
+            <div><strong style="color:var(--text-1);">Услуга:</strong> ${b.problem}</div>
+            <div><strong style="color:var(--text-1);">Автомобиль:</strong> ${b.car_model}</div>
+            ${b.car_number ? `<div><strong style="color:var(--text-1);">Госномер:</strong> ${b.car_number}</div>` : ''}
+            <div><strong style="color:var(--text-1);">Время:</strong> ${b.slot}</div>
+            ${b.comment ? `<div style="margin-top:4px;padding:6px 10px;background:rgba(43,126,255,0.08);border-radius:8px;"><strong style="color:#2b7eff;">Прим. модератора:</strong> <em>${b.comment}</em></div>` : ''}
           </div>
 
           ${actionsHtml}
         </div>
       `;
     }).join("");
-
 
     container.querySelectorAll(".admin-btn-approve").forEach(btn => {
       btn.addEventListener("click", () => openAdminModal(btn.dataset.id, "approve"));
@@ -1429,7 +1279,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Admin Modal Handling
   const modal = document.getElementById("admin-modal");
   const modalComment = document.getElementById("modal-comment");
   const modalConfirmBtn = document.getElementById("modal-confirm-btn");
@@ -1491,7 +1340,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Admin Master & Date Selection Logic
   let selectedAdmMaster = "Алексей Смирнов";
 
   const admMasterSelector = document.getElementById("adm-masters-selector");
@@ -1505,7 +1353,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Set default date picker value to today
   const admOffDateInput = document.getElementById("adm-off-date");
   if (admOffDateInput && !admOffDateInput.value) {
     const todayStr = new Date().toISOString().split("T")[0];

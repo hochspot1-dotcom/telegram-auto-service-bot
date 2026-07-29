@@ -221,19 +221,62 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Home CTA Button Handler
+  // ── Home CTA Button Handlers (new Triton classes) ──────────────────────
+
+  // Hero banner & hero play button → booking step 1
   const homeStartBookingBtn = document.getElementById("home-start-booking-btn");
   if (homeStartBookingBtn) {
-    homeStartBookingBtn.addEventListener("click", () => {
+    homeStartBookingBtn.addEventListener("click", (e) => {
+      // Only trigger if the click wasn't on the "Записаться" button itself (handled separately)
+      if (!e.target.closest('.tr-hero-play-btn')) {
+        switchTab("booking");
+        goToStep(1);
+      }
+    });
+  }
+
+  const heroPlayBtn = document.getElementById("hero-play-btn");
+  if (heroPlayBtn) {
+    heroPlayBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
       switchTab("booking");
       goToStep(1);
     });
   }
 
-  document.querySelectorAll(".home-square-card").forEach(card => {
-    card.addEventListener("click", () => {
+  // Primary claim button → booking step 2
+  const quickBookingBanner = document.getElementById("triton-quick-booking-banner");
+  if (quickBookingBanner) {
+    quickBookingBanner.addEventListener("click", () => {
       switchTab("booking");
-      goToStep(1);
+      goToStep(2);
+    });
+  }
+
+  // Widget: Ваши Записи → profile tab
+  const widgetBookings = document.getElementById("triton-widget-bookings");
+  if (widgetBookings) {
+    widgetBookings.addEventListener("click", () => {
+      switchTab("profile");
+    });
+  }
+
+  // Widget: Специалисты → booking step 2
+  const widgetMasters = document.getElementById("triton-widget-masters");
+  if (widgetMasters) {
+    widgetMasters.addEventListener("click", () => {
+      switchTab("booking");
+      goToStep(2);
+    });
+  }
+
+  // tr-hub cards → respect data-tab & data-step attributes
+  document.querySelectorAll(".tr-hub[data-tab], .tr-widget[data-tab]").forEach(card => {
+    card.addEventListener("click", () => {
+      const tab = card.dataset.tab;
+      const step = card.dataset.step ? parseInt(card.dataset.step, 10) : null;
+      if (tab) switchTab(tab);
+      if (step) goToStep(step);
     });
   });
 
@@ -243,37 +286,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (privacyAgreeCheckbox && submitBookingBtn) {
     submitBookingBtn.disabled = !privacyAgreeCheckbox.checked;
-
-  // Triton Hub & Action Widgets Handlers
-  const quickBookingBanner = document.getElementById("triton-quick-booking-banner");
-  if (quickBookingBanner) {
-    quickBookingBanner.addEventListener("click", () => {
-      switchTab("booking");
-      goToStep(2);
-    });
-  }
-
-  const widgetBookings = document.getElementById("triton-widget-bookings");
-  if (widgetBookings) {
-    widgetBookings.addEventListener("click", () => {
-      switchTab("profile");
-    });
-  }
-
-  const widgetMasters = document.getElementById("triton-widget-masters");
-  if (widgetMasters) {
-    widgetMasters.addEventListener("click", () => {
-      switchTab("booking");
-      goToStep(2);
-    });
-  }
-
-  document.querySelectorAll(".triton-hub-card").forEach(card => {
-    card.addEventListener("click", () => {
-      switchTab("booking");
-      goToStep(1);
-    });
-  });
 
   // Services Categories & Subservices Tree
   const SERVICE_CATEGORIES = [
@@ -984,7 +996,7 @@ document.addEventListener("DOMContentLoaded", () => {
       let isUnavailable = b.status.includes("недоступен") || b.status.includes("Перенос");
 
       if (isUnavailable) {
-        badgeClass = "badge-warning";
+        badgeClass = "badge-pending";
         statusIcon = "⚠️";
       } else if (b.status === "Одобрена" || b.status === "Активна") {
         badgeClass = "badge-approved";
@@ -997,26 +1009,26 @@ document.addEventListener("DOMContentLoaded", () => {
       const isCancelable = ["На рассмотрении", "Одобрена", "Активна"].includes(b.status) || isUnavailable;
 
       return `
-        <div class="booking-card glass-card ${isUnavailable ? 'warning-card' : ''}">
-          <div class="booking-header">
-            <span class="booking-id">Запись №${b.id}</span>
-            <span class="badge ${badgeClass}">${statusIcon} ${b.status}</span>
+        <div class="booking-card" style="${isUnavailable ? 'border-color:rgba(245,158,11,0.38);' : ''}">
+          <div class="booking-card-header">
+            <span class="booking-card-title">Запись №${b.id}</span>
+            <span class="booking-badge ${badgeClass}">${statusIcon} ${b.status}</span>
           </div>
-          <div class="booking-details">
-            <p><strong>Услуга:</strong> ${b.problem}</p>
-            <p><strong>Автомобиль:</strong> ${b.car_model}</p>
-            ${b.car_number ? `<p><strong>Госномер:</strong> ${b.car_number}</p>` : ''}
-            <p><strong>Время:</strong> ${b.slot}</p>
-            ${b.comment ? `<p class="booking-comment-box"><strong>Сообщение автосервиса:</strong> <em>${b.comment}</em></p>` : ''}
+          <div class="booking-card-meta">
+            <div><strong style="color:var(--text-1);">Услуга:</strong> ${b.problem}</div>
+            <div><strong style="color:var(--text-1);">Автомобиль:</strong> ${b.car_model}</div>
+            ${b.car_number ? `<div><strong style="color:var(--text-1);">Госномер:</strong> ${b.car_number}</div>` : ''}
+            <div><strong style="color:var(--text-1);">Время:</strong> ${b.slot}</div>
+            ${b.comment ? `<div style="margin-top:4px;padding:8px 10px;background:rgba(43,126,255,0.07);border-radius:10px;border:1px solid rgba(43,126,255,0.18);"><strong style="color:#2b7eff;">Сообщение:</strong> <em>${b.comment}</em></div>` : ''}
           </div>
-
           <div class="booking-card-actions">
-            ${isUnavailable ? `<button class="reschedule-btn glow-btn" data-id="${b.id}">🔄 Выбрать другого мастера / время</button>` : ''}
-            ${isCancelable ? `<button class="cancel-btn" data-id="${b.id}">Отменить запись</button>` : ''}
+            ${isUnavailable ? `<button class="reschedule-btn" data-id="${b.id}">🔄 Выбрать другого мастера / время</button>` : ''}
+            ${isCancelable ? `<button class="cancel-btn" data-id="${b.id}">Отменить</button>` : ''}
           </div>
         </div>
       `;
     }).join("");
+
 
     container.querySelectorAll(".reschedule-btn").forEach(btn => {
       btn.addEventListener("click", () => {

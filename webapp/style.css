@@ -2155,7 +2155,7 @@ body {
   inset: 0;
   z-index: 999;
   background: #07090e;
-  display: flex;
+  display: none;
   flex-direction: column;
   justify-content: space-between;
   padding: max(20px, env(safe-area-inset-top)) 24px max(32px, env(safe-area-inset-bottom));
@@ -2175,6 +2175,7 @@ body {
 }
 
 .triton-onboarding-overlay.visible {
+  display: flex !important;
   opacity: 1;
   pointer-events: auto;
 }
@@ -2183,6 +2184,10 @@ body {
   opacity: 0;
   transform: scale(0.98);
   transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.triton-onboarding-overlay.hidden {
+  display: none !important;
 }
 
 .onboarding-top-bar {

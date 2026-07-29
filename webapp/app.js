@@ -215,6 +215,9 @@ document.addEventListener("DOMContentLoaded", () => {
   navItems.forEach(item => {
     item.addEventListener("click", () => {
       switchTab(item.dataset.tab);
+      if (item.dataset.tab === "booking" && item.dataset.step) {
+        goToStep(parseInt(item.dataset.step, 10));
+      }
     });
   });
 
@@ -227,16 +230,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Home Quick Categories Click Handlers
-  document.querySelectorAll(".home-cat-card").forEach(card => {
+  document.querySelectorAll(".home-square-card").forEach(card => {
     card.addEventListener("click", () => {
-      const cat = card.dataset.cat;
-      if (cat) {
-        selectedCategory = cat;
-        selectedProblemTitle = "";
-        switchTab("booking");
-        goToStep(1);
-      }
+      switchTab("booking");
+      goToStep(1);
     });
   });
 

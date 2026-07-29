@@ -27,14 +27,14 @@
   --red:           #ff3b30;
   --yellow:        #ffcc00;
 
-  --r-sm:          8px;
-  --r-md:          14px;
-  --r-lg:          20px;
+  --r-sm:          10px;
+  --r-md:          16px;
+  --r-lg:          22px;
   --r-pill:        999px;
 
   --font-main:     'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
-  --shadow-sm:     0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-sm:     0 2px 10px rgba(0, 0, 0, 0.04);
   --shadow-md:     0 6px 20px rgba(0, 0, 0, 0.06);
   --shadow-lg:     0 12px 32px rgba(0, 0, 0, 0.10);
 
@@ -61,7 +61,7 @@ html, body {
 }
 
 body {
-  padding-bottom: max(90px, env(safe-area-inset-bottom));
+  padding-bottom: max(95px, env(safe-area-inset-bottom));
   padding-top: env(safe-area-inset-top, 0px);
 }
 
@@ -73,8 +73,8 @@ body {
   display: flex;
   flex-direction: column;
   position: relative;
-  padding: 10px 14px 0;
-  gap: 12px;
+  padding: 12px 16px 0;
+  gap: 16px;
 }
 
 .hidden { display: none !important; }
@@ -84,7 +84,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 2px;
+  padding: 4px 2px;
 }
 
 .af-header-title-box {
@@ -94,14 +94,14 @@ body {
 
 .af-header-sub {
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--gray-3);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .af-header-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
   color: var(--dark);
   letter-spacing: -0.4px;
@@ -111,7 +111,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 12px;
+  padding: 6px 14px;
   background: var(--bg-card);
   border-radius: var(--r-pill);
   box-shadow: var(--shadow-sm);
@@ -119,14 +119,14 @@ body {
 }
 
 .af-user-avatar {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: var(--gray-light);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .af-user-name {
@@ -145,7 +145,7 @@ body {
 .tab-content {
   display: none;
   flex-direction: column;
-  gap: 14px;
+  gap: 18px;
   animation: afFade 0.22s var(--ease) both;
 }
 
@@ -157,7 +157,7 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   AUTO-SLIDING PROMO BANNER CAROUSEL (Top Images Slider Only)
+   AUTO-SLIDING PROMO BANNER CAROUSEL (Top Images Slider)
    ═══════════════════════════════════════════════════════════ */
 
 .af-carousel-wrapper {
@@ -177,14 +177,14 @@ body {
 
 .af-carousel-slide {
   min-width: 100%;
-  height: 190px;
+  height: 200px;
   position: relative;
   background-size: cover;
   background-position: center;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 12px;
+  padding: 14px;
   transition: transform 0.18s var(--spring);
 }
 
@@ -200,7 +200,7 @@ body {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-radius: var(--r-md);
-  padding: 12px 14px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -211,7 +211,7 @@ body {
 
 .af-slide-tag {
   align-self: flex-start;
-  padding: 3px 8px;
+  padding: 4px 10px;
   background: var(--dark);
   color: #ffffff;
   border-radius: var(--r-pill);
@@ -223,14 +223,14 @@ body {
 }
 
 .af-slide-title {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 800;
   color: var(--dark);
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 .af-slide-sub {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--gray-2);
   font-weight: 600;
 }
@@ -261,7 +261,7 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   POPULAR WORK CARDS (Clean Minimal Text Cards — No Photos)
+   POPULAR WORK CARDS (Spacious, Generous Height & Perfect Text Layout)
    ═══════════════════════════════════════════════════════════ */
 
 .af-section-header {
@@ -271,7 +271,7 @@ body {
 }
 
 .af-section-title {
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 800;
   color: var(--dark);
   letter-spacing: -0.3px;
@@ -280,25 +280,24 @@ body {
 .af-section-sub {
   font-size: 13px;
   color: var(--gray-3);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .af-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 14px;
 }
 
-/* Clean Minimal White Cards matching user request */
+/* Larger, comfortable cards with proper typography spacing */
 .af-service-card {
   background: var(--bg-card);
   border-radius: var(--r-lg);
-  padding: 16px 14px;
+  padding: 18px 16px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 12px;
-  height: 130px;
+  min-height: 155px;
   box-shadow: var(--shadow-sm);
   border: 1px solid rgba(0, 0, 0, 0.04);
   cursor: pointer;
@@ -314,21 +313,23 @@ body {
   font-size: 15px;
   font-weight: 800;
   color: var(--dark);
-  line-height: 1.25;
+  line-height: 1.3;
+  word-break: break-word;
 }
 
 .af-service-sub {
   font-size: 12px;
   color: var(--gray-2);
   font-weight: 500;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .af-service-bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: auto;
+  margin-top: 14px;
+  gap: 4px;
 }
 
 .af-service-price {
@@ -338,14 +339,15 @@ body {
 }
 
 .af-service-btn {
-  padding: 7px 13px;
+  padding: 8px 14px;
   background: var(--dark);
   color: #ffffff;
   border-radius: var(--r-pill);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
   border: none;
   cursor: pointer;
+  white-space: nowrap;
   transition: transform 0.15s var(--spring);
 }
 
@@ -354,30 +356,175 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   COMMON COMPONENTS & WIZARD STEPS
+   LARGE CATEGORY BLOCKS (Services Tab - Big Rectangles)
    ═══════════════════════════════════════════════════════════ */
 
-.af-card {
+.af-category-blocks-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.af-category-block {
   background: var(--bg-card);
   border-radius: var(--r-lg);
-  padding: 16px;
+  padding: 20px;
   box-shadow: var(--shadow-sm);
   border: 1px solid rgba(0,0,0,0.04);
   display: flex;
   flex-direction: column;
+  gap: 14px;
+  cursor: pointer;
+  transition: transform 0.18s var(--spring), box-shadow 0.18s var(--ease);
+}
+
+.af-category-block:active {
+  transform: scale(0.98);
+}
+
+.af-category-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.af-category-block-title-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.af-category-block-title {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--dark);
+  line-height: 1.25;
+}
+
+.af-category-block-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-3);
+}
+
+.af-category-arrow {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--dark);
+  transition: transform 0.2s var(--ease);
+}
+
+.af-category-block.expanded .af-category-arrow {
+  transform: rotate(180deg);
+  background: var(--dark);
+  color: #ffffff;
+}
+
+.af-category-items-list {
+  display: none;
+  flex-direction: column;
   gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--bg-pill);
+}
+
+.af-category-block.expanded .af-category-items-list {
+  display: flex;
+}
+
+.af-service-row-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--bg-pill);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: background 0.15s var(--ease);
+}
+
+.af-service-row-item.selected {
+  background: rgba(52, 199, 89, 0.12);
+  border: 1px solid var(--green);
+}
+
+.af-service-row-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dark);
+}
+
+.af-service-row-price {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--dark);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SPACIOUS & ERGONOMIC BOOKING WIZARD (Steps 1, 2, 3, 4)
+   ═══════════════════════════════════════════════════════════ */
+
+.af-wizard-bar {
+  display: flex;
+  background: var(--bg-pill);
+  padding: 5px;
+  border-radius: var(--r-md);
+  gap: 6px;
+}
+
+.af-step-pill {
+  flex: 1;
+  padding: 10px 4px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-3);
+  transition: all 0.18s var(--ease);
+}
+
+.af-step-pill.active {
+  background: var(--bg-card);
+  color: var(--dark);
+  font-weight: 800;
+  box-shadow: var(--shadow-sm);
+}
+
+.af-step-pill.completed { color: var(--green); }
+
+.wizard-step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.af-card {
+  background: var(--bg-card);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   position: relative;
 }
 
 .af-btn-primary {
   width: 100%;
-  padding: 14px 20px;
+  padding: 16px 22px;
   background: var(--dark);
   border: none;
   border-radius: var(--r-md);
   color: #ffffff;
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 800;
   font-family: var(--font-main);
   cursor: pointer;
   box-shadow: var(--shadow-sm);
@@ -399,13 +546,13 @@ body {
 }
 
 .af-btn-secondary {
-  padding: 14px 18px;
+  padding: 16px 20px;
   background: var(--bg-pill);
   border: none;
   border-radius: var(--r-md);
   color: var(--dark);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
   font-family: var(--font-main);
   cursor: pointer;
   transition: background 0.15s var(--ease);
@@ -413,116 +560,27 @@ body {
 
 .af-btn-secondary:active { background: var(--gray-6); }
 
-.af-wizard-bar {
-  display: flex;
-  background: var(--bg-pill);
-  padding: 4px;
-  border-radius: var(--r-md);
-  gap: 4px;
-}
-
-.af-step-pill {
-  flex: 1;
-  padding: 8px 4px;
-  border-radius: 10px;
-  text-align: center;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--gray-3);
-}
-
-.af-step-pill.active {
-  background: var(--bg-card);
-  color: var(--dark);
-  font-weight: 700;
-  box-shadow: var(--shadow-sm);
-}
-
-.af-step-pill.completed { color: var(--green); }
-
-.af-accordion {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.af-accordion-group {
-  background: var(--bg-card);
-  border-radius: var(--r-md);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid rgba(0,0,0,0.04);
-}
-
-.af-accordion-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 16px;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--dark);
-  cursor: pointer;
-}
-
-.af-accordion-body {
-  display: none;
-  flex-direction: column;
-  gap: 8px;
-  padding: 0 12px 14px;
-}
-
-.af-accordion-group.open .af-accordion-body { display: flex; }
-
-.af-checkbox-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 12px;
-  background: var(--bg-pill);
-  border-radius: var(--r-sm);
-  cursor: pointer;
-  user-select: none;
-}
-
-.af-checkbox-row.selected {
-  background: rgba(52, 199, 89, 0.12);
-  border: 1px solid var(--green);
-}
-
-.af-checkbox-text {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--dark);
-}
-
-.af-checkbox-price {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--gray-2);
-}
-
 .af-form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .af-label {
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--gray-2);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
 }
 
 .af-input {
   width: 100%;
-  padding: 12px 14px;
+  padding: 14px 16px;
   background: var(--bg-pill);
-  border: 1px solid transparent;
+  border: 1.5px solid transparent;
   border-radius: var(--r-md);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   font-family: var(--font-main);
   color: var(--dark);
@@ -536,11 +594,12 @@ body {
   box-shadow: var(--shadow-sm);
 }
 
+/* Master Cards */
 .af-master-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
+  gap: 14px;
+  padding: 16px;
   background: var(--bg-card);
   border-radius: var(--r-md);
   border: 2px solid transparent;
@@ -554,35 +613,37 @@ body {
 }
 
 .af-master-avatar {
-  width: 42px;
-  height: 42px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   background: var(--bg-pill);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 22px;
 }
 
 .af-master-name {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 800;
   color: var(--dark);
 }
 
 .af-master-role {
   font-size: 12px;
   color: var(--gray-3);
+  margin-top: 2px;
 }
 
+/* Light Calendar */
 .af-calendar-card {
   background: var(--bg-card);
   border-radius: var(--r-lg);
-  padding: 16px;
+  padding: 18px;
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .af-cal-header {
@@ -591,16 +652,16 @@ body {
   justify-content: space-between;
 }
 
-.af-cal-title { font-size: 15px; font-weight: 800; }
+.af-cal-title { font-size: 16px; font-weight: 800; }
 
 .af-cal-btn {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: var(--bg-pill);
   border: none;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
 }
 
@@ -608,7 +669,7 @@ body {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   text-align: center;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--gray-3);
 }
@@ -616,7 +677,7 @@ body {
 .af-cal-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
+  gap: 6px;
 }
 
 .af-cal-day {
@@ -624,7 +685,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   border-radius: 50%;
   cursor: pointer;
@@ -635,18 +696,19 @@ body {
 .af-cal-day.today { border: 2px solid var(--dark); }
 .af-cal-day.selected { background: var(--dark); color: #ffffff; }
 
+/* Time Slots */
 .af-slots-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 10px;
 }
 
 .af-slot-item {
-  padding: 10px 4px;
+  padding: 12px 6px;
   border-radius: var(--r-md);
   background: var(--bg-pill);
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 800;
   text-align: center;
   cursor: pointer;
 }
@@ -665,21 +727,21 @@ body {
 .af-summary-card {
   background: var(--bg-card);
   border-radius: var(--r-lg);
-  padding: 16px;
+  padding: 18px;
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .af-summary-row {
   display: flex;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .af-summary-lbl { color: var(--gray-3); font-weight: 600; }
-.af-summary-val { color: var(--dark); font-weight: 700; }
+.af-summary-val { color: var(--dark); font-weight: 800; }
 
 /* Bottom Nav Bar */
 .af-navbar {
@@ -692,7 +754,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding: 8px 12px max(12px, env(safe-area-inset-bottom));
+  padding: 10px 14px max(14px, env(safe-area-inset-bottom));
   background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);

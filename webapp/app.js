@@ -250,7 +250,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Services Categories & Subservices Tree
+  // Services Categories Data
   const SERVICE_CATEGORIES = [
     {
       id: "cat_engine",
@@ -348,9 +348,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     summaryEl.innerHTML = `
       <div class="af-card" style="margin-top:8px;">
-        <div style="font-size:12px;font-weight:700;color:var(--green);">✅ Выбранные работы:</div>
-        <ul style="font-size:13px;color:var(--dark);padding-left:18px;">
-          ${items.map(i => `<li>${i}</li>`).join("")}
+        <div style="font-size:12px;font-weight:800;color:var(--green);">✅ Выбранные работы (${items.length}):</div>
+        <ul style="font-size:13px;color:var(--dark);padding-left:18px;margin-top:4px;">
+          ${items.map(i => `<li style="margin-bottom:2px;">${i}</li>`).join("")}
         </ul>
       </div>
     `;
@@ -358,79 +358,63 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const wizardSearchInput = document.getElementById("wizard-search-input");
 
-  function renderCategoryAccordion(filterQuery = "") {
-    const container = document.getElementById("category-pills");
+  function renderLargeCategoryBlocks(filterQuery = "") {
+    const container = document.getElementById("category-blocks-wrapper");
     if (!container) return;
     const query = filterQuery.toLowerCase().trim();
 
-    if (query) {
-      const matched = [];
-      SERVICE_CATEGORIES.forEach(cat => {
-        cat.items.forEach(item => {
-          if (item.title.toLowerCase().includes(query) || cat.title.toLowerCase().includes(query)) {
-            matched.push({ ...item, catTitle: cat.title });
-          }
-        });
+    container.innerHTML = SERVICE_CATEGORIES.map(cat => {
+      const itemsMatching = cat.items.filter(item => {
+        if (!query) return true;
+        return item.title.toLowerCase().includes(query) || cat.title.toLowerCase().includes(query);
       });
 
-      if (matched.length === 0) {
-        container.innerHTML = `<div class="af-card"><p style="text-align:center;color:var(--gray-3);">Ничего не найдено по запросу «${filterQuery}»</p></div>`;
-        renderSelectedSummary();
-        return;
-      }
+      if (query && itemsMatching.length === 0) return "";
 
-      container.innerHTML = matched.map(m => {
-        const isChecked = selectedProblemsSet.has(m.title);
-        return `
-          <div class="af-checkbox-row ${isChecked ? 'selected' : ''}" data-title="${m.title}">
-            <span class="af-checkbox-text">${m.title}</span>
-            <span class="af-checkbox-price">${m.price}</span>
-          </div>
-        `;
-      }).join("");
-    } else {
-      container.innerHTML = SERVICE_CATEGORIES.map(cat => {
-        const customVal = customCategoryInputs[cat.id] || "";
-        return `
-          <div class="af-accordion-group" data-cat-id="${cat.id}">
-            <div class="af-accordion-header">
-              <span>${cat.title}</span>
-              <span class="af-arrow">▼</span>
+      const customVal = customCategoryInputs[cat.id] || "";
+      const isExpanded = query.length > 0;
+
+      return `
+        <div class="af-category-block ${isExpanded ? 'expanded' : ''}" data-cat-id="${cat.id}">
+          <div class="af-category-block-header">
+            <div class="af-category-block-title-box">
+              <div class="af-category-block-title">${cat.title}</div>
+              <div class="af-category-block-count">${cat.items.length} услуг · нажмите для выбора</div>
             </div>
-            <div class="af-accordion-body">
-              ${cat.items.map(item => {
-                const isChecked = selectedProblemsSet.has(item.title);
-                return `
-                  <div class="af-checkbox-row ${isChecked ? 'selected' : ''}" data-title="${item.title}">
-                    <span class="af-checkbox-text">${item.title}</span>
-                    <span class="af-checkbox-price">${item.price}</span>
-                  </div>
-                `;
-              }).join('')}
-              <div onclick="event.stopPropagation();" style="margin-top:4px;">
-                <input
-                  type="text"
-                  class="af-input custom-cat-input"
-                  data-cat-id="${cat.id}"
-                  placeholder="Другая проблема в этой категории..."
-                  value="${customVal}"
-                />
-              </div>
+            <div class="af-category-arrow">▼</div>
+          </div>
+          <div class="af-category-items-list">
+            ${cat.items.map(item => {
+              const isChecked = selectedProblemsSet.has(item.title);
+              return `
+                <div class="af-service-row-item ${isChecked ? 'selected' : ''}" data-title="${item.title}">
+                  <span class="af-service-row-title">${item.title}</span>
+                  <span class="af-service-row-price">${item.price}</span>
+                </div>
+              `;
+            }).join("")}
+            <div onclick="event.stopPropagation();" style="margin-top:4px;">
+              <input
+                type="text"
+                class="af-input custom-cat-input"
+                data-cat-id="${cat.id}"
+                placeholder="Другая проблема в этой категории..."
+                value="${customVal}"
+              />
             </div>
           </div>
-        `;
-      }).join("");
-    }
+        </div>
+      `;
+    }).join("");
 
-    container.querySelectorAll(".af-accordion-header").forEach(header => {
-      header.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const parent = header.parentElement;
-        parent.classList.toggle("open");
+    container.querySelectorAll(".af-category-block").forEach(block => {
+      block.addEventListener("click", (e) => {
+        if (e.target.closest(".af-service-row-item") || e.target.closest(".custom-cat-input")) return;
+        block.classList.toggle("expanded");
       });
     });
 
-    container.querySelectorAll(".af-checkbox-row").forEach(rowEl => {
+    container.querySelectorAll(".af-service-row-item").forEach(rowEl => {
       rowEl.addEventListener("click", (e) => {
         e.stopPropagation();
         const title = rowEl.dataset.title;
@@ -462,11 +446,11 @@ document.addEventListener("DOMContentLoaded", () => {
     renderSelectedSummary();
   }
 
-  renderCategoryAccordion();
+  renderLargeCategoryBlocks();
 
   if (wizardSearchInput) {
     wizardSearchInput.addEventListener("input", (e) => {
-      renderCategoryAccordion(e.target.value);
+      renderLargeCategoryBlocks(e.target.value);
     });
   }
 
@@ -1035,7 +1019,7 @@ document.addEventListener("DOMContentLoaded", () => {
         bookingForm.reset();
         selectedProblemsSet.clear();
         Object.keys(customCategoryInputs).forEach(k => delete customCategoryInputs[k]);
-        renderCategoryAccordion();
+        renderLargeCategoryBlocks();
         goToStep(1);
         setTimeout(() => {
           switchTab("bookings-list");

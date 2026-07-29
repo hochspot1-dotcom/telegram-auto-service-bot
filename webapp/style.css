@@ -1,6 +1,6 @@
 /* ============================================================
    AUTOFRIENDS LIGHT iOS DESIGN SYSTEM (Reference Match)
-   Clean Off-White · Dark Charcoal #1c1c1e · iOS Segmented Pills
+   Clean Off-White · Dark Charcoal #1c1c1e · Inline SVG Nav Icons
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -204,6 +204,8 @@ body {
 .af-search-icon {
   font-size: 16px;
   color: var(--gray-3);
+  display: flex;
+  align-items: center;
 }
 
 .af-search-input {
@@ -278,7 +280,7 @@ body {
   font-weight: 500;
 }
 
-/* Featured Hero Card with Floating Action (+) Button (Reference Audi Card) */
+/* Featured Hero Card with Full-Bleed Real Photo + Floating Action (+) Button */
 .af-hero-card {
   background: var(--bg-card);
   border-radius: var(--r-lg);
@@ -294,15 +296,17 @@ body {
 
 .af-hero-banner-img {
   width: 100%;
-  height: 160px;
-  background: linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%);
+  height: 170px;
   border-radius: var(--r-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  font-size: 54px;
   position: relative;
+  overflow: hidden;
+}
+
+.af-hero-banner-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .af-hero-floating-btn {
@@ -322,6 +326,7 @@ body {
   border: none;
   cursor: pointer;
   transition: transform 0.18s var(--spring);
+  z-index: 2;
 }
 
 .af-hero-floating-btn:active { transform: scale(0.90); }
@@ -398,7 +403,7 @@ body {
 
 .af-btn-secondary:active { background: var(--gray-6); }
 
-/* ── 2-Column Product / Service Cards Grid ──────────────────── */
+/* ── 2-Column Product / Service Cards Grid (Real Photos Full Bleed) ── */
 .af-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -408,7 +413,7 @@ body {
 .af-service-card {
   background: var(--bg-card);
   border-radius: var(--r-lg);
-  padding: 14px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -420,15 +425,21 @@ body {
 
 .af-service-card:active { transform: scale(0.97); }
 
+/* Full-bleed real photo box covering the entire rectangular container */
 .af-service-img {
   width: 100%;
-  height: 95px;
-  background: var(--bg-pill);
+  height: 110px;
   border-radius: var(--r-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 40px;
+  overflow: hidden;
+  position: relative;
+  background: var(--bg-pill);
+}
+
+.af-service-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .af-service-title {
@@ -752,7 +763,7 @@ body {
 .af-summary-val { color: var(--dark); font-weight: 700; }
 
 /* ═══════════════════════════════════════════════════════════
-   BOTTOM NAVIGATION BAR (Reference Bottom Bar)
+   BOTTOM NAVIGATION BAR (SVG Format Icons)
    ═══════════════════════════════════════════════════════════ */
 
 .af-navbar {
@@ -786,9 +797,23 @@ body {
 }
 
 .af-nav-icon {
-  font-size: 20px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--gray-3);
   transition: transform 0.15s var(--spring), color 0.15s var(--ease);
+}
+
+.af-nav-icon svg {
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .af-nav-lbl {
@@ -837,15 +862,18 @@ body {
 }
 
 .af-onboard-icon {
-  width: 120px;
-  height: 120px;
+  width: 140px;
+  height: 140px;
   border-radius: 32px;
-  background: var(--bg-pill);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 60px;
+  overflow: hidden;
   margin-bottom: 24px;
+  box-shadow: var(--shadow-md);
+}
+
+.af-onboard-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .af-onboard-title {

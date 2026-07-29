@@ -800,7 +800,7 @@ body {
 .af-summary-val { color: var(--dark); font-weight: 800; }
 
 /* ═══════════════════════════════════════════════════════════
-   FLOATING CENTER FAB BOTTOM NAVIGATION BAR (Reference Layout)
+   CURVED NOTCHED BOTTOM NAVIGATION BAR (Exact Reference Notch)
    ═══════════════════════════════════════════════════════════ */
 
 .af-navbar {
@@ -810,18 +810,29 @@ body {
   transform: translateX(-50%);
   width: 100%;
   max-width: 540px;
+  height: 68px;
   display: flex;
   align-items: flex-end;
   justify-content: space-around;
-  padding: 8px 14px max(12px, env(safe-area-inset-bottom));
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 0 14px max(10px, env(safe-area-inset-bottom));
+  background: transparent;
   z-index: 50;
 }
 
+.af-navbar-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  filter: drop-shadow(0 -4px 14px rgba(0, 0, 0, 0.06));
+  pointer-events: none;
+}
+
 .af-nav-item {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -829,7 +840,7 @@ body {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px 12px;
+  padding: 4px 12px 6px;
   flex: 1;
 }
 
@@ -870,10 +881,11 @@ body {
   font-weight: 800;
 }
 
-/* Center Elevated Floating Circular Button (FAB) */
+/* Center Elevated Floating Circle Button (FAB) in Curved Notch */
 .af-nav-center-fab {
   position: relative;
-  top: -14px;
+  z-index: 10;
+  top: -18px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -881,19 +893,18 @@ body {
   background: none;
   border: none;
   cursor: pointer;
-  z-index: 60;
 }
 
 .af-fab-circle {
-  width: 52px;
-  height: 52px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
   background: var(--dark);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 18px rgba(28, 28, 30, 0.28);
+  box-shadow: 0 8px 22px rgba(28, 28, 30, 0.32);
   transition: transform 0.18s var(--spring), background 0.15s var(--ease), box-shadow 0.15s var(--ease);
 }
 
@@ -914,7 +925,7 @@ body {
 
 .af-nav-center-fab.active .af-fab-circle {
   background: var(--dark);
-  box-shadow: 0 8px 22px rgba(28, 28, 30, 0.38);
+  box-shadow: 0 10px 26px rgba(28, 28, 30, 0.42);
   transform: scale(1.08);
 }
 

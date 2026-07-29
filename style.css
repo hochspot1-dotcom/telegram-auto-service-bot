@@ -116,6 +116,15 @@ body {
   border-radius: var(--r-pill);
   box-shadow: var(--shadow-sm);
   border: 1px solid rgba(0,0,0,0.04);
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s var(--spring), background 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+
+.af-user-chip:active {
+  transform: scale(0.94);
+  background: var(--bg-pill);
+  box-shadow: var(--shadow-md);
 }
 
 .af-user-avatar {
@@ -790,7 +799,10 @@ body {
 .af-summary-lbl { color: var(--gray-3); font-weight: 600; }
 .af-summary-val { color: var(--dark); font-weight: 800; }
 
-/* Bottom Nav Bar */
+/* ═══════════════════════════════════════════════════════════
+   FLOATING CENTER FAB BOTTOM NAVIGATION BAR (Ref Match)
+   ═══════════════════════════════════════════════════════════ */
+
 .af-navbar {
   position: fixed;
   bottom: 0;
@@ -799,9 +811,9 @@ body {
   width: 100%;
   max-width: 540px;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-around;
-  padding: 10px 14px max(14px, env(safe-area-inset-bottom));
+  padding: 8px 14px max(12px, env(safe-area-inset-bottom));
   background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -817,13 +829,13 @@ body {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 4px 12px;
   flex: 1;
 }
 
 .af-nav-icon {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -854,6 +866,59 @@ body {
 }
 
 .af-nav-item.active .af-nav-lbl {
+  color: var(--dark);
+  font-weight: 800;
+}
+
+/* Center Elevated Floating Circular Button (FAB) */
+.af-nav-center-fab {
+  position: relative;
+  top: -14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 60;
+}
+
+.af-fab-circle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--dark);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(28, 28, 30, 0.28);
+  transition: transform 0.18s var(--spring), background 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+
+.af-fab-circle svg {
+  width: 24px;
+  height: 24px;
+  stroke: #ffffff;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.af-nav-center-fab:active .af-fab-circle {
+  transform: scale(0.92);
+  background: var(--dark-hover);
+}
+
+.af-nav-center-fab.active .af-fab-circle {
+  background: var(--dark);
+  box-shadow: 0 8px 22px rgba(28, 28, 30, 0.38);
+  transform: scale(1.08);
+}
+
+.af-nav-center-fab.active .af-nav-lbl {
   color: var(--dark);
   font-weight: 800;
 }

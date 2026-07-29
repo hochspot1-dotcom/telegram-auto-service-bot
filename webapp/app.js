@@ -229,6 +229,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  const topUserProfileBtn = document.getElementById("top-user-profile-btn");
+  if (topUserProfileBtn) {
+    topUserProfileBtn.addEventListener("click", () => {
+      switchTab("profile");
+    });
+  }
+
   document.querySelectorAll("[data-tab]").forEach(card => {
     card.addEventListener("click", () => {
       if (card.classList.contains("af-nav-item")) return;

@@ -39,13 +39,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const userName = tgUser.first_name + (tgUser.last_name ? " " + tgUser.last_name : "");
 
   const greetingEl = document.getElementById("user-greeting");
-  if (greetingEl) {
-    greetingEl.textContent = userName.toUpperCase();
-  }
+  if (greetingEl) greetingEl.textContent = userName;
+
   const profileNameEl = document.getElementById("profile-name");
-  if (profileNameEl) {
-    profileNameEl.textContent = userName.toUpperCase();
-  }
+  if (profileNameEl) profileNameEl.textContent = userName;
 
   let isAdmin = false;
   let currentAdminFilter = "all";
@@ -57,20 +54,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const onboardingNextBtn = document.getElementById("onboarding-next-btn");
   const onboardingCancelBtn = document.getElementById("onboarding-cancel-btn");
 
-  const isOnboarded = localStorage.getItem("cyber_onboarded");
+  const isOnboarded = localStorage.getItem("af_onboarded");
   if (!isOnboarded && onboardingOverlay) {
     onboardingOverlay.classList.add("visible");
   }
 
   function closeOnboarding() {
     if (onboardingOverlay) {
-      onboardingOverlay.classList.add("closing");
-      setTimeout(() => {
-        onboardingOverlay.classList.remove("visible", "closing");
-        onboardingOverlay.classList.add("hidden");
-      }, 250);
+      onboardingOverlay.classList.remove("visible");
+      onboardingOverlay.classList.add("hidden");
     }
-    localStorage.setItem("cyber_onboarded", "true");
+    localStorage.setItem("af_onboarded", "true");
   }
 
   if (onboardingNextBtn) {
@@ -119,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const num = "+" + event.responseUnsafe.contact.phone_number.replace(/\D/g, "");
           localStorage.setItem("user_phone_saved", num);
           if (phoneInputEl) phoneInputEl.value = num;
-          showToast("✅ Номер телефона получен!");
+          showToast("✅ Номер телефона сохранен!");
         }
       });
     }
@@ -144,10 +138,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (data.is_admin) {
         isAdmin = true;
         const adminProfileBtn = document.getElementById("admin-profile-btn");
+        const adminPanelSection = document.getElementById("admin-panel-section");
         if (adminProfileBtn) {
           adminProfileBtn.classList.remove("hidden");
           adminProfileBtn.addEventListener("click", () => {
-            switchTab("admin");
+            if (adminPanelSection) adminPanelSection.classList.toggle("hidden");
+            loadAdminBookings(currentAdminFilter);
           });
         }
       }
@@ -158,7 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
   checkAdminStatus();
 
   // Navigation Tab Switching
-  const navItems = document.querySelectorAll(".cyber-nav-item");
+  const navItems = document.querySelectorAll(".af-nav-item");
   const tabContents = document.querySelectorAll(".tab-content");
 
   function switchTab(tabName) {
@@ -166,15 +162,16 @@ document.addEventListener("DOMContentLoaded", () => {
       item.classList.toggle("active", item.dataset.tab === tabName);
     });
     tabContents.forEach(content => {
-      content.classList.toggle("active", content.id === `tab-${tabName}`);
+      const targetId = content.id === `tab-${tabName}` || (tabName === "bookings-list" && content.id === "tab-bookings-list");
+      content.classList.toggle("active", targetId);
     });
 
     if (tabName === "profile") {
       loadUserProfile();
+    } else if (tabName === "bookings-list") {
+      loadUserProfile();
     } else if (tabName === "booking") {
       loadSlots();
-    } else if (tabName === "admin" && isAdmin) {
-      loadAdminBookings(currentAdminFilter);
     }
   }
 
@@ -187,42 +184,40 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Home CTA Handlers
-  const homeStartBookingBtn = document.getElementById("home-start-booking-btn");
-  if (homeStartBookingBtn) {
-    homeStartBookingBtn.addEventListener("click", (e) => {
-      if (!e.target.closest('#hero-play-btn')) {
-        switchTab("booking");
-        goToStep(1);
-      }
-    });
-  }
-
-  const heroPlayBtn = document.getElementById("hero-play-btn");
-  if (heroPlayBtn) {
-    heroPlayBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
+  // Home CTA & Floating Plus Button Handlers
+  const homeHeroCard = document.getElementById("home-hero-card");
+  if (homeHeroCard) {
+    homeHeroCard.addEventListener("click", () => {
       switchTab("booking");
       goToStep(1);
     });
   }
 
-  const quickBookingBanner = document.getElementById("triton-quick-booking-banner");
-  if (quickBookingBanner) {
-    quickBookingBanner.addEventListener("click", () => {
+  const heroFloatingPlusBtn = document.getElementById("hero-floating-plus-btn");
+  if (heroFloatingPlusBtn) {
+    heroFloatingPlusBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
       switchTab("booking");
       goToStep(2);
     });
   }
 
   document.querySelectorAll("[data-tab]").forEach(card => {
-    card.addEventListener("click", (e) => {
-      // Avoid double trigger if it's nav item
-      if (card.classList.contains("cyber-nav-item")) return;
+    card.addEventListener("click", () => {
+      if (card.classList.contains("af-nav-item")) return;
       const tab = card.dataset.tab;
       const step = card.dataset.step ? parseInt(card.dataset.step, 10) : null;
       if (tab) switchTab(tab);
       if (step) goToStep(step);
+    });
+  });
+
+  // Home Segmented Filter Pills Handler
+  const segmentedBtns = document.querySelectorAll("#home-category-segmented .af-segmented-btn");
+  segmentedBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      segmentedBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
     });
   });
 
@@ -334,9 +329,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     summaryEl.innerHTML = `
-      <div class="cyber-card" style="margin-top:8px;">
-        <div style="font-size:11px;font-weight:700;color:var(--green-neon);text-transform:uppercase;margin-bottom:4px;">✅ ВЫБРАННЫЕ УСЛУГИ:</div>
-        <ul style="font-size:12px;color:var(--text-1);padding-left:16px;">
+      <div class="af-card" style="margin-top:8px;">
+        <div style="font-size:12px;font-weight:700;color:var(--green);">✅ Выбранные работы:</div>
+        <ul style="font-size:13px;color:var(--dark);padding-left:18px;">
           ${items.map(i => `<li>${i}</li>`).join("")}
         </ul>
       </div>
@@ -361,7 +356,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       if (matched.length === 0) {
-        container.innerHTML = `<div class="cyber-card"><p style="text-align:center;color:var(--text-2);">По запросу «${filterQuery}» ничего не найдено.</p></div>`;
+        container.innerHTML = `<div class="af-card"><p style="text-align:center;color:var(--gray-3);">Ничего не найдено по запросу «${filterQuery}»</p></div>`;
         renderSelectedSummary();
         return;
       }
@@ -369,10 +364,9 @@ document.addEventListener("DOMContentLoaded", () => {
       container.innerHTML = matched.map(m => {
         const isChecked = selectedProblemsSet.has(m.title);
         return `
-          <div class="cyber-checkbox-row ${isChecked ? 'selected' : ''}" data-title="${m.title}">
-            <span class="cyber-box-icon"><span class="cyber-box-inner"></span></span>
-            <span class="cyber-checkbox-label-text">${m.title}</span>
-            <span class="cyber-checkbox-price-tag">${m.price}</span>
+          <div class="af-checkbox-row ${isChecked ? 'selected' : ''}" data-title="${m.title}">
+            <span class="af-checkbox-text">${m.title}</span>
+            <span class="af-checkbox-price">${m.price}</span>
           </div>
         `;
       }).join("");
@@ -380,28 +374,27 @@ document.addEventListener("DOMContentLoaded", () => {
       container.innerHTML = SERVICE_CATEGORIES.map(cat => {
         const customVal = customCategoryInputs[cat.id] || "";
         return `
-          <div class="cyber-accordion-group" data-cat-id="${cat.id}">
-            <div class="cyber-accordion-header">
+          <div class="af-accordion-group" data-cat-id="${cat.id}">
+            <div class="af-accordion-header">
               <span>${cat.title}</span>
-              <span class="cyber-accordion-arrow">▼</span>
+              <span class="af-arrow">▼</span>
             </div>
-            <div class="cyber-accordion-body">
+            <div class="af-accordion-body">
               ${cat.items.map(item => {
                 const isChecked = selectedProblemsSet.has(item.title);
                 return `
-                  <div class="cyber-checkbox-row ${isChecked ? 'selected' : ''}" data-title="${item.title}">
-                    <span class="cyber-box-icon"><span class="cyber-box-inner"></span></span>
-                    <span class="cyber-checkbox-label-text">${item.title}</span>
-                    <span class="cyber-checkbox-price-tag">${item.price}</span>
+                  <div class="af-checkbox-row ${isChecked ? 'selected' : ''}" data-title="${item.title}">
+                    <span class="af-checkbox-text">${item.title}</span>
+                    <span class="af-checkbox-price">${item.price}</span>
                   </div>
                 `;
               }).join('')}
               <div onclick="event.stopPropagation();" style="margin-top:4px;">
                 <input
                   type="text"
-                  class="cyber-cat-custom-input custom-cat-input"
+                  class="af-input custom-cat-input"
                   data-cat-id="${cat.id}"
-                  placeholder="Другая проблема в категории..."
+                  placeholder="Другая проблема в этой категории..."
                   value="${customVal}"
                 />
               </div>
@@ -411,7 +404,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }).join("");
     }
 
-    container.querySelectorAll(".cyber-accordion-header").forEach(header => {
+    container.querySelectorAll(".af-accordion-header").forEach(header => {
       header.addEventListener("click", (e) => {
         e.stopPropagation();
         const parent = header.parentElement;
@@ -419,8 +412,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
 
-    // Bind Cyber Tech Checkbox Rows [ ■ ]
-    container.querySelectorAll(".cyber-checkbox-row").forEach(rowEl => {
+    container.querySelectorAll(".af-checkbox-row").forEach(rowEl => {
       rowEl.addEventListener("click", (e) => {
         e.stopPropagation();
         const title = rowEl.dataset.title;
@@ -513,29 +505,25 @@ document.addEventListener("DOMContentLoaded", () => {
       id: "master_any",
       name: "🌟 Любой свободный мастер",
       role: "Ближайшее доступное время",
-      avatar: "👨‍🔧",
-      badge: "⚡ БЫСТРЫЙ ВЫБОР"
+      avatar: "👨‍🔧"
     },
     {
       id: "master_alexey",
       name: "Алексей Смирнов",
       role: "Старший механик (Двигатель и ТО)",
-      avatar: "👨‍🔧",
-      badge: "ОПЫТ 12 ЛЕТ"
+      avatar: "👨‍🔧"
     },
     {
       id: "master_dmitry",
       name: "Дмитрий Ковалев",
       role: "Диагност-автоэлектрик",
-      avatar: "⚡",
-      badge: "ОПЫТ 9 ЛЕТ"
+      avatar: "⚡"
     },
     {
       id: "master_igor",
       name: "Игорь Соколов",
       role: "Мастер по ходовой части",
-      avatar: "🛞",
-      badge: "ОПЫТ 8 ЛЕТ"
+      avatar: "🛞"
     }
   ];
 
@@ -550,18 +538,17 @@ document.addEventListener("DOMContentLoaded", () => {
     container.innerHTML = MASTERS_DATA.map(m => {
       const isSelected = m.id === selectedMasterId;
       return `
-        <div class="cyber-master-card ${isSelected ? 'selected' : ''}" data-master-id="${m.id}">
-          <div class="cyber-master-avatar">${m.avatar}</div>
+        <div class="af-master-card ${isSelected ? 'selected' : ''}" data-master-id="${m.id}">
+          <div class="af-master-avatar">${m.avatar}</div>
           <div>
-            <div class="cyber-master-name">${m.name}</div>
-            <div class="cyber-master-role">${m.role}</div>
+            <div class="af-master-name">${m.name}</div>
+            <div class="af-master-role">${m.role}</div>
           </div>
-          <div class="cyber-master-badge">${m.badge}</div>
         </div>
       `;
     }).join("");
 
-    container.querySelectorAll(".cyber-master-card").forEach(card => {
+    container.querySelectorAll(".af-master-card").forEach(card => {
       card.addEventListener("click", () => {
         const id = card.dataset.masterId;
         const master = MASTERS_DATA.find(m => m.id === id);
@@ -591,7 +578,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let daysHtml = "";
     for (let i = 0; i < startDayOfWeek; i++) {
-      daysHtml += `<div class="cyber-cal-day empty"></div>`;
+      daysHtml += `<div class="af-cal-day empty"></div>`;
     }
 
     for (let day = 1; day <= totalDays; day++) {
@@ -600,7 +587,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const isPast = (cellDate < new Date(todayObj.getFullYear(), todayObj.getMonth(), todayObj.getDate()));
       const isSelected = (cellDate.toDateString() === selectedDateObj.toDateString());
 
-      let classes = "cyber-cal-day";
+      let classes = "af-cal-day";
       if (isPast) classes += " past";
       if (isToday) classes += " today";
       if (isSelected) classes += " selected";
@@ -613,15 +600,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     container.innerHTML = `
-      <div class="cyber-cal-header">
-        <button type="button" class="cyber-cal-btn" id="cal-prev-month" ${isPrevDisabled ? 'disabled' : ''}>‹</button>
-        <span class="cyber-cal-title">${MONTH_NAMES_RU[calendarMonth]} ${calendarYear}</span>
-        <button type="button" class="cyber-cal-btn" id="cal-next-month">›</button>
+      <div class="af-cal-header">
+        <button type="button" class="af-cal-btn" id="cal-prev-month" ${isPrevDisabled ? 'disabled' : ''}>‹</button>
+        <span class="af-cal-title">${MONTH_NAMES_RU[calendarMonth]} ${calendarYear}</span>
+        <button type="button" class="af-cal-btn" id="cal-next-month">›</button>
       </div>
-      <div class="cyber-cal-weekdays">
+      <div class="af-cal-weekdays">
         <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
       </div>
-      <div class="cyber-cal-grid">
+      <div class="af-cal-grid">
         ${daysHtml}
       </div>
     `;
@@ -653,7 +640,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    container.querySelectorAll(".cyber-cal-day:not(.past):not(.empty)").forEach(cell => {
+    container.querySelectorAll(".af-cal-day:not(.past):not(.empty)").forEach(cell => {
       cell.addEventListener("click", () => {
         const y = parseInt(cell.dataset.year);
         const m = parseInt(cell.dataset.month);
@@ -674,7 +661,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const dateBadge = document.getElementById("slots-date-badge");
 
     if (dateBadge) {
-      dateBadge.textContent = `📅 ${selectedDateLabel.toUpperCase()}`;
+      dateBadge.textContent = selectedDateLabel;
     }
 
     renderSlotsForMasterAndDate();
@@ -702,7 +689,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!container) return;
 
     if (label) {
-      label.textContent = `ВРЕМЯ ЗАПИСИ НА ${selectedDateLabel.toUpperCase()} (${selectedMasterName.toUpperCase()}):`;
+      label.textContent = `Свободное время на ${selectedDateLabel} (${selectedMasterName}):`;
     }
 
     const busyMap = BUSY_SLOTS_MAP[selectedMasterId] || {};
@@ -719,23 +706,15 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (isBusy) {
-        return `
-          <div class="cyber-slot-item booked">
-            ${time}
-          </div>
-        `;
+        return `<div class="af-slot-item booked">${time}</div>`;
       }
 
-      return `
-        <div class="cyber-slot-item ${isSelected ? 'active' : ''}" data-time="${time}">
-          ${time}
-        </div>
-      `;
+      return `<div class="af-slot-item ${isSelected ? 'active' : ''}" data-time="${time}">${time}</div>`;
     }).join("");
 
-    container.querySelectorAll(".cyber-slot-item:not(.booked)").forEach(item => {
+    container.querySelectorAll(".af-slot-item:not(.booked)").forEach(item => {
       item.addEventListener("click", () => {
-        container.querySelectorAll(".cyber-slot-item").forEach(i => i.classList.remove("active"));
+        container.querySelectorAll(".af-slot-item").forEach(i => i.classList.remove("active"));
         item.classList.add("active");
         selectedSlot = `${selectedDateLabel} в ${item.dataset.time}`;
       });
@@ -783,33 +762,33 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!container) return;
 
     if (!bookings || bookings.length === 0) {
-      container.innerHTML = `<div class="cyber-card"><p style="text-align: center; color: var(--text-2);">У вас пока нет оформленных записей.</p></div>`;
+      container.innerHTML = `<div class="af-card"><p style="text-align: center; color: var(--gray-3);">У вас пока нет активных записей.</p></div>`;
       return;
     }
 
     container.innerHTML = bookings.map(b => {
       let isUnavailable = b.status.includes("недоступен") || b.status.includes("Перенос");
       let statusColor = "var(--yellow)";
-      if (b.status === "Одобрена" || b.status === "Активна") statusColor = "var(--green-neon)";
+      if (b.status === "Одобрена" || b.status === "Активна") statusColor = "var(--green)";
       if (b.status.includes("Отменен") || b.status.includes("Отклонен")) statusColor = "var(--red)";
 
       const isCancelable = ["На рассмотрении", "Одобрена", "Активна"].includes(b.status) || isUnavailable;
 
       return `
-        <div class="cyber-card">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-            <span style="font-size:13px;font-weight:700;">ЗАПИСЬ №${b.id}</span>
-            <span style="font-size:11px;font-weight:700;color:${statusColor};text-transform:uppercase;">[ ${b.status} ]</span>
+        <div class="af-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:14px;font-weight:800;">Запись №${b.id}</span>
+            <span style="font-size:12px;font-weight:700;color:${statusColor};">${b.status}</span>
           </div>
-          <div style="font-size:12px;color:var(--text-2);line-height:1.4;">
+          <div style="font-size:13px;color:var(--gray-2);line-height:1.45;">
             <div><strong>Услуга:</strong> ${b.problem}</div>
-            <div><strong>Автомобиль:</strong> ${b.car_model} ${b.car_number ? `(${b.car_number})` : ''}</div>
+            <div><strong>Авто:</strong> ${b.car_model} ${b.car_number ? `(${b.car_number})` : ''}</div>
             <div><strong>Время:</strong> ${b.slot}</div>
-            ${b.comment ? `<div style="margin-top:4px;padding:6px;background:rgba(255,42,95,0.08);border-radius:4px;"><strong style="color:var(--pink);">Сообщение:</strong> <em>${b.comment}</em></div>` : ''}
+            ${b.comment ? `<div style="margin-top:4px;padding:6px;background:var(--bg-pill);border-radius:6px;"><strong>Примечание:</strong> ${b.comment}</div>` : ''}
           </div>
-          <div style="display:flex;gap:6px;margin-top:8px;">
-            ${isUnavailable ? `<button class="cyber-btn-primary reschedule-btn" data-id="${b.id}" style="padding:6px 10px;font-size:11px;">🔄 ВЫБРАТЬ ДРУГОЕ ВРЕМЯ</button>` : ''}
-            ${isCancelable ? `<button class="cyber-btn-secondary cancel-btn" data-id="${b.id}" style="padding:6px 10px;font-size:11px;color:var(--red);">ОТМЕНИТЬ</button>` : ''}
+          <div style="display:flex;gap:6px;margin-top:4px;">
+            ${isUnavailable ? `<button class="af-btn-primary reschedule-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">Выбрать другое время</button>` : ''}
+            ${isCancelable ? `<button class="af-btn-secondary cancel-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;color:var(--red);">Отменить</button>` : ''}
           </div>
         </div>
       `;
@@ -820,7 +799,7 @@ document.addEventListener("DOMContentLoaded", () => {
         activeRescheduleBookingId = parseInt(btn.dataset.id);
         switchTab("booking");
         goToStep(2);
-        showToast(`🔄 ПЕРЕНОС ЗАПИСИ №${activeRescheduleBookingId}`);
+        showToast(`🔄 Перенос записи №${activeRescheduleBookingId}`);
       });
     });
 
@@ -895,21 +874,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const carNumber = document.getElementById("car-number") ? document.getElementById("car-number").value.trim().toUpperCase() : "";
 
     summaryContainer.innerHTML = `
-      <div class="cyber-summary-row">
-        <span class="cyber-summary-lbl">🛠 РАБОТЫ:</span>
-        <span class="cyber-summary-val">${problemText}</span>
+      <div class="af-summary-row">
+        <span class="af-summary-lbl">Услуги:</span>
+        <span class="af-summary-val">${problemText}</span>
       </div>
-      <div class="cyber-summary-row">
-        <span class="cyber-summary-lbl">👨‍🔧 МАСТЕР:</span>
-        <span class="cyber-summary-val" style="color:var(--pink);">${selectedMasterName}</span>
+      <div class="af-summary-row">
+        <span class="af-summary-lbl">Мастер:</span>
+        <span class="af-summary-val">${selectedMasterName}</span>
       </div>
-      <div class="cyber-summary-row">
-        <span class="cyber-summary-lbl">📅 ДАТА И ВРЕМЯ:</span>
-        <span class="cyber-summary-val" style="color:var(--pink);">${selectedSlot || "Не выбрано"}</span>
+      <div class="af-summary-row">
+        <span class="af-summary-lbl">Дата и время:</span>
+        <span class="af-summary-val">${selectedSlot || "Не выбрано"}</span>
       </div>
-      <div class="cyber-summary-row">
-        <span class="cyber-summary-lbl">🚗 АВТОМОБИЛЬ:</span>
-        <span class="cyber-summary-val">${carModel || "Не указан"} ${carNumber ? `(${carNumber})` : ""}</span>
+      <div class="af-summary-row">
+        <span class="af-summary-lbl">Автомобиль:</span>
+        <span class="af-summary-val">${carModel || "Не указан"} ${carNumber ? `(${carNumber})` : ""}</span>
       </div>
     `;
   }
@@ -932,15 +911,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const customProblems = Object.values(customCategoryInputs).map(v => v.trim()).filter(v => v.length > 0);
       const allProblems = [...checkedProblems, ...customProblems];
 
-      let problem = "";
-      if (allProblems.length > 0) {
-        problem = allProblems.join(", ");
-      } else if (document.getElementById("custom-problem")) {
-        problem = document.getElementById("custom-problem").value.trim();
-      }
-
-      if (!problem) {
-        showToast("⚠️ Выберите или опишите проблему!");
+      if (allProblems.length === 0) {
+        showToast("⚠️ Выберите хотя бы одну услугу!");
         return;
       }
       goToStep(2);
@@ -954,10 +926,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       goToStep(3);
-      setTimeout(() => {
-        const carInput = document.getElementById("car-model");
-        if (carInput) carInput.focus();
-      }, 100);
     });
   }
 
@@ -966,8 +934,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const carModel = document.getElementById("car-model").value.trim();
       if (!carModel || carModel.length < 2) {
         showToast("⚠️ Укажите марку и модель авто!");
-        const carInput = document.getElementById("car-model");
-        if (carInput) carInput.focus();
         return;
       }
       goToStep(4);
@@ -987,33 +953,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const checkedProblems = Array.from(selectedProblemsSet);
     const customProblems = Object.values(customCategoryInputs).map(v => v.trim()).filter(v => v.length > 0);
     const allProblems = [...checkedProblems, ...customProblems];
-
-    let problem = "";
-    if (allProblems.length > 0) {
-      problem = allProblems.join(", ");
-    } else if (document.getElementById("custom-problem")) {
-      problem = document.getElementById("custom-problem").value.trim();
-    }
+    const problem = allProblems.join(", ");
 
     const carModel = document.getElementById("car-model").value.trim();
     const carNumber = document.getElementById("car-number") ? document.getElementById("car-number").value.trim().toUpperCase() : "";
     const phone = document.getElementById("phone-number").value.trim();
     const privacyAgree = document.getElementById("privacy-agree");
 
-    if (!problem) { showToast("⚠️ Опишите проблему!"); goToStep(1); return; }
-    if (!carModel) { showToast("⚠️ Укажите марку и модель авто!"); goToStep(2); return; }
+    if (!problem) { showToast("⚠️ Выберите услугу!"); goToStep(1); return; }
+    if (!carModel) { showToast("⚠️ Укажите марку авто!"); goToStep(3); return; }
     if (!phone) { showToast("⚠️ Укажите телефон!"); return; }
     if (privacyAgree && !privacyAgree.checked) { showToast("⚠️ Примите Соглашение!"); return; }
 
     submitBtn.disabled = true;
-    submitBtn.innerHTML = `<span>⏳ ОТПРАВКА...</span>`;
+    submitBtn.innerHTML = `<span>⏳ Отправка...</span>`;
 
     try {
-      if (!BACKEND_URL) {
-        showToast("⚠️ Ошибка адреса бэкенда!");
-        return;
-      }
-
       const targetSlot = `${selectedSlot} (Мастер: ${selectedMasterName})`;
 
       if (activeRescheduleBookingId) {
@@ -1029,14 +984,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const data = await res.json();
         if (res.ok && data.success) {
-          showToast(`🎉 ЗАПИСЬ №${activeRescheduleBookingId} ПЕРЕНЕСЕНА!`);
+          showToast(`🎉 Запись №${activeRescheduleBookingId} перенесена!`);
           activeRescheduleBookingId = null;
-          switchTab("profile");
+          switchTab("bookings-list");
           return;
         } else {
           showToast("⚠️ " + (data.error || "Ошибка переноса"));
           submitBtn.disabled = false;
-          submitBtn.innerHTML = `🚀 ПОДТВЕРДИТЬ ЗАПИСЬ`;
+          submitBtn.innerHTML = `🚀 Подтвердить запись`;
           return;
         }
       }
@@ -1058,24 +1013,24 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        showToast(`🎉 ЗАЯВКА №${data.booking_id} СОЗДАНА!`);
+        showToast(`🎉 Заявка №${data.booking_id} успешно создана!`);
         bookingForm.reset();
         selectedProblemsSet.clear();
         Object.keys(customCategoryInputs).forEach(k => delete customCategoryInputs[k]);
         renderCategoryAccordion();
         goToStep(1);
         setTimeout(() => {
-          switchTab("profile");
+          switchTab("bookings-list");
         }, 1000);
       } else {
         showToast("⚠️ " + (data.error || "Ошибка создания"));
       }
     } catch (err) {
-      console.error("Submit error:", err);
-      showToast("⚠️ Ошибка соединения с бэкендом");
+      console.error(err);
+      showToast("⚠️ Ошибка соединения с серверным API");
     } finally {
       submitBtn.disabled = false;
-      submitBtn.innerHTML = `🚀 ПОДТВЕРДИТЬ ЗАПИСЬ`;
+      submitBtn.innerHTML = `🚀 Подтвердить запись`;
     }
   });
 
@@ -1089,17 +1044,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 3200);
   }
 
-  // ADMIN LOGIC
-  const adminPills = document.querySelectorAll("#admin-status-pills button");
-  adminPills.forEach(pill => {
-    pill.addEventListener("click", () => {
-      adminPills.forEach(p => p.classList.remove("active"));
-      pill.classList.add("active");
-      currentAdminFilter = pill.dataset.status;
-      loadAdminBookings(currentAdminFilter);
-    });
-  });
-
+  // Admin moderation logic
   async function loadAdminBookings(statusFilter = "all") {
     const container = document.getElementById("admin-bookings-list");
     if (!container) return;
@@ -1108,14 +1053,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch(`${BACKEND_URL}/api/admin/bookings?user_id=${userId}&status=${statusFilter}`);
       if (!res.ok) throw new Error("Access denied");
       const data = await res.json();
-
-      document.getElementById("adm-stat-pending").textContent = data.stats.pending || 0;
-      document.getElementById("adm-stat-approved").textContent = data.stats.approved || 0;
-      document.getElementById("adm-stat-rejected").textContent = data.stats.rejected || 0;
-
       renderAdminBookings(data.bookings || []);
     } catch (e) {
-      container.innerHTML = `<div class="cyber-card"><p style="text-align: center; color: var(--text-2);">Ошибка модерации</p></div>`;
+      container.innerHTML = `<div class="af-card"><p style="text-align:center;color:var(--gray-3);">Ошибка загрузки заявок</p></div>`;
     }
   }
 
@@ -1124,36 +1064,30 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!container) return;
 
     if (!bookings || bookings.length === 0) {
-      container.innerHTML = `<div class="cyber-card"><p style="text-align: center; color: var(--text-2);">Заявок не найдено.</p></div>`;
+      container.innerHTML = `<div class="af-card"><p style="text-align:center;color:var(--gray-3);">Заявок нет.</p></div>`;
       return;
     }
 
     container.innerHTML = bookings.map(b => {
       let isPending = b.status === "На рассмотрении";
       let actionsHtml = isPending ? `
-        <div style="display:flex;gap:6px;margin-top:8px;">
-          <button class="cyber-btn-primary admin-btn-approve" data-id="${b.id}" style="padding:6px 10px;font-size:11px;">✅ ОДОБРИТЬ</button>
-          <button class="cyber-btn-secondary admin-btn-reject" data-id="${b.id}" style="padding:6px 10px;font-size:11px;color:var(--red);">❌ ОТКЛОНИТЬ</button>
-          <button class="cyber-btn-secondary admin-btn-delete" data-id="${b.id}" style="padding:6px 10px;font-size:11px;">🗑 УДАЛИТЬ</button>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <button class="af-btn-primary admin-btn-approve" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">✅ Одобрить</button>
+          <button class="af-btn-secondary admin-btn-reject" data-id="${b.id}" style="padding:6px 12px;font-size:12px;color:var(--red);">❌ Отклонить</button>
         </div>
-      ` : `
-        <div style="display:flex;gap:6px;margin-top:8px;">
-          <button class="cyber-btn-secondary admin-btn-delete" data-id="${b.id}" style="padding:6px 10px;font-size:11px;">🗑 УДАЛИТЬ</button>
-        </div>
-      `;
+      ` : ``;
 
       return `
-        <div class="cyber-card">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-            <span style="font-size:13px;font-weight:700;">ЗАПИСЬ №${b.id}</span>
-            <span style="font-size:11px;font-weight:700;color:var(--pink);">[ ${b.status} ]</span>
+        <div class="af-card">
+          <div style="display:flex;justify-content:space-between;">
+            <span style="font-size:14px;font-weight:800;">Заявка №${b.id}</span>
+            <span style="font-size:12px;font-weight:700;">${b.status}</span>
           </div>
-          <div style="font-size:11px;color:var(--text-2);">👤 <strong>${b.user_name}</strong> | 📞 ${b.phone}</div>
-          <div style="font-size:12px;color:var(--text-2);margin-top:4px;">
+          <div style="font-size:13px;color:var(--gray-2);">
+            <div><strong>Клиент:</strong> ${b.user_name} (${b.phone})</div>
             <div><strong>Услуга:</strong> ${b.problem}</div>
-            <div><strong>Авто:</strong> ${b.car_model} ${b.car_number ? `(${b.car_number})` : ''}</div>
+            <div><strong>Авто:</strong> ${b.car_model}</div>
             <div><strong>Время:</strong> ${b.slot}</div>
-            ${b.comment ? `<div><strong>Прим.:</strong> <em>${b.comment}</em></div>` : ''}
           </div>
           ${actionsHtml}
         </div>
@@ -1166,9 +1100,6 @@ document.addEventListener("DOMContentLoaded", () => {
     container.querySelectorAll(".admin-btn-reject").forEach(btn => {
       btn.addEventListener("click", () => openAdminModal(btn.dataset.id, "reject"));
     });
-    container.querySelectorAll(".admin-btn-delete").forEach(btn => {
-      btn.addEventListener("click", () => confirmDeleteBooking(btn.dataset.id));
-    });
   }
 
   const modal = document.getElementById("admin-modal");
@@ -1178,34 +1109,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function openAdminModal(bookingId, action) {
     pendingAdminAction = { bookingId, action };
-    const title = action === "approve" ? `ОДОБРИТЬ ЗАПИСЬ №${bookingId}` : `ОТКЛОНИТЬ ЗАПИСЬ №${bookingId}`;
-    document.getElementById("modal-title").textContent = title;
+    document.getElementById("modal-title").textContent = action === "approve" ? `Одобрить запись №${bookingId}` : `Отклонить запись №${bookingId}`;
     if (modalComment) modalComment.value = "";
     if (modal) modal.classList.remove("hidden");
   }
 
-  if (modalCancelBtn) {
-    modalCancelBtn.addEventListener("click", () => {
-      if (modal) modal.classList.add("hidden");
-      pendingAdminAction = null;
-    });
-  }
-
+  if (modalCancelBtn) modalCancelBtn.addEventListener("click", () => modal.classList.add("hidden"));
   if (modalConfirmBtn) {
     modalConfirmBtn.addEventListener("click", async () => {
       if (!pendingAdminAction) return;
       const { bookingId, action } = pendingAdminAction;
       const comment = modalComment ? modalComment.value.trim() : "";
-      if (modal) modal.classList.add("hidden");
+      modal.classList.add("hidden");
       await executeAdminAction(bookingId, action, comment);
-      pendingAdminAction = null;
     });
-  }
-
-  async function confirmDeleteBooking(bookingId) {
-    if (confirm(`Удалить запись №${bookingId}?`)) {
-      await executeAdminAction(bookingId, "delete", "");
-    }
   }
 
   async function executeAdminAction(bookingId, action, comment) {
@@ -1213,95 +1130,49 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch(`${BACKEND_URL}/api/admin/booking/action`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          admin_id: userId,
-          booking_id: parseInt(bookingId),
-          action: action,
-          comment: comment
-        })
+        body: JSON.stringify({ admin_id: userId, booking_id: parseInt(bookingId), action: action, comment: comment })
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        showToast(`✅ Выполнено`);
+        showToast("✅ Действие выполнено");
         loadAdminBookings(currentAdminFilter);
-      } else {
-        showToast("⚠️ " + (data.error || "Ошибка"));
       }
     } catch (e) {
-      showToast("⚠️ Ошибка соединения");
+      showToast("⚠️ Ошибка вызова API");
     }
-  }
-
-  let selectedAdmMaster = "Алексей Смирнов";
-
-  const admMasterSelector = document.getElementById("adm-masters-selector");
-  if (admMasterSelector) {
-    admMasterSelector.querySelectorAll(".cyber-checkbox-row").forEach(chip => {
-      chip.addEventListener("click", () => {
-        admMasterSelector.querySelectorAll(".cyber-checkbox-row").forEach(c => c.classList.remove("selected"));
-        chip.classList.add("selected");
-        selectedAdmMaster = chip.dataset.master;
-      });
-    });
-  }
-
-  const admOffDateInput = document.getElementById("adm-off-date");
-  if (admOffDateInput && !admOffDateInput.value) {
-    const todayStr = new Date().toISOString().split("T")[0];
-    admOffDateInput.value = todayStr;
   }
 
   const admTriggerRescheduleBtn = document.getElementById("adm-trigger-reschedule-btn");
   if (admTriggerRescheduleBtn) {
     admTriggerRescheduleBtn.addEventListener("click", async () => {
+      const masterSelect = document.getElementById("adm-master-select");
+      const dateInput = document.getElementById("adm-off-date");
       const reasonInput = document.getElementById("adm-master-reason");
-      const rawDate = admOffDateInput ? admOffDateInput.value : "";
+
+      const masterName = masterSelect ? masterSelect.value : "";
+      const rawDate = dateInput ? dateInput.value : "";
       const reason = reasonInput ? reasonInput.value.trim() : "";
 
-      let formattedDateTarget = "";
-      if (rawDate) {
-        const [year, monthStr, dayStr] = rawDate.split("-");
-        const monthIdx = parseInt(monthStr, 10) - 1;
-        const day = parseInt(dayStr, 10);
-        if (MONTH_NAMES_RU_GENITIVE[monthIdx]) {
-          formattedDateTarget = `${day} ${MONTH_NAMES_RU_GENITIVE[monthIdx]}`;
-        }
-      }
-
-      if (!selectedAdmMaster) { showToast("⚠️ Выберите мастера!"); return; }
       if (!rawDate) { showToast("⚠️ Укажите дату!"); return; }
 
-      if (!confirm(`Отменить смену мастера "${selectedAdmMaster}" на ${formattedDateTarget}?`)) {
-        return;
-      }
+      const [y, m, d] = rawDate.split("-");
+      const formattedDate = `${parseInt(d)} ${MONTH_NAMES_RU_GENITIVE[parseInt(m)-1]}`;
 
-      admTriggerRescheduleBtn.disabled = true;
-      admTriggerRescheduleBtn.innerHTML = "<span>⏳ ОТПРАВКА...</span>";
+      if (!confirm(`Отменить смену мастера "${masterName}" на ${formattedDate}?`)) return;
 
       try {
         const res = await fetch(`${BACKEND_URL}/api/admin/master/reschedule`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            admin_id: userId,
-            master_name: selectedAdmMaster,
-            target_date: formattedDateTarget,
-            reason: reason
-          })
+          body: JSON.stringify({ admin_id: userId, master_name: masterName, target_date: formattedDate, reason: reason })
         });
-
         const data = await res.json();
         if (res.ok && data.success) {
-          showToast(`✅ Смена мастера отменена (${data.affected_count} затронуто)!`);
+          showToast(`✅ Смена мастера отменена!`);
           loadAdminBookings(currentAdminFilter);
-        } else {
-          showToast("⚠️ " + (data.error || "Ошибка"));
         }
       } catch (e) {
         showToast("⚠️ Ошибка соединения");
-      } finally {
-        admTriggerRescheduleBtn.disabled = false;
-        admTriggerRescheduleBtn.innerHTML = "⚠️ СНЯТЬ МАСТЕРА И УВЕДОМИТЬ КЛИЕНТОВ";
       }
     });
   }

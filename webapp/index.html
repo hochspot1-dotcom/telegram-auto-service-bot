@@ -8,9 +8,33 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=35.0" />
+  <link rel="stylesheet" href="style.css?v=36.0" />
 </head>
 <body>
+  <!-- 🌟 Triton Welcome Onboarding Full Screen (Screen 1 in Reference) -->
+  <div id="triton-onboarding-screen" class="triton-onboarding-overlay">
+    <div class="onboarding-top-bar">
+      <button type="button" class="onboarding-cancel-btn" id="onboarding-cancel-btn">Cancel</button>
+    </div>
+
+    <div class="onboarding-center-content">
+      <div class="triton-3d-logo-card">
+        <div class="logo-3d-main">🏎️</div>
+        <div class="floating-tag tag-top">%</div>
+        <div class="floating-tag tag-bottom">🔧</div>
+      </div>
+
+      <h2 class="onboarding-title">Welcome to Автосервис.Pro</h2>
+      <p class="onboarding-subtitle">Записывайтесь на ремонт и ТО автомобиля прямо в Telegram за пару кликов!</p>
+    </div>
+
+    <div class="onboarding-bottom-action">
+      <button type="button" class="onboarding-next-circle-btn" id="onboarding-next-btn">
+        <span>→</span>
+      </button>
+    </div>
+  </div>
+
   <div id="app">
     <!-- Triton Top Profile Header -->
     <header class="header triton-header">
@@ -444,12 +468,12 @@
 
     </main>
 
-    <!-- Floating Glass Navbar -->
+    <!-- Floating Glass Navbar (Triton 4-Tab + Center Circle) -->
     <nav class="floating-navbar glass-navbar" id="main-nav">
       <!-- Liquid Blob Capsule Pill for active tab transition -->
       <div class="nav-blob-pill" id="nav-blob-pill"></div>
 
-      <!-- Home -->
+      <!-- 1. Home -->
       <button class="nav-item active" data-tab="home">
         <span class="nav-icon">
           <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -459,17 +483,27 @@
         <span class="nav-label">Главная</span>
       </button>
 
-      <!-- Center Booking Button -->
-      <button class="nav-item nav-item-main" data-tab="booking">
+      <!-- 2. Services / Market -->
+      <button class="nav-item" data-tab="booking" data-step="1">
+        <span class="nav-icon">
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0" stroke="currentColor"/>
+          </svg>
+        </span>
+        <span class="nav-label">Услуги</span>
+      </button>
+
+      <!-- 3. Floating Center Booking Button -->
+      <button class="nav-item nav-item-main" data-tab="booking" data-step="2">
         <div class="nav-main-circle">
           <svg class="nav-svg-main" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 5v14M5 12h14" stroke="white"/>
           </svg>
         </div>
-        <span class="nav-label main-label">Записаться</span>
+        <span class="nav-label main-label">Запись</span>
       </button>
 
-      <!-- Profile -->
+      <!-- 4. Profile -->
       <button class="nav-item" data-tab="profile">
         <span class="nav-icon">
           <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -518,6 +552,6 @@
     <div id="toast" class="toast hidden glass-toast"></div>
   </div>
 
-  <script src="app.js?v=35.0"></script>
+  <script src="app.js?v=36.0"></script>
 </body>
 </html>

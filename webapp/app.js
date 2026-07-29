@@ -58,8 +58,48 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentAdminFilter = "all";
   let pendingAdminAction = null;
 
-  // Persistent Phone Autofill & Initial Telegram Contact Request
-  const phoneInputEl = document.getElementById("phone-number");
+  // Triton Onboarding Overlay Handler
+  const onboardingOverlay = document.getElementById("triton-onboarding-screen");
+  const onboardingNextBtn = document.getElementById("onboarding-next-btn");
+  const onboardingCancelBtn = document.getElementById("onboarding-cancel-btn");
+
+  const isOnboarded = localStorage.getItem("triton_onboarded");
+  if (!isOnboarded && onboardingOverlay) {
+    onboardingOverlay.classList.add("visible");
+  }
+
+  function closeOnboarding() {
+    if (onboardingOverlay) {
+      onboardingOverlay.classList.add("closing");
+      setTimeout(() => {
+        onboardingOverlay.classList.remove("visible", "closing");
+        onboardingOverlay.classList.add("hidden");
+      }, 300);
+    }
+    localStorage.setItem("triton_onboarded", "true");
+  }
+
+  if (onboardingNextBtn) {
+    onboardingNextBtn.addEventListener("click", () => {
+      // Prompt Telegram phone contact share
+      if (tg?.requestContact) {
+        tg.requestContact((sent, response) => {
+          if (sent && response?.responseUnsafe?.contact?.phone_number) {
+            const rawPhone = response.responseUnsafe.contact.phone_number;
+            const formatted = "+" + rawPhone.replace(/\D/g, "");
+            localStorage.setItem("user_phone_saved", formatted);
+            if (phoneInputEl) phoneInputEl.value = formatted;
+            showToast("✅ Номер телефона сохранен!");
+          }
+        });
+      }
+      closeOnboarding();
+    });
+  }
+
+  if (onboardingCancelBtn) {
+    onboardingCancelBtn.addEventListener("click", closeOnboarding);
+  }
 
   function initAutoPhoneRequest() {
     const savedPhone = localStorage.getItem("user_phone_saved");

@@ -8,36 +8,48 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=37.0" />
+  <link rel="stylesheet" href="style.css?v=38.0" />
 </head>
 <body>
-  <!-- 🌟 Triton Welcome Onboarding Full Screen (Screen 1 in Reference) -->
-  <div id="triton-onboarding-screen" class="triton-onboarding-overlay">
+
+  <!-- ══════════════════════════════════════════════
+       SCREEN 1 — TRITON ONBOARDING (Welcome Screen)
+       ══════════════════════════════════════════════ -->
+  <div id="triton-onboarding-screen" class="triton-onboarding-overlay hidden">
+    <!-- Top bar: "Cancel" link -->
     <div class="onboarding-top-bar">
-      <button type="button" class="onboarding-cancel-btn" id="onboarding-cancel-btn">Cancel</button>
+      <button type="button" class="onboarding-cancel-btn" id="onboarding-cancel-btn">Отмена</button>
     </div>
 
+    <!-- Center: 3D Logo + Title + Subtitle -->
     <div class="onboarding-center-content">
       <div class="triton-3d-logo-card">
         <div class="logo-3d-main">🏎️</div>
-        <div class="floating-tag tag-top">%</div>
+        <div class="floating-tag tag-top">ТО</div>
         <div class="floating-tag tag-bottom">🔧</div>
       </div>
 
-      <h2 class="onboarding-title">Welcome to Автосервис.Pro</h2>
-      <p class="onboarding-subtitle">Записывайтесь на ремонт и ТО автомобиля прямо в Telegram за пару кликов!</p>
+      <h2 class="onboarding-title">Добро пожаловать в Автосервис.Pro</h2>
+      <p class="onboarding-subtitle">Запись на ремонт и ТО автомобиля прямо в Telegram — быстро, просто и без очередей!</p>
     </div>
 
+    <!-- Bottom: Blue circle arrow button -->
     <div class="onboarding-bottom-action">
       <button type="button" class="onboarding-next-circle-btn" id="onboarding-next-btn">
-        <span>→</span>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+          <path d="M5 12h14M13 6l6 6-6 6" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </button>
     </div>
   </div>
 
+  <!-- ══════════════════════════════════════════════
+       SCREEN 2 — MAIN APP SHELL
+       ══════════════════════════════════════════════ -->
   <div id="app">
-    <!-- Triton Top Profile Header -->
-    <header class="header triton-header">
+
+    <!-- Profile Row Header (like Triton: avatar + name left, status right) -->
+    <header class="triton-header">
       <div class="triton-user-profile">
         <div class="user-avatar-circle">
           <span>👨‍🔧</span>
@@ -50,117 +62,128 @@
       </div>
     </header>
 
-    <!-- Main Content Area -->
+    <!-- Main Scrollable Content -->
     <main class="content">
 
-      <!-- 🏠 Tab: Home (Triton Dashboard Layout) -->
+      <!-- ════════════════════════════════════════
+           🏠 HOME TAB (Triton Screen 2 Layout)
+           ════════════════════════════════════════ -->
       <section id="tab-home" class="tab-content active">
-        <!-- 1. Triton Hero Banner Card -->
-        <div class="triton-hero-card">
-          <div class="hero-content">
-            <div class="hero-tag">Автосервис.Pro</div>
-            <h2>Запись на ТО в 1 клик!</h2>
-            <p>Быстрый выбор мастера и удобного времени без очередей</p>
-            <button class="triton-white-btn" id="home-start-booking-btn">
-              <span>Записаться</span>
-            </button>
+
+        <!-- 1. Hero Banner Card (like "Spin & win!" card in Triton) -->
+        <div class="tr-hero-banner" id="home-start-booking-btn">
+          <div class="tr-hero-text">
+            <div>
+              <div class="tr-hero-label">Запись на ТО<br>в 1 клик!</div>
+              <div class="tr-hero-sub" style="margin-top:6px;">Быстрый выбор мастера и удобного времени без очередей</div>
+            </div>
+            <button class="tr-hero-play-btn" id="hero-play-btn">Записаться</button>
           </div>
-          <div class="hero-3d-graphic">
-            <span class="graphic-emoji">🏎️</span>
+          <div class="tr-hero-img">
+            <div class="tr-hero-img-emoji">🏎️</div>
           </div>
         </div>
 
-        <!-- 2. Triton Primary Action Pill -->
-        <div class="triton-action-banner" id="triton-quick-booking-banner">
-          <span>🚀 Выбрать свободного мастера и время</span>
-        </div>
+        <!-- 2. Primary Blue Full-Width Button (like "Claim 50 💎" in Triton) -->
+        <button class="tr-claim-btn" id="triton-quick-booking-banner">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M12 5v14M5 12h14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+          Выбрать мастера и время
+        </button>
 
-        <!-- 3. Triton 2-Column Quick Hub Widgets -->
-        <div class="triton-grid-2col">
-          <div class="triton-hub-card" data-cat="cat_electric">
-            <div class="hub-icon">🛒</div>
-            <div class="hub-title">Услуги</div>
-            <div class="hub-sub">Каталог работ</div>
-          </div>
-          <div class="triton-hub-card" data-cat="cat_to">
-            <div class="hub-icon">🛠️</div>
-            <div class="hub-title">Мой Гараж</div>
-            <div class="hub-sub">Марка и госномер</div>
-          </div>
-        </div>
-
-        <!-- 4. Triton 2x2 Feature Widgets (Bookings & Masters) -->
-        <div class="triton-grid-2col">
-          <div class="triton-feature-widget" id="triton-widget-bookings">
-            <div class="widget-icon-stack">
-              <span class="widget-check">✅</span>
-              <span class="widget-check">☑️</span>
+        <!-- 3. 2-Column Hub Cards (like "Shop" + "Craft" in Triton) -->
+        <div class="tr-grid-2">
+          <div class="tr-hub" data-tab="booking" data-step="1">
+            <div class="tr-hub-icon">🛒</div>
+            <div class="tr-hub-info">
+              <div class="tr-hub-title">Услуги</div>
+              <div class="tr-hub-sub">Каталог работ</div>
             </div>
-            <div class="widget-title">Ваши Записи</div>
-            <div class="widget-desc">Статус и отмены</div>
           </div>
-
-          <div class="triton-feature-widget" id="triton-widget-masters">
-            <div class="widget-avatars-stack">
-              <span class="avatar-stacked">👨‍🔧</span>
-              <span class="avatar-stacked">⚡</span>
-              <span class="avatar-stacked">🛞</span>
+          <div class="tr-hub" data-tab="booking" data-step="1">
+            <div class="tr-hub-icon">🛠️</div>
+            <div class="tr-hub-info">
+              <div class="tr-hub-title">Мой Гараж</div>
+              <div class="tr-hub-sub">Марка авто</div>
             </div>
-            <div class="widget-title">Специалисты</div>
-            <div class="widget-desc">Опыт 12 лет</div>
           </div>
         </div>
 
-        <!-- Popular Services Section -->
-        <div class="home-section-title">
-          <h3>💡 Популярные услуги и стоимость</h3>
-        </div>
-
-        <div class="home-square-grid">
-          <div class="home-square-card glass-card" data-cat="cat_electric">
-            <div class="square-card-img">
-              <img src="img/icon_diagnostics.jpg" alt="Диагностика" />
+        <!-- 4. 2-Column Feature Widgets (like "Tasks" + "Friends" in Triton) -->
+        <div class="tr-grid-2">
+          <!-- Bookings Widget -->
+          <div class="tr-widget" id="triton-widget-bookings" data-tab="profile">
+            <div class="tr-widget-title">Ваши Записи</div>
+            <div class="tr-widget-sub">Статус и отмены</div>
+            <div class="tr-widget-checks">
+              <div class="tr-check">✓</div>
+              <div class="tr-check">✓</div>
             </div>
-            <div class="square-card-title">Компьютерная диагностика</div>
-            <div class="square-card-price">от 1 000 ₽</div>
           </div>
 
-          <div class="home-square-card glass-card" data-cat="cat_to">
-            <div class="square-card-img">
-              <img src="img/icon_oil.jpg" alt="Замена масла" />
+          <!-- Masters Widget -->
+          <div class="tr-widget" id="triton-widget-masters" data-tab="booking" data-step="2">
+            <div class="tr-widget-avatars">
+              <div class="tr-avatar-sm">👨‍🔧</div>
+              <div class="tr-avatar-sm">⚡</div>
+              <div class="tr-avatar-sm">🛞</div>
             </div>
-            <div class="square-card-title">Замена масла и фильтров</div>
-            <div class="square-card-price">от 1 500 ₽</div>
-          </div>
-
-          <div class="home-square-card glass-card" data-cat="cat_chassis">
-            <div class="square-card-img">
-              <img src="img/icon_suspension.jpg" alt="Ходовая" />
-            </div>
-            <div class="square-card-title">Диагностика ходовой</div>
-            <div class="square-card-price">от 1 000 ₽</div>
-          </div>
-
-          <div class="home-square-card glass-card" data-cat="cat_climate">
-            <div class="square-card-img">
-              <img src="img/icon_ac.jpg" alt="Кондиционер" />
-            </div>
-            <div class="square-card-title">Заправка кондиционера</div>
-            <div class="square-card-price">от 2 000 ₽</div>
+            <div class="tr-widget-title">Специалисты</div>
+            <div class="tr-widget-sub">Опыт 12+ лет</div>
           </div>
         </div>
+
+        <!-- 5. Popular Services Label -->
+        <div class="tr-section-title">💡 Популярные услуги</div>
+
+        <!-- 6. Service Cards (scrollable horizontal row like Triton items row) -->
+        <div class="tr-grid-2">
+          <div class="tr-hub" data-tab="booking" data-step="1" data-cat="cat_electric">
+            <div class="tr-hub-icon">🔍</div>
+            <div class="tr-hub-info">
+              <div class="tr-hub-title">Диагностика</div>
+              <div class="tr-hub-sub">от 1 000 ₽</div>
+            </div>
+          </div>
+          <div class="tr-hub" data-tab="booking" data-step="1" data-cat="cat_to">
+            <div class="tr-hub-icon">🛢️</div>
+            <div class="tr-hub-info">
+              <div class="tr-hub-title">Замена масла</div>
+              <div class="tr-hub-sub">от 1 500 ₽</div>
+            </div>
+          </div>
+          <div class="tr-hub" data-tab="booking" data-step="1" data-cat="cat_chassis">
+            <div class="tr-hub-icon">🔩</div>
+            <div class="tr-hub-info">
+              <div class="tr-hub-title">Ходовая</div>
+              <div class="tr-hub-sub">от 1 000 ₽</div>
+            </div>
+          </div>
+          <div class="tr-hub" data-tab="booking" data-step="1" data-cat="cat_climate">
+            <div class="tr-hub-icon">❄️</div>
+            <div class="tr-hub-info">
+              <div class="tr-hub-title">Кондиционер</div>
+              <div class="tr-hub-sub">от 2 000 ₽</div>
+            </div>
+          </div>
+        </div>
+
       </section>
 
-      <!-- 📅 Tab: Booking -->
+      <!-- ════════════════════════════════════════
+           📅 BOOKING TAB — Wizard
+           ════════════════════════════════════════ -->
       <section id="tab-booking" class="tab-content">
-        <div class="section-hero glass-card">
+
+        <div class="booking-header">
           <div class="hero-badge">📅 Онлайн Бронирование</div>
           <h2>Запись на обслуживание</h2>
           <p>Пошаговое быстрое оформление заявки на ТО</p>
         </div>
 
         <!-- Wizard Progress Bar (4 steps) -->
-        <div class="wizard-progress-bar glass-card">
+        <div class="wizard-progress-bar">
           <div class="wizard-step active" id="wizard-step-ind-1">
             <span class="step-num">1</span>
             <span class="step-lbl">Услуга</span>
@@ -182,38 +205,31 @@
           </div>
         </div>
 
-        <form id="booking-form" class="booking-form glass-card">
+        <form id="booking-form" class="booking-form">
 
-          <!-- 🔹 Step 1: Category accordion with multi-select checkboxes -->
+          <!-- Step 1: Service Selection -->
           <div class="wizard-step-content active" id="form-step-1">
             <div class="form-group">
               <label class="form-label">Шаг 1: Выберите услугу или проблему:</label>
-              <!-- Search -->
-              <div class="search-box-wrapper wizard-search">
+              <div class="search-box-wrapper">
                 <span class="search-icon">🔍</span>
-                <input type="text" id="wizard-search-input" class="glass-input search-input" placeholder="Поиск услуги (напр. ГРМ, диагност, фильтр)..." />
+                <input type="text" id="wizard-search-input" class="form-input search-input" placeholder="Поиск услуги (напр. ГРМ, диагност, фильтр)..." />
               </div>
-              <!-- Accordion categories rendered here by JS -->
-              <div id="category-pills" class="category-accordion-container">
-              </div>
-              <!-- Selected problems summary shown below accordion (rendered by JS) -->
+              <div id="category-pills" class="category-accordion-container"></div>
               <div id="selected-summary"></div>
             </div>
 
-            <!-- Custom problem input (shown when user selects "написать свою проблему") -->
             <div class="form-group hidden" id="custom-problem-group">
               <label class="form-label" for="custom-problem">Описание проблемы:</label>
-              <input type="text" id="custom-problem" class="form-input glass-input" placeholder="Например: Стучит подвеска справа..." />
+              <input type="text" id="custom-problem" class="form-input" placeholder="Например: Стучит подвеска справа..." />
             </div>
 
             <div class="wizard-actions">
-              <button type="button" class="wizard-nav-btn next-btn glow-btn" id="to-step-2-btn">
-                <span>Далее: выбор мастера и времени ➔</span>
-              </button>
+              <button type="button" class="next-btn" id="to-step-2-btn">Далее: выбор мастера и времени ➔</button>
             </div>
           </div>
 
-          <!-- 🔹 Step 2: Master & Free Time Slots -->
+          <!-- Step 2: Master + Calendar + Time -->
           <div class="wizard-step-content hidden" id="form-step-2">
             <div class="form-group">
               <label class="form-label">Шаг 2: Выберите специалиста:</label>
@@ -222,25 +238,22 @@
               </div>
             </div>
 
-            <!-- 2. Date Selection (Calendar View) -->
+            <!-- Calendar -->
             <div class="form-group" id="calendar-step-group">
               <label class="form-label">Выберите дату записи на календаре:</label>
-              <div class="full-calendar-card glass-card" id="full-calendar-widget">
-                <!-- Full month calendar widget rendered via JS -->
+              <div class="calendar-card" id="full-calendar-widget">
+                <!-- Full month calendar rendered via JS -->
               </div>
             </div>
 
-            <!-- 3. Time Slots View (Swaps with calendar when date is chosen) -->
+            <!-- Time Slots -->
             <div class="form-group hidden" id="slots-step-group">
               <div class="slots-view-header">
-                <button type="button" class="change-date-btn" id="change-date-btn">
-                  <span>← Изменить дату</span>
-                </button>
+                <button type="button" class="change-date-btn" id="change-date-btn">← Изменить дату</button>
                 <span class="slots-selected-date-badge" id="slots-date-badge">28 июля</span>
               </div>
-
               <label class="form-label" id="slots-header-label">Выберите свободное время:</label>
-              <div class="slots-card glass-card">
+              <div class="slots-card">
                 <div class="slots-grid" id="slots-container">
                   <!-- Time slots rendered via JS -->
                 </div>
@@ -248,164 +261,140 @@
             </div>
 
             <div class="wizard-actions dual">
-              <button type="button" class="wizard-nav-btn back-btn" id="back-to-step-1-btn">
-                <span>← Назад</span>
-              </button>
-              <button type="button" class="wizard-nav-btn next-btn glow-btn" id="to-step-3-btn">
-                <span>Далее к выбору авто ➔</span>
-              </button>
+              <button type="button" class="back-btn" id="back-to-step-1-btn">← Назад</button>
+              <button type="button" class="next-btn" id="to-step-3-btn">Далее к выбору авто ➔</button>
             </div>
           </div>
 
-          <!-- 🔹 Step 3: Car Brand & Model + License Plate -->
+          <!-- Step 3: Car Details -->
           <div class="wizard-step-content hidden" id="form-step-3">
             <div class="form-group">
               <label class="form-label" for="car-model">Шаг 3: Укажите марку и модель авто:</label>
-              <input type="text" id="car-model" class="form-input glass-input" placeholder="Например: Toyota Camry, Tank 500, Opel Astra" />
+              <input type="text" id="car-model" class="form-input" placeholder="Например: Toyota Camry, Tank 500, Opel Astra" />
               <small class="form-hint">Укажите марку и модель вашего автомобиля</small>
             </div>
 
             <div class="form-group">
               <label class="form-label" for="car-number">Госномер автомобиля (необязательно):</label>
-              <input type="text" id="car-number" class="form-input glass-input uppercase-input" placeholder="А000АА180" maxlength="12" />
+              <input type="text" id="car-number" class="form-input uppercase-input" placeholder="А000АА180" maxlength="12" />
               <small class="form-hint">Автоматически преобразуется в ЗАГЛАВНЫЕ БУКВЫ</small>
             </div>
 
             <div class="wizard-actions dual">
-              <button type="button" class="wizard-nav-btn back-btn" id="back-to-step-2-btn">
-                <span>← Назад</span>
-              </button>
-              <button type="button" class="wizard-nav-btn next-btn glow-btn" id="to-step-4-btn">
-                <span>Далее к итогу ➔</span>
-              </button>
+              <button type="button" class="back-btn" id="back-to-step-2-btn">← Назад</button>
+              <button type="button" class="next-btn" id="to-step-4-btn">Далее к итогу ➔</button>
             </div>
           </div>
 
-          <!-- 🔹 Step 4: Final Confirmation & Summary -->
+          <!-- Step 4: Confirmation -->
           <div class="wizard-step-content hidden" id="form-step-4">
             <div class="form-group">
               <label class="form-label">Шаг 4: Проверьте данные записи:</label>
-              <!-- Summary Card -->
-              <div class="booking-summary-card glass-card" id="final-booking-summary">
+              <div class="booking-card" id="final-booking-summary" style="cursor:default;border-color:rgba(43,126,255,0.28);">
                 <!-- Rendered dynamically by JS -->
               </div>
             </div>
 
-            <!-- Phone number with Edit pencil button -->
             <div class="form-group">
               <label class="form-label" for="phone-number">Ваш телефон для связи:</label>
-              <div class="phone-input-wrapper">
-                <input type="tel" id="phone-number" class="form-input glass-input" placeholder="+7 (999) 000-00-00" readonly required />
-                <button type="button" id="edit-phone-btn" class="edit-phone-btn" title="Нажмите, чтобы изменить номер">
-                  ✏️
-                </button>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input type="tel" id="phone-number" class="form-input" placeholder="+7 (999) 000-00-00" readonly required style="flex:1;" />
+                <button type="button" id="edit-phone-btn" style="padding:12px 14px;border-radius:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--text-2);font-size:16px;cursor:pointer;flex-shrink:0;">✏️</button>
               </div>
             </div>
 
-            <!-- Premium Total Price Card -->
-            <div class="total-price-card glass-card" id="total-price-box">
-              <div class="total-price-header">
-                <span class="total-price-icon">💰</span>
-                <span class="total-price-label">Ориентировочная стоимость</span>
-              </div>
-              <div class="total-price-value" id="total-price-val">от 0 ₽</div>
+            <div class="booking-card" id="total-price-box" style="cursor:default;flex-direction:row;align-items:center;justify-content:space-between;">
+              <span style="font-size:13px;color:var(--text-2);">💰 Ориентировочная стоимость</span>
+              <span style="font-size:16px;font-weight:800;color:#2b7eff;" id="total-price-val">от 0 ₽</span>
             </div>
 
-            <!-- Privacy Policy Checkbox (UNCHECKED by default) -->
-            <div class="form-group privacy-group">
-              <label class="privacy-label">
-                <input type="checkbox" id="privacy-agree" class="privacy-checkbox" />
-                <span>Я согласен с <a href="#" id="privacy-link" class="privacy-link">Политикой конфиденциальности</a></span>
-              </label>
+            <div class="privacy-row">
+              <input type="checkbox" id="privacy-agree" />
+              <span class="privacy-text">Я согласен с <a href="#" id="privacy-link" class="privacy-link">Политикой конфиденциальности</a></span>
             </div>
 
             <div class="wizard-actions dual">
-              <button type="button" class="wizard-nav-btn back-btn" id="back-to-step-3-btn">
-                <span>← Назад</span>
-              </button>
-              <button type="submit" class="submit-btn glow-btn" id="submit-booking-btn" disabled>
-                <span>🚀 Подтвердить запись</span>
-              </button>
+              <button type="button" class="back-btn" id="back-to-step-3-btn">← Назад</button>
+              <button type="submit" class="submit-btn" id="submit-booking-btn" disabled>🚀 Подтвердить запись</button>
             </div>
           </div>
 
         </form>
       </section>
 
-      <!-- 👤 Tab: Profile & History -->
-      <!-- Admin button is ONLY here, ONLY for approved admins -->
+      <!-- ════════════════════════════════════════
+           👤 PROFILE TAB
+           ════════════════════════════════════════ -->
       <section id="tab-profile" class="tab-content">
-        <div class="profile-card glass-card">
-          <div class="profile-header">
-            <div class="profile-avatar" id="profile-avatar">👤</div>
-            <div class="profile-info">
-              <h3 id="profile-name">Клиент</h3>
-              <p id="profile-phone">Телефон: Не указан</p>
-            </div>
-          </div>
 
-          <div class="stats-grid">
-            <div class="stat-card glass-stat">
-              <span class="stat-val" id="stat-active">0</span>
-              <span class="stat-lbl">Активных</span>
-            </div>
-            <div class="stat-card glass-stat">
-              <span class="stat-val" id="stat-total">0</span>
-              <span class="stat-lbl">Всего записей</span>
-            </div>
-            <div class="stat-card glass-stat">
-              <span class="stat-val" id="stat-cancelled">0</span>
-              <span class="stat-lbl">Отклоненных</span>
-            </div>
+        <div class="profile-user-card">
+          <div class="profile-avatar-lg" id="profile-avatar">👤</div>
+          <div>
+            <div class="profile-name" id="profile-name">Клиент</div>
+            <div class="profile-id" id="profile-phone">Телефон: Не указан</div>
           </div>
-
-          <!-- Admin Button inside Profile ONLY (hidden until admin check confirms) -->
-          <button id="admin-profile-btn" class="admin-profile-btn glow-btn hidden">
-            <span>🛡 Панель модератора</span>
-          </button>
         </div>
 
-        <div class="bookings-section">
-          <div class="section-subtitle">
-            <h3>Ваши записи</h3>
+        <!-- Stats Row -->
+        <div class="tr-grid-2" style="grid-template-columns:1fr 1fr 1fr;">
+          <div class="tr-widget" style="cursor:default;min-height:70px;align-items:center;flex-direction:column;justify-content:center;">
+            <div style="font-size:22px;font-weight:900;color:#2b7eff;" id="stat-active">0</div>
+            <div style="font-size:11px;color:var(--text-2);">Активных</div>
           </div>
-          <div id="user-bookings-list" class="bookings-list">
-            <!-- Bookings loaded via JS -->
+          <div class="tr-widget" style="cursor:default;min-height:70px;align-items:center;flex-direction:column;justify-content:center;">
+            <div style="font-size:22px;font-weight:900;color:#2b7eff;" id="stat-total">0</div>
+            <div style="font-size:11px;color:var(--text-2);">Всего</div>
           </div>
+          <div class="tr-widget" style="cursor:default;min-height:70px;align-items:center;flex-direction:column;justify-content:center;">
+            <div style="font-size:22px;font-weight:900;color:var(--red);" id="stat-cancelled">0</div>
+            <div style="font-size:11px;color:var(--text-2);">Отклонено</div>
+          </div>
+        </div>
+
+        <!-- Admin button (hidden by default) -->
+        <button id="admin-profile-btn" class="tr-claim-btn hidden" style="background:linear-gradient(135deg,#ef4444,#b91c1c);">
+          🛡 Панель модератора
+        </button>
+
+        <!-- Bookings History -->
+        <div class="tr-section-title">📋 Ваши записи</div>
+        <div class="bookings-list" id="user-bookings-list">
+          <!-- Loaded via JS -->
         </div>
       </section>
 
-      <!-- 🛡 Tab: Admin Moderation (accessed via Profile → admin button) -->
+      <!-- ════════════════════════════════════════
+           🛡 ADMIN TAB
+           ════════════════════════════════════════ -->
       <section id="tab-admin" class="tab-content">
-        <div class="section-hero glass-card admin-hero">
+
+        <div class="booking-header">
           <div class="hero-badge admin-badge">🛡 Панель Модератора</div>
           <h2>Управление заявками</h2>
           <p>Быстрое подтверждение, отмена и удаление записей</p>
         </div>
 
-        <div class="profile-card glass-card admin-stats-card">
-          <div class="stats-grid">
-            <div class="stat-card glass-stat">
-              <span class="stat-val" id="adm-stat-pending">0</span>
-              <span class="stat-lbl">Ожидают</span>
-            </div>
-            <div class="stat-card glass-stat">
-              <span class="stat-val" id="adm-stat-approved">0</span>
-              <span class="stat-lbl">Одобрено</span>
-            </div>
-            <div class="stat-card glass-stat">
-              <span class="stat-val" id="adm-stat-rejected">0</span>
-              <span class="stat-lbl">Отклонено</span>
-            </div>
+        <!-- Admin Stats Row -->
+        <div class="tr-grid-2" style="grid-template-columns:1fr 1fr 1fr;">
+          <div class="tr-widget" style="cursor:default;min-height:70px;align-items:center;flex-direction:column;justify-content:center;">
+            <div style="font-size:22px;font-weight:900;color:var(--yellow);" id="adm-stat-pending">0</div>
+            <div style="font-size:11px;color:var(--text-2);">Ожидают</div>
+          </div>
+          <div class="tr-widget" style="cursor:default;min-height:70px;align-items:center;flex-direction:column;justify-content:center;">
+            <div style="font-size:22px;font-weight:900;color:var(--green);" id="adm-stat-approved">0</div>
+            <div style="font-size:11px;color:var(--text-2);">Одобрено</div>
+          </div>
+          <div class="tr-widget" style="cursor:default;min-height:70px;align-items:center;flex-direction:column;justify-content:center;">
+            <div style="font-size:22px;font-weight:900;color:var(--red);" id="adm-stat-rejected">0</div>
+            <div style="font-size:11px;color:var(--text-2);">Отклонено</div>
           </div>
         </div>
 
-        <!-- Master & Date Off-Duty Management Card for Admin -->
-        <div class="glass-card admin-master-tool-card">
+        <!-- Master Off-Duty Tool Card -->
+        <div class="booking-card admin-master-tool-card">
           <div class="tool-card-title">👨‍🔧 Управление сменами мастеров (Отгул / Больничный)</div>
           <p class="tool-card-desc">Укажите мастера и дату его отсутствия. Все записи на этот день будут сброшены с предложением клиенту выбрать другого мастера или время.</p>
 
-          <!-- 1. Master Selector Chips -->
           <div class="form-group">
             <label class="form-label">1. Выберите мастера:</label>
             <div class="adm-masters-grid" id="adm-masters-selector">
@@ -433,44 +422,40 @@
             </div>
           </div>
 
-          <!-- 2. Date Selector -->
           <div class="form-group">
             <label class="form-label" for="adm-off-date">2. Укажите дату отсутствия:</label>
-            <input type="date" id="adm-off-date" class="form-input glass-input date-input" />
+            <input type="date" id="adm-off-date" class="form-input date-input" />
           </div>
 
-          <!-- 3. Reason Input -->
           <div class="form-group">
             <label class="form-label" for="adm-master-reason">3. Причина (отобразится клиентам):</label>
-            <input type="text" id="adm-master-reason" class="form-input glass-input" placeholder="Например: Больничный мастера / Отгул" value="Больничный мастера" />
+            <input type="text" id="adm-master-reason" class="form-input" placeholder="Например: Больничный мастера / Отгул" value="Больничный мастера" />
           </div>
 
-          <button type="button" id="adm-trigger-reschedule-btn" class="admin-btn admin-btn-reject glow-btn">
-            <span>⚠️ Снять мастера на выбранную дату и уведомить клиентов</span>
+          <button type="button" id="adm-trigger-reschedule-btn" class="tr-claim-btn" style="background:linear-gradient(135deg,#ef4444,#b91c1c);box-shadow:0 0 22px rgba(239,68,68,0.40);">
+            ⚠️ Снять мастера и уведомить клиентов
           </button>
         </div>
 
-        <div class="admin-filters-bar">
-          <div class="pills-grid" id="admin-status-pills">
-            <div class="pill active" data-status="all">Все записи</div>
-            <div class="pill" data-status="На рассмотрении">⏳ На рассмотрении</div>
-            <div class="pill" data-status="Одобрена">✅ Одобренные</div>
-            <div class="pill" data-status="Отклонена">🔴 Отклоненные</div>
-          </div>
+        <!-- Filter Pills -->
+        <div class="pills-grid" id="admin-status-pills">
+          <div class="pill active" data-status="all">Все записи</div>
+          <div class="pill" data-status="На рассмотрении">⏳ На рассмотрении</div>
+          <div class="pill" data-status="Одобрена">✅ Одобренные</div>
+          <div class="pill" data-status="Отклонена">🔴 Отклоненные</div>
         </div>
 
-        <div class="bookings-section">
-          <div id="admin-bookings-list" class="bookings-list">
-            <!-- Admin bookings rendered via JS -->
-          </div>
+        <div class="bookings-list" id="admin-bookings-list">
+          <!-- Admin bookings rendered via JS -->
         </div>
       </section>
 
     </main>
 
-    <!-- Floating Glass Navbar (Triton 4-Tab + Center Circle) -->
-    <nav class="floating-navbar glass-navbar" id="main-nav">
-      <!-- Liquid Blob Capsule Pill for active tab transition -->
+    <!-- ════════════════════════════════════════
+         FLOATING NAVBAR (Triton 4-Tab + Center Circle)
+         ════════════════════════════════════════ -->
+    <nav class="floating-navbar" id="main-nav">
       <div class="nav-blob-pill" id="nav-blob-pill"></div>
 
       <!-- 1. Home -->
@@ -483,7 +468,7 @@
         <span class="nav-label">Главная</span>
       </button>
 
-      <!-- 2. Services / Market -->
+      <!-- 2. Services -->
       <button class="nav-item" data-tab="booking" data-step="1">
         <span class="nav-icon">
           <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -493,7 +478,7 @@
         <span class="nav-label">Услуги</span>
       </button>
 
-      <!-- 3. Floating Center Booking Button -->
+      <!-- 3. Center Floating Blue Circle (Booking) -->
       <button class="nav-item nav-item-main" data-tab="booking" data-step="2">
         <div class="nav-main-circle">
           <svg class="nav-svg-main" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -503,7 +488,18 @@
         <span class="nav-label main-label">Запись</span>
       </button>
 
-      <!-- 4. Profile -->
+      <!-- 4. Bookings -->
+      <button class="nav-item" data-tab="profile">
+        <span class="nav-icon">
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor"/>
+            <path d="M8 21h8M12 17v4" stroke="currentColor"/>
+          </svg>
+        </span>
+        <span class="nav-label">Записи</span>
+      </button>
+
+      <!-- 5. Profile -->
       <button class="nav-item" data-tab="profile">
         <span class="nav-icon">
           <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -517,10 +513,10 @@
 
     <!-- Admin Comment Modal -->
     <div id="admin-modal" class="modal-overlay hidden">
-      <div class="modal-card glass-card">
+      <div class="modal-card">
         <h3 id="modal-title">Решение по заявке</h3>
         <p id="modal-subtitle" class="form-hint">Укажите примечание клиенту (необязательно):</p>
-        <textarea id="modal-comment" class="glass-input modal-textarea" placeholder="Например: Ждем вас на посту №2..." rows="3"></textarea>
+        <textarea id="modal-comment" class="modal-textarea" placeholder="Например: Ждем вас на посту №2..." rows="3"></textarea>
         <div class="modal-actions">
           <button id="modal-cancel-btn" class="modal-btn btn-secondary">Отмена</button>
           <button id="modal-confirm-btn" class="modal-btn btn-primary">Подтвердить</button>
@@ -528,19 +524,16 @@
       </div>
     </div>
 
-    <!-- 🔒 Privacy Policy Modal -->
+    <!-- Privacy Policy Modal -->
     <div id="privacy-modal" class="modal-overlay hidden">
-      <div class="modal-card glass-card">
+      <div class="modal-card">
         <div class="modal-header">
           <h3>🔒 Политика конфиденциальности</h3>
         </div>
         <div class="modal-body privacy-modal-body">
-          <p>Настоящая Политика конфиденциальности определяет порядок обработки и защиты персональных данных клиентов автосервиса.</p>
-          <br />
-          <p><strong>1. Сбор данных:</strong> Мы собираем ваше имя, номер телефона, марку и госномер автомобиля исключительно для оформления записи на техническое обслуживание.</p>
-          <br />
-          <p><strong>2. Использование данных:</strong> Данные используются модераторами и мастерами автосервиса для связи с вами и подтверждения бронирования времени.</p>
-          <br />
+          <p>Настоящая Политика конфиденциальности определяет порядок обработки и защиты персональных данных клиентов автосервиса.</p><br/>
+          <p><strong>1. Сбор данных:</strong> Мы собираем ваше имя, номер телефона, марку и госномер автомобиля исключительно для оформления записи на техническое обслуживание.</p><br/>
+          <p><strong>2. Использование данных:</strong> Данные используются модераторами и мастерами автосервиса для связи с вами и подтверждения бронирования времени.</p><br/>
           <p><strong>3. Безопасность:</strong> Ваши персональные данные хранятся в зашифрованном виде и не передаются третьим лицам.</p>
         </div>
         <div class="modal-actions">
@@ -549,9 +542,9 @@
       </div>
     </div>
 
-    <div id="toast" class="toast hidden glass-toast"></div>
+    <div id="toast" class="glass-toast hidden"></div>
   </div>
 
-  <script src="app.js?v=37.0"></script>
+  <script src="app.js?v=38.0"></script>
 </body>
 </html>

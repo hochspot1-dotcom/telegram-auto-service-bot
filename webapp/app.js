@@ -1,10 +1,6 @@
 // ==========================================
-// НАСТРОЙКА АДРЕСА БЭКЕНДА (Bot API URL)
+// CONFIG & BACKEND API URL
 // ==========================================
-// Если Mini App размещен на отдельном хостинге (например GitHub Pages, Vercel, Netlify):
-// Укажите здесь HTTPS-адрес хостинга вашего бота (куда вы задеплоили main.py/web_server.py)!
-// Пример: const CONFIG_BACKEND_URL = "https://my-bot-backend.onrender.com";
-// Также можно передавать параметр в URL кнопки WebApp: https://your-miniapp.vercel.app?backend=https://my-bot-backend.onrender.com
 const CONFIG_BACKEND_URL = "https://carservicegorlovka.de1.netrun.io";
 
 function getBackendUrl() {
@@ -16,7 +12,6 @@ function getBackendUrl() {
     return CONFIG_BACKEND_URL.trim().replace(/\/$/, "");
   }
 
-  // Если открыто как локальный файл или через браузер без указывания порт/домена
   if (window.location.protocol === "file:" || window.location.hostname === "") {
     return "";
   }
@@ -28,13 +23,12 @@ const BACKEND_URL = getBackendUrl();
 
 document.addEventListener("DOMContentLoaded", () => {
   const tg = window.Telegram?.WebApp;
-  
+
   if (tg) {
     tg.ready();
     tg.expand();
   }
 
-  // Current user info (from Telegram or test fallback)
   const tgUser = tg?.initDataUnsafe?.user || {
     id: 123456789,
     first_name: "Посетитель",
@@ -44,26 +38,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const userId = tgUser.id;
   const userName = tgUser.first_name + (tgUser.last_name ? " " + tgUser.last_name : "");
 
-  // Update greeting
   const greetingEl = document.getElementById("user-greeting");
   if (greetingEl) {
-    greetingEl.textContent = `Привет, ${userName}!`;
+    greetingEl.textContent = userName.toUpperCase();
   }
   const profileNameEl = document.getElementById("profile-name");
   if (profileNameEl) {
-    profileNameEl.textContent = userName;
+    profileNameEl.textContent = userName.toUpperCase();
   }
 
   let isAdmin = false;
   let currentAdminFilter = "all";
   let pendingAdminAction = null;
+  let activeRescheduleBookingId = null;
 
-  // Triton Onboarding Overlay Handler
+  // Onboarding Screen Handler
   const onboardingOverlay = document.getElementById("triton-onboarding-screen");
   const onboardingNextBtn = document.getElementById("onboarding-next-btn");
   const onboardingCancelBtn = document.getElementById("onboarding-cancel-btn");
 
-  const isOnboarded = localStorage.getItem("triton_onboarded");
+  const isOnboarded = localStorage.getItem("cyber_onboarded");
   if (!isOnboarded && onboardingOverlay) {
     onboardingOverlay.classList.add("visible");
   }
@@ -74,20 +68,20 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => {
         onboardingOverlay.classList.remove("visible", "closing");
         onboardingOverlay.classList.add("hidden");
-      }, 300);
+      }, 250);
     }
-    localStorage.setItem("triton_onboarded", "true");
+    localStorage.setItem("cyber_onboarded", "true");
   }
 
   if (onboardingNextBtn) {
     onboardingNextBtn.addEventListener("click", () => {
-      // Prompt Telegram phone contact share
       if (tg?.requestContact) {
         tg.requestContact((sent, response) => {
           if (sent && response?.responseUnsafe?.contact?.phone_number) {
             const rawPhone = response.responseUnsafe.contact.phone_number;
             const formatted = "+" + rawPhone.replace(/\D/g, "");
             localStorage.setItem("user_phone_saved", formatted);
+            const phoneInputEl = document.getElementById("phone-number");
             if (phoneInputEl) phoneInputEl.value = formatted;
             showToast("✅ Номер телефона сохранен!");
           }
@@ -104,6 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function initAutoPhoneRequest() {
     const savedPhone = localStorage.getItem("user_phone_saved");
     const tgPhone = tg?.initDataUnsafe?.user?.phone_number || "";
+    const phoneInputEl = document.getElementById("phone-number");
 
     if (savedPhone && phoneInputEl) {
       phoneInputEl.value = savedPhone;
@@ -117,7 +112,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // First time launch: request phone via Telegram WebApp API if supported
     if (tg && typeof tg.requestContact === "function" && !localStorage.getItem("tg_contact_requested")) {
       localStorage.setItem("tg_contact_requested", "true");
       tg.requestContact((sent, event) => {
@@ -125,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const num = "+" + event.responseUnsafe.contact.phone_number.replace(/\D/g, "");
           localStorage.setItem("user_phone_saved", num);
           if (phoneInputEl) phoneInputEl.value = num;
-          showToast("✅ Номер телефона получен из Telegram!");
+          showToast("✅ Номер телефона получен!");
         }
       });
     }
@@ -133,6 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initAutoPhoneRequest();
 
+  const phoneInputEl = document.getElementById("phone-number");
   if (phoneInputEl) {
     phoneInputEl.addEventListener("input", () => {
       if (phoneInputEl.value.trim()) {
@@ -148,7 +143,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       if (data.is_admin) {
         isAdmin = true;
-        // Show admin button ONLY inside Profile tab
         const adminProfileBtn = document.getElementById("admin-profile-btn");
         if (adminProfileBtn) {
           adminProfileBtn.classList.remove("hidden");
@@ -163,32 +157,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   checkAdminStatus();
 
-
-  // Floating Navbar Tab switching & Liquid Blob animation
-  const navItems = document.querySelectorAll(".nav-item");
+  // Navigation Tab Switching
+  const navItems = document.querySelectorAll(".cyber-nav-item");
   const tabContents = document.querySelectorAll(".tab-content");
-  const navBlobPill = document.getElementById("nav-blob-pill");
-  const mainNav = document.getElementById("main-nav");
-
-  function updateNavBlobPosition() {
-    if (!navBlobPill || !mainNav) return;
-    const activeNav = mainNav.querySelector(".nav-item.active");
-    if (!activeNav || activeNav.classList.contains("nav-item-main")) {
-      navBlobPill.style.opacity = "0";
-      return;
-    }
-
-    const navRect = mainNav.getBoundingClientRect();
-    const activeRect = activeNav.getBoundingClientRect();
-
-    // Compact width capsule centered over tab item
-    const targetWidth = Math.min(activeRect.width - 20, 64);
-    const left = activeRect.left - navRect.left + (activeRect.width - targetWidth) / 2;
-
-    navBlobPill.style.opacity = "1";
-    navBlobPill.style.transform = `translateX(${left}px)`;
-    navBlobPill.style.width = `${targetWidth}px`;
-  }
 
   function switchTab(tabName) {
     navItems.forEach(item => {
@@ -197,8 +168,6 @@ document.addEventListener("DOMContentLoaded", () => {
     tabContents.forEach(content => {
       content.classList.toggle("active", content.id === `tab-${tabName}`);
     });
-
-    updateNavBlobPosition();
 
     if (tabName === "profile") {
       loadUserProfile();
@@ -209,9 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  window.addEventListener("resize", updateNavBlobPosition);
-  setTimeout(updateNavBlobPosition, 100);
-
   navItems.forEach(item => {
     item.addEventListener("click", () => {
       switchTab(item.dataset.tab);
@@ -221,14 +187,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ── Home CTA Button Handlers (new Triton classes) ──────────────────────
-
-  // Hero banner & hero play button → booking step 1
+  // Home CTA Handlers
   const homeStartBookingBtn = document.getElementById("home-start-booking-btn");
   if (homeStartBookingBtn) {
     homeStartBookingBtn.addEventListener("click", (e) => {
-      // Only trigger if the click wasn't on the "Записаться" button itself (handled separately)
-      if (!e.target.closest('.tr-hero-play-btn')) {
+      if (!e.target.closest('#hero-play-btn')) {
         switchTab("booking");
         goToStep(1);
       }
@@ -244,7 +207,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Primary claim button → booking step 2
   const quickBookingBanner = document.getElementById("triton-quick-booking-banner");
   if (quickBookingBanner) {
     quickBookingBanner.addEventListener("click", () => {
@@ -253,26 +215,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Widget: Ваши Записи → profile tab
-  const widgetBookings = document.getElementById("triton-widget-bookings");
-  if (widgetBookings) {
-    widgetBookings.addEventListener("click", () => {
-      switchTab("profile");
-    });
-  }
-
-  // Widget: Специалисты → booking step 2
-  const widgetMasters = document.getElementById("triton-widget-masters");
-  if (widgetMasters) {
-    widgetMasters.addEventListener("click", () => {
-      switchTab("booking");
-      goToStep(2);
-    });
-  }
-
-  // tr-hub cards → respect data-tab & data-step attributes
-  document.querySelectorAll(".tr-hub[data-tab], .tr-widget[data-tab]").forEach(card => {
-    card.addEventListener("click", () => {
+  document.querySelectorAll("[data-tab]").forEach(card => {
+    card.addEventListener("click", (e) => {
+      // Avoid double trigger if it's nav item
+      if (card.classList.contains("cyber-nav-item")) return;
       const tab = card.dataset.tab;
       const step = card.dataset.step ? parseInt(card.dataset.step, 10) : null;
       if (tab) switchTab(tab);
@@ -280,19 +226,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Privacy Checkbox Enable/Disable Submit Button Handler
+  // Privacy Checkbox Handler
   const privacyAgreeCheckbox = document.getElementById("privacy-agree");
   const submitBookingBtn = document.getElementById("submit-booking-btn");
 
   if (privacyAgreeCheckbox && submitBookingBtn) {
     submitBookingBtn.disabled = !privacyAgreeCheckbox.checked;
+    privacyAgreeCheckbox.addEventListener("change", () => {
+      submitBookingBtn.disabled = !privacyAgreeCheckbox.checked;
+    });
+  }
 
   // Services Categories & Subservices Tree
   const SERVICE_CATEGORIES = [
     {
       id: "cat_engine",
       title: "🔧 Двигатель и выхлопная система",
-      icon: "🔧",
       items: [
         { title: "Замена моторного масла и фильтра", price: "от 1 500 ₽" },
         { title: "Компьютерная диагностика двигателя", price: "от 1 000 ₽" },
@@ -305,7 +254,6 @@ document.addEventListener("DOMContentLoaded", () => {
     {
       id: "cat_chassis",
       title: "🛞 Подвеска и тормозная система",
-      icon: "🛞",
       items: [
         { title: "Замена тормозных колодок (пара)", price: "от 1 500 ₽" },
         { title: "Замена тормозных дисков", price: "от 2 500 ₽" },
@@ -318,7 +266,6 @@ document.addEventListener("DOMContentLoaded", () => {
     {
       id: "cat_electric",
       title: "⚡ Электрика и автоэлектроника",
-      icon: "⚡",
       items: [
         { title: "Полная компьютерная диагностика", price: "от 1 000 ₽" },
         { title: "Замена генератора / стартера", price: "от 2 500 ₽" },
@@ -330,7 +277,6 @@ document.addEventListener("DOMContentLoaded", () => {
     {
       id: "cat_to",
       title: "🛢 Регулярное ТО и масляный сервис",
-      icon: "🛢",
       items: [
         { title: "Комплексное ТО (масло + 3 фильтра)", price: "от 3 500 ₽" },
         { title: "Замена масла в АКПП / МКПП", price: "от 3 000 ₽" },
@@ -341,7 +287,6 @@ document.addEventListener("DOMContentLoaded", () => {
     {
       id: "cat_climate",
       title: "❄️ Климат и кондиционер",
-      icon: "❄️",
       items: [
         { title: "Диагностика и заправка кондиционера", price: "от 2 000 ₽" },
         { title: "Антибактериальная чистка кондиционера", price: "от 1 500 ₽" },
@@ -351,7 +296,6 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   const selectedProblemsSet = new Set();
-  // Map: catId -> custom problem text entered by user
   const customCategoryInputs = {};
 
   function updateEstimatedTotalPrice() {
@@ -376,7 +320,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Renders summary list of selected problems below the accordion
   function renderSelectedSummary() {
     const summaryEl = document.getElementById("selected-summary");
     if (!summaryEl) return;
@@ -391,123 +334,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     summaryEl.innerHTML = `
-      <div class="selected-summary-box glass-card">
-        <div class="selected-summary-title">✅ Выбранные услуги:</div>
-        <ul class="selected-summary-list">
+      <div class="cyber-card" style="margin-top:8px;">
+        <div style="font-size:11px;font-weight:700;color:var(--green-neon);text-transform:uppercase;margin-bottom:4px;">✅ ВЫБРАННЫЕ УСЛУГИ:</div>
+        <ul style="font-size:12px;color:var(--text-1);padding-left:16px;">
           ${items.map(i => `<li>${i}</li>`).join("")}
         </ul>
       </div>
     `;
   }
 
-  function toggleProblemSelection(title) {
-    if (selectedProblemsSet.has(title)) {
-      selectedProblemsSet.delete(title);
-    } else {
-      selectedProblemsSet.add(title);
-    }
-    updateEstimatedTotalPrice();
-    renderSelectedSummary();
-  }
-
-
-  function renderServicesAccordion(filterQuery = "") {
-    const container = document.getElementById("category-pills");
-    if (!container) return;
-
-    const query = filterQuery.toLowerCase().trim();
-
-    if (query) {
-      // Search Results View
-      const matched = [];
-      SERVICE_CATEGORIES.forEach(cat => {
-        cat.items.forEach(item => {
-          if (item.title.toLowerCase().includes(query) || cat.title.toLowerCase().includes(query)) {
-            matched.push({ ...item, catTitle: cat.title });
-          }
-        });
-      });
-
-      if (matched.length === 0) {
-        container.innerHTML = `<div class="info-card glass-card"><p style="text-align: center; color: var(--text-muted);">По вашему запросу «${filterQuery}» ничего не найдено. Попробуйте сформулировать иначе.</p></div>`;
-        return;
-      }
-
-      container.innerHTML = matched.map(m => {
-        const isChecked = selectedProblemsSet.has(m.title);
-        return `
-          <div class="service-card glass-card ${isChecked ? 'selected' : ''}">
-            <div class="service-info">
-              <input type="checkbox" class="subservice-checkbox" ${isChecked ? 'checked' : ''} data-title="${m.title}" />
-              <div>
-                <div class="service-title">${m.title}</div>
-                <div class="service-price">${m.price} (${m.catTitle})</div>
-              </div>
-            </div>
-            <button class="service-action-btn select-subservice-btn" data-title="${m.title}">
-              ${isChecked ? '✓ Выбрано' : '+ Выбрать'}
-            </button>
-          </div>
-        `;
-      }).join("");
-    } else {
-      // Accordion Categories View with Multi-Select Checkboxes
-      container.innerHTML = SERVICE_CATEGORIES.map(cat => `
-        <div class="accordion-category glass-card">
-          <div class="accordion-header">
-            <span>${cat.title}</span>
-            <span class="accordion-arrow">▼</span>
-          </div>
-          <div class="accordion-body">
-            ${cat.items.map(item => {
-              const isChecked = selectedProblemsSet.has(item.title);
-              return `
-                <div class="subservice-item ${isChecked ? 'selected' : ''}" data-title="${item.title}">
-                  <label class="subservice-checkbox-label" onclick="event.stopPropagation();">
-                    <input type="checkbox" class="subservice-checkbox" ${isChecked ? 'checked' : ''} data-title="${item.title}" />
-                    <span class="subservice-title">${item.title}</span>
-                  </label>
-                  <span class="subservice-price">${item.price}</span>
-                </div>
-              `;
-            }).join("")}
-          </div>
-        </div>
-      `).join("");
-    }
-
-    // Bind Accordion Header Click Handlers
-    container.querySelectorAll(".accordion-header").forEach(header => {
-      header.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const parent = header.parentElement;
-        parent.classList.toggle("open");
-      });
-    });
-
-    // Bind Subservice Checkbox Handlers WITHOUT closing accordion!
-    container.querySelectorAll(".subservice-item").forEach(itemEl => {
-      itemEl.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const title = itemEl.dataset.title;
-        if (title) {
-          toggleProblemSelection(title);
-          const checkbox = itemEl.querySelector(".subservice-checkbox");
-          const isChecked = selectedProblemsSet.has(title);
-          if (checkbox) checkbox.checked = isChecked;
-          itemEl.classList.toggle("selected", isChecked);
-        }
-      });
-    });
-
-  } // end renderServicesAccordion
-
-  renderCategoryAccordion();
-
-  // Wizard Step 1 Accordion + Search Setup
   const wizardSearchInput = document.getElementById("wizard-search-input");
-  const customProblemGroup = document.getElementById("custom-problem-group");
-  let selectedCategory = "";
 
   function renderCategoryAccordion(filterQuery = "") {
     const container = document.getElementById("category-pills");
@@ -515,7 +351,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const query = filterQuery.toLowerCase().trim();
 
     if (query) {
-      // Search results: flat list with checkboxes
       const matched = [];
       SERVICE_CATEGORIES.forEach(cat => {
         cat.items.forEach(item => {
@@ -526,7 +361,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       if (matched.length === 0) {
-        container.innerHTML = `<div class="info-card glass-card"><p style="text-align:center;color:var(--text-muted);">По запросу «${filterQuery}» ничего не найдено.</p></div>`;
+        container.innerHTML = `<div class="cyber-card"><p style="text-align:center;color:var(--text-2);">По запросу «${filterQuery}» ничего не найдено.</p></div>`;
         renderSelectedSummary();
         return;
       }
@@ -534,44 +369,39 @@ document.addEventListener("DOMContentLoaded", () => {
       container.innerHTML = matched.map(m => {
         const isChecked = selectedProblemsSet.has(m.title);
         return `
-          <div class="subservice-item ${isChecked ? 'selected' : ''}" data-title="${m.title}">
-            <label class="subservice-checkbox-label">
-              <input type="checkbox" class="subservice-checkbox" ${isChecked ? 'checked' : ''} data-title="${m.title}" />
-              <span class="subservice-title">${m.title}</span>
-            </label>
-            <span class="subservice-price">${m.price}</span>
+          <div class="cyber-checkbox-row ${isChecked ? 'selected' : ''}" data-title="${m.title}">
+            <span class="cyber-box-icon"><span class="cyber-box-inner"></span></span>
+            <span class="cyber-checkbox-label-text">${m.title}</span>
+            <span class="cyber-checkbox-price-tag">${m.price}</span>
           </div>
         `;
       }).join("");
     } else {
-      // Accordion categories view — each has checkboxes + a text input at the bottom
       container.innerHTML = SERVICE_CATEGORIES.map(cat => {
         const customVal = customCategoryInputs[cat.id] || "";
         return `
-          <div class="accordion-category glass-card" data-cat-id="${cat.id}">
-            <div class="accordion-header">
+          <div class="cyber-accordion-group" data-cat-id="${cat.id}">
+            <div class="cyber-accordion-header">
               <span>${cat.title}</span>
-              <span class="accordion-arrow">▼</span>
+              <span class="cyber-accordion-arrow">▼</span>
             </div>
-            <div class="accordion-body">
+            <div class="cyber-accordion-body">
               ${cat.items.map(item => {
                 const isChecked = selectedProblemsSet.has(item.title);
                 return `
-                  <div class="subservice-item ${isChecked ? 'selected' : ''}" data-title="${item.title}">
-                    <label class="subservice-checkbox-label">
-                      <input type="checkbox" class="subservice-checkbox" ${isChecked ? 'checked' : ''} data-title="${item.title}" />
-                      <span class="subservice-title">${item.title}</span>
-                    </label>
-                    <span class="subservice-price">${item.price}</span>
+                  <div class="cyber-checkbox-row ${isChecked ? 'selected' : ''}" data-title="${item.title}">
+                    <span class="cyber-box-icon"><span class="cyber-box-inner"></span></span>
+                    <span class="cyber-checkbox-label-text">${item.title}</span>
+                    <span class="cyber-checkbox-price-tag">${item.price}</span>
                   </div>
                 `;
               }).join('')}
-              <div class="custom-cat-input-row" onclick="event.stopPropagation();">
+              <div onclick="event.stopPropagation();" style="margin-top:4px;">
                 <input
                   type="text"
-                  class="form-input glass-input custom-cat-input"
+                  class="cyber-cat-custom-input custom-cat-input"
                   data-cat-id="${cat.id}"
-                  placeholder="Другая проблема..."
+                  placeholder="Другая проблема в категории..."
                   value="${customVal}"
                 />
               </div>
@@ -581,51 +411,34 @@ document.addEventListener("DOMContentLoaded", () => {
       }).join("");
     }
 
-    // Bind accordion header toggles
-    container.querySelectorAll(".accordion-header").forEach(header => {
+    container.querySelectorAll(".cyber-accordion-header").forEach(header => {
       header.addEventListener("click", (e) => {
         e.stopPropagation();
         const parent = header.parentElement;
         parent.classList.toggle("open");
-        const arrow = header.querySelector(".accordion-arrow");
-        if (arrow) arrow.textContent = parent.classList.contains("open") ? "▲" : "▼";
       });
     });
 
-    // Bind subservice checkboxes — use change event on checkbox as source of truth
-    container.querySelectorAll(".subservice-item").forEach(itemEl => {
-      itemEl.addEventListener("click", (e) => {
+    // Bind Cyber Tech Checkbox Rows [ ■ ]
+    container.querySelectorAll(".cyber-checkbox-row").forEach(rowEl => {
+      rowEl.addEventListener("click", (e) => {
         e.stopPropagation();
-        const title = itemEl.dataset.title;
+        const title = rowEl.dataset.title;
         if (!title) return;
 
-        const checkbox = itemEl.querySelector(".subservice-checkbox");
-        if (!checkbox) return;
-
-        // If click landed on checkbox or its label, the browser already toggled checkbox.checked.
-        // If click was on price or row padding, we need to manually toggle.
-        const throughLabel = !!e.target.closest('label');
-        const onCheckbox   = e.target === checkbox;
-
-        if (!throughLabel && !onCheckbox) {
-          // Manual toggle for clicks on the price tag or row bg
-          checkbox.checked = !checkbox.checked;
-        }
-
-        // Sync Set with current checkbox state (browser may have already toggled)
-        if (checkbox.checked) {
-          selectedProblemsSet.add(title);
-        } else {
+        if (selectedProblemsSet.has(title)) {
           selectedProblemsSet.delete(title);
+          rowEl.classList.remove("selected");
+        } else {
+          selectedProblemsSet.add(title);
+          rowEl.classList.add("selected");
         }
 
-        itemEl.classList.toggle("selected", checkbox.checked);
         updateEstimatedTotalPrice();
         renderSelectedSummary();
       });
     });
 
-    // Bind custom text inputs per category
     container.querySelectorAll(".custom-cat-input").forEach(input => {
       input.addEventListener("input", (e) => {
         e.stopPropagation();
@@ -647,7 +460,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Car Number Input Auto-Caps
   const carNumberInput = document.getElementById("car-number");
   if (carNumberInput) {
     carNumberInput.addEventListener("input", () => {
@@ -655,7 +467,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Privacy Policy Modal Handlers
   const privacyLink = document.getElementById("privacy-link");
   const privacyModal = document.getElementById("privacy-modal");
   const closePrivacyBtn = document.getElementById("close-privacy-btn");
@@ -673,8 +484,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-
-  // Full Interactive Month Calendar & Time Slots
   const MONTH_NAMES_RU = [
     "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
     "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
@@ -691,7 +500,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedDateObj = new Date(todayObj.getFullYear(), todayObj.getMonth(), todayObj.getDate());
   let selectedDateLabel = `${todayObj.getDate()} ${MONTH_NAMES_RU_GENITIVE[todayObj.getMonth()]} ${todayObj.getFullYear()}`;
 
-  // Daily schedule slots (clean time display)
   const DAILY_TIME_SLOTS = ["09:00", "10:30", "12:00", "13:30", "15:00", "16:30", "18:00"];
 
   const BUSY_SLOTS_MAP = {
@@ -706,28 +514,28 @@ document.addEventListener("DOMContentLoaded", () => {
       name: "🌟 Любой свободный мастер",
       role: "Ближайшее доступное время",
       avatar: "👨‍🔧",
-      badge: "⚡ Быстрый выбор"
+      badge: "⚡ БЫСТРЫЙ ВЫБОР"
     },
     {
       id: "master_alexey",
       name: "Алексей Смирнов",
       role: "Старший механик (Двигатель и ТО)",
       avatar: "👨‍🔧",
-      badge: "Опыт 12 лет"
+      badge: "ОПЫТ 12 ЛЕТ"
     },
     {
       id: "master_dmitry",
       name: "Дмитрий Ковалев",
       role: "Диагност-автоэлектрик",
       avatar: "⚡",
-      badge: "Опыт 9 лет"
+      badge: "ОПЫТ 9 ЛЕТ"
     },
     {
       id: "master_igor",
       name: "Игорь Соколов",
       role: "Мастер по ходовой части",
       avatar: "🛞",
-      badge: "Опыт 8 лет"
+      badge: "ОПЫТ 8 ЛЕТ"
     }
   ];
 
@@ -742,18 +550,18 @@ document.addEventListener("DOMContentLoaded", () => {
     container.innerHTML = MASTERS_DATA.map(m => {
       const isSelected = m.id === selectedMasterId;
       return `
-        <div class="master-card glass-card ${isSelected ? 'selected' : ''}" data-master-id="${m.id}">
-          <div class="master-avatar">${m.avatar}</div>
-          <div class="master-info">
-            <div class="master-name">${m.name}</div>
-            <div class="master-role">${m.role}</div>
+        <div class="cyber-master-card ${isSelected ? 'selected' : ''}" data-master-id="${m.id}">
+          <div class="cyber-master-avatar">${m.avatar}</div>
+          <div>
+            <div class="cyber-master-name">${m.name}</div>
+            <div class="cyber-master-role">${m.role}</div>
           </div>
-          <div class="master-badge">${m.badge}</div>
+          <div class="cyber-master-badge">${m.badge}</div>
         </div>
       `;
     }).join("");
 
-    container.querySelectorAll(".master-card").forEach(card => {
+    container.querySelectorAll(".cyber-master-card").forEach(card => {
       card.addEventListener("click", () => {
         const id = card.dataset.masterId;
         const master = MASTERS_DATA.find(m => m.id === id);
@@ -775,7 +583,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const lastDayOfMonth = new Date(calendarYear, calendarMonth + 1, 0);
     const totalDays = lastDayOfMonth.getDate();
 
-    // Calculate day offset (Monday = 0, Sunday = 6)
     let startDayOfWeek = firstDayOfMonth.getDay() - 1;
     if (startDayOfWeek === -1) startDayOfWeek = 6;
 
@@ -783,20 +590,18 @@ document.addEventListener("DOMContentLoaded", () => {
                            (calendarYear === todayObj.getFullYear() && calendarMonth <= todayObj.getMonth());
 
     let daysHtml = "";
-    // Empty padding cells for first week
     for (let i = 0; i < startDayOfWeek; i++) {
-      daysHtml += `<div class="cal-day empty"></div>`;
+      daysHtml += `<div class="cyber-cal-day empty"></div>`;
     }
 
-    // Days 1..totalDays
     for (let day = 1; day <= totalDays; day++) {
       const cellDate = new Date(calendarYear, calendarMonth, day);
       const isToday = (cellDate.toDateString() === todayObj.toDateString());
       const isPast = (cellDate < new Date(todayObj.getFullYear(), todayObj.getMonth(), todayObj.getDate()));
       const isSelected = (cellDate.toDateString() === selectedDateObj.toDateString());
 
-      let classes = "cal-day";
-      if (isPast) classes += " past disabled";
+      let classes = "cyber-cal-day";
+      if (isPast) classes += " past";
       if (isToday) classes += " today";
       if (isSelected) classes += " selected";
 
@@ -808,20 +613,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     container.innerHTML = `
-      <div class="cal-header">
-        <button type="button" class="cal-nav-btn" id="cal-prev-month" ${isPrevDisabled ? 'disabled' : ''}>‹</button>
-        <span class="cal-month-title">${MONTH_NAMES_RU[calendarMonth]} ${calendarYear}</span>
-        <button type="button" class="cal-nav-btn" id="cal-next-month">›</button>
+      <div class="cyber-cal-header">
+        <button type="button" class="cyber-cal-btn" id="cal-prev-month" ${isPrevDisabled ? 'disabled' : ''}>‹</button>
+        <span class="cyber-cal-title">${MONTH_NAMES_RU[calendarMonth]} ${calendarYear}</span>
+        <button type="button" class="cyber-cal-btn" id="cal-next-month">›</button>
       </div>
-      <div class="cal-weekdays">
+      <div class="cyber-cal-weekdays">
         <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
       </div>
-      <div class="cal-days-grid">
+      <div class="cyber-cal-grid">
         ${daysHtml}
       </div>
     `;
 
-    // Month Navigation Handlers
     const prevBtn = document.getElementById("cal-prev-month");
     const nextBtn = document.getElementById("cal-next-month");
 
@@ -849,8 +653,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Day Selection Click Handlers — Swaps calendar view for time slots view!
-    container.querySelectorAll(".cal-day:not(.past):not(.empty)").forEach(cell => {
+    container.querySelectorAll(".cyber-cal-day:not(.past):not(.empty)").forEach(cell => {
       cell.addEventListener("click", () => {
         const y = parseInt(cell.dataset.year);
         const m = parseInt(cell.dataset.month);
@@ -871,7 +674,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const dateBadge = document.getElementById("slots-date-badge");
 
     if (dateBadge) {
-      dateBadge.textContent = `📅 ${selectedDateLabel}`;
+      dateBadge.textContent = `📅 ${selectedDateLabel.toUpperCase()}`;
     }
 
     renderSlotsForMasterAndDate();
@@ -888,7 +691,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (slotsGroup) slotsGroup.classList.add("hidden");
   }
 
-  // Bind "← Изменить дату" button
   const changeDateBtn = document.getElementById("change-date-btn");
   if (changeDateBtn) {
     changeDateBtn.addEventListener("click", showCalendarView);
@@ -900,7 +702,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!container) return;
 
     if (label) {
-      label.textContent = `Время записи на ${selectedDateLabel} (${selectedMasterName}):`;
+      label.textContent = `ВРЕМЯ ЗАПИСИ НА ${selectedDateLabel.toUpperCase()} (${selectedMasterName.toUpperCase()}):`;
     }
 
     const busyMap = BUSY_SLOTS_MAP[selectedMasterId] || {};
@@ -916,25 +718,24 @@ document.addEventListener("DOMContentLoaded", () => {
         selectedSlot = `${selectedDateLabel} в ${time}`;
       }
 
-      // Simple line-through grayed out style for occupied slots (no locks, no tags)
       if (isBusy) {
         return `
-          <div class="slot-item busy disabled" title="Время занято">
+          <div class="cyber-slot-item booked">
             ${time}
           </div>
         `;
       }
 
       return `
-        <div class="slot-item ${isSelected ? 'active' : ''}" data-time="${time}">
+        <div class="cyber-slot-item ${isSelected ? 'active' : ''}" data-time="${time}">
           ${time}
         </div>
       `;
     }).join("");
 
-    container.querySelectorAll(".slot-item:not(.busy)").forEach(item => {
+    container.querySelectorAll(".cyber-slot-item:not(.booked)").forEach(item => {
       item.addEventListener("click", () => {
-        container.querySelectorAll(".slot-item").forEach(i => i.classList.remove("active"));
+        container.querySelectorAll(".cyber-slot-item").forEach(i => i.classList.remove("active"));
         item.classList.add("active");
         selectedSlot = `${selectedDateLabel} в ${item.dataset.time}`;
       });
@@ -947,7 +748,6 @@ document.addEventListener("DOMContentLoaded", () => {
     showCalendarView();
   }
 
-  // User Profile loading
   async function loadUserProfile() {
     try {
       const res = await fetch(`${BACKEND_URL}/api/user/info?user_id=${userId}`);
@@ -959,7 +759,6 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("stat-cancelled").textContent = data.stats.cancelled || 0;
       document.getElementById("profile-phone").textContent = `Телефон: ${data.stats.phone || 'Не указан'}`;
 
-      // Auto-fill phone from profile if not yet set
       if (data.stats.phone && data.stats.phone !== "Не указан") {
         const phoneInput = document.getElementById("phone-number");
         if (phoneInput && !phoneInput.value) {
@@ -984,58 +783,44 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!container) return;
 
     if (!bookings || bookings.length === 0) {
-      container.innerHTML = `<div class="info-card glass-card"><p style="text-align: center; color: var(--text-muted);">У вас пока нет оформленных записей.</p></div>`;
+      container.innerHTML = `<div class="cyber-card"><p style="text-align: center; color: var(--text-2);">У вас пока нет оформленных записей.</p></div>`;
       return;
     }
 
-    let activeRescheduleBookingId = null;
-
     container.innerHTML = bookings.map(b => {
-      let badgeClass = "badge-pending";
-      let statusIcon = "⏳";
       let isUnavailable = b.status.includes("недоступен") || b.status.includes("Перенос");
-
-      if (isUnavailable) {
-        badgeClass = "badge-pending";
-        statusIcon = "⚠️";
-      } else if (b.status === "Одобрена" || b.status === "Активна") {
-        badgeClass = "badge-approved";
-        statusIcon = "✅";
-      } else if (b.status.includes("Отменен") || b.status.includes("Отклонен")) {
-        badgeClass = "badge-cancelled";
-        statusIcon = "🔴";
-      }
+      let statusColor = "var(--yellow)";
+      if (b.status === "Одобрена" || b.status === "Активна") statusColor = "var(--green-neon)";
+      if (b.status.includes("Отменен") || b.status.includes("Отклонен")) statusColor = "var(--red)";
 
       const isCancelable = ["На рассмотрении", "Одобрена", "Активна"].includes(b.status) || isUnavailable;
 
       return `
-        <div class="booking-card" style="${isUnavailable ? 'border-color:rgba(245,158,11,0.38);' : ''}">
-          <div class="booking-card-header">
-            <span class="booking-card-title">Запись №${b.id}</span>
-            <span class="booking-badge ${badgeClass}">${statusIcon} ${b.status}</span>
+        <div class="cyber-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <span style="font-size:13px;font-weight:700;">ЗАПИСЬ №${b.id}</span>
+            <span style="font-size:11px;font-weight:700;color:${statusColor};text-transform:uppercase;">[ ${b.status} ]</span>
           </div>
-          <div class="booking-card-meta">
-            <div><strong style="color:var(--text-1);">Услуга:</strong> ${b.problem}</div>
-            <div><strong style="color:var(--text-1);">Автомобиль:</strong> ${b.car_model}</div>
-            ${b.car_number ? `<div><strong style="color:var(--text-1);">Госномер:</strong> ${b.car_number}</div>` : ''}
-            <div><strong style="color:var(--text-1);">Время:</strong> ${b.slot}</div>
-            ${b.comment ? `<div style="margin-top:4px;padding:8px 10px;background:rgba(43,126,255,0.07);border-radius:10px;border:1px solid rgba(43,126,255,0.18);"><strong style="color:#2b7eff;">Сообщение:</strong> <em>${b.comment}</em></div>` : ''}
+          <div style="font-size:12px;color:var(--text-2);line-height:1.4;">
+            <div><strong>Услуга:</strong> ${b.problem}</div>
+            <div><strong>Автомобиль:</strong> ${b.car_model} ${b.car_number ? `(${b.car_number})` : ''}</div>
+            <div><strong>Время:</strong> ${b.slot}</div>
+            ${b.comment ? `<div style="margin-top:4px;padding:6px;background:rgba(255,42,95,0.08);border-radius:4px;"><strong style="color:var(--pink);">Сообщение:</strong> <em>${b.comment}</em></div>` : ''}
           </div>
-          <div class="booking-card-actions">
-            ${isUnavailable ? `<button class="reschedule-btn" data-id="${b.id}">🔄 Выбрать другого мастера / время</button>` : ''}
-            ${isCancelable ? `<button class="cancel-btn" data-id="${b.id}">Отменить</button>` : ''}
+          <div style="display:flex;gap:6px;margin-top:8px;">
+            ${isUnavailable ? `<button class="cyber-btn-primary reschedule-btn" data-id="${b.id}" style="padding:6px 10px;font-size:11px;">🔄 ВЫБРАТЬ ДРУГОЕ ВРЕМЯ</button>` : ''}
+            ${isCancelable ? `<button class="cyber-btn-secondary cancel-btn" data-id="${b.id}" style="padding:6px 10px;font-size:11px;color:var(--red);">ОТМЕНИТЬ</button>` : ''}
           </div>
         </div>
       `;
     }).join("");
-
 
     container.querySelectorAll(".reschedule-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         activeRescheduleBookingId = parseInt(btn.dataset.id);
         switchTab("booking");
         goToStep(2);
-        showToast(`🔄 Перенос записи №${activeRescheduleBookingId}: выберите мастера и время`);
+        showToast(`🔄 ПЕРЕНОС ЗАПИСИ №${activeRescheduleBookingId}`);
       });
     });
 
@@ -1058,17 +843,16 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       const data = await res.json();
       if (data.success) {
-        showToast("✅ Запись успешно отменена");
+        showToast("✅ Запись отменена");
         loadUserProfile();
       } else {
-        showToast("⚠️ " + (data.error || "Не удалось отменить"));
+        showToast("⚠️ " + (data.error || "Ошибка"));
       }
     } catch (e) {
       showToast("⚠️ Ошибка соединения");
     }
   }
 
-  // Multi-Step Wizard Logic (4 steps)
   let currentStep = 1;
   const toStep2Btn = document.getElementById("to-step-2-btn");
   const toStep3Btn = document.getElementById("to-step-3-btn");
@@ -1111,44 +895,37 @@ document.addEventListener("DOMContentLoaded", () => {
     const carNumber = document.getElementById("car-number") ? document.getElementById("car-number").value.trim().toUpperCase() : "";
 
     summaryContainer.innerHTML = `
-      <div class="summary-item">
-        <span class="summary-label">🛠 Выбранные работы:</span>
-        <span class="summary-val">${problemText}</span>
+      <div class="cyber-summary-row">
+        <span class="cyber-summary-lbl">🛠 РАБОТЫ:</span>
+        <span class="cyber-summary-val">${problemText}</span>
       </div>
-      <div class="summary-item">
-        <span class="summary-label">👨‍🔧 Специалист:</span>
-        <span class="summary-val highlight">${selectedMasterName}</span>
+      <div class="cyber-summary-row">
+        <span class="cyber-summary-lbl">👨‍🔧 МАСТЕР:</span>
+        <span class="cyber-summary-val" style="color:var(--pink);">${selectedMasterName}</span>
       </div>
-      <div class="summary-item">
-        <span class="summary-label">📅 Дата и время:</span>
-        <span class="summary-val highlight">${selectedSlot || "Не выбрано"}</span>
+      <div class="cyber-summary-row">
+        <span class="cyber-summary-lbl">📅 ДАТА И ВРЕМЯ:</span>
+        <span class="cyber-summary-val" style="color:var(--pink);">${selectedSlot || "Не выбрано"}</span>
       </div>
-      <div class="summary-item">
-        <span class="summary-label">🚗 Автомобиль:</span>
-        <span class="summary-val">${carModel || "Не указан"} ${carNumber ? `(${carNumber})` : ""}</span>
+      <div class="cyber-summary-row">
+        <span class="cyber-summary-lbl">🚗 АВТОМОБИЛЬ:</span>
+        <span class="cyber-summary-val">${carModel || "Не указан"} ${carNumber ? `(${carNumber})` : ""}</span>
       </div>
     `;
   }
 
-  // Phone Edit Pencil Handler
   const editPhoneBtn = document.getElementById("edit-phone-btn");
   const phoneInput = document.getElementById("phone-number");
-  const phoneHint = document.getElementById("phone-hint");
 
   if (editPhoneBtn && phoneInput) {
     editPhoneBtn.addEventListener("click", () => {
       phoneInput.removeAttribute("readonly");
       phoneInput.focus();
       phoneInput.select();
-      if (phoneHint) {
-        phoneHint.textContent = "✏️ Режим редактирования. Введите нужный номер.";
-        phoneHint.style.color = "#38bdf8";
-      }
-      showToast("✏️ Вы можете изменить номер телефона");
+      showToast("✏️ Введите нужный номер");
     });
   }
 
-  // Step 1 -> Step 2
   if (toStep2Btn) {
     toStep2Btn.addEventListener("click", () => {
       const checkedProblems = Array.from(selectedProblemsSet);
@@ -1158,24 +935,22 @@ document.addEventListener("DOMContentLoaded", () => {
       let problem = "";
       if (allProblems.length > 0) {
         problem = allProblems.join(", ");
-      } else if (selectedCategory === "cat_custom") {
-        const customProblemInput = document.getElementById("custom-problem");
-        problem = customProblemInput ? customProblemInput.value.trim() : "";
+      } else if (document.getElementById("custom-problem")) {
+        problem = document.getElementById("custom-problem").value.trim();
       }
 
       if (!problem) {
-        showToast("⚠️ Пожалуйста, выберите или опишите вашу проблему!");
+        showToast("⚠️ Выберите или опишите проблему!");
         return;
       }
       goToStep(2);
     });
   }
 
-  // Step 2 -> Step 3
   if (toStep3Btn) {
     toStep3Btn.addEventListener("click", () => {
       if (!selectedSlot) {
-        showToast("⚠️ Пожалуйста, выберите удобное время записи!");
+        showToast("⚠️ Выберите время записи!");
         return;
       }
       goToStep(3);
@@ -1186,12 +961,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Step 3 -> Step 4
   if (toStep4Btn) {
     toStep4Btn.addEventListener("click", () => {
       const carModel = document.getElementById("car-model").value.trim();
       if (!carModel || carModel.length < 2) {
-        showToast("⚠️ Пожалуйста, укажите марку и модель авто!");
+        showToast("⚠️ Укажите марку и модель авто!");
         const carInput = document.getElementById("car-model");
         if (carInput) carInput.focus();
         return;
@@ -1204,14 +978,12 @@ document.addEventListener("DOMContentLoaded", () => {
   if (backToStep2Btn) backToStep2Btn.addEventListener("click", () => goToStep(2));
   if (backToStep3Btn) backToStep3Btn.addEventListener("click", () => goToStep(3));
 
-  // Booking Form Submission
   const bookingForm = document.getElementById("booking-form");
   const submitBtn = document.getElementById("submit-booking-btn");
 
   bookingForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    // Collect all problems (checkboxes + custom text inputs)
     const checkedProblems = Array.from(selectedProblemsSet);
     const customProblems = Object.values(customCategoryInputs).map(v => v.trim()).filter(v => v.length > 0);
     const allProblems = [...checkedProblems, ...customProblems];
@@ -1219,48 +991,31 @@ document.addEventListener("DOMContentLoaded", () => {
     let problem = "";
     if (allProblems.length > 0) {
       problem = allProblems.join(", ");
-    } else if (selectedCategory === "cat_custom") {
-      const customProblemInput = document.getElementById("custom-problem");
-      problem = customProblemInput ? customProblemInput.value.trim() : "";
+    } else if (document.getElementById("custom-problem")) {
+      problem = document.getElementById("custom-problem").value.trim();
     }
-
 
     const carModel = document.getElementById("car-model").value.trim();
     const carNumber = document.getElementById("car-number") ? document.getElementById("car-number").value.trim().toUpperCase() : "";
     const phone = document.getElementById("phone-number").value.trim();
     const privacyAgree = document.getElementById("privacy-agree");
 
-    if (!problem) {
-      showToast("⚠️ Опишите вашу проблему!");
-      goToStep(1);
-      return;
-    }
-    if (!carModel) {
-      showToast("⚠️ Укажите марку и модель авто!");
-      goToStep(2);
-      return;
-    }
-    if (!phone) {
-      showToast("⚠️ Укажите ваш телефон!");
-      return;
-    }
-    if (privacyAgree && !privacyAgree.checked) {
-      showToast("⚠️ Необходимо согласие с Политикой конфиденциальности!");
-      return;
-    }
+    if (!problem) { showToast("⚠️ Опишите проблему!"); goToStep(1); return; }
+    if (!carModel) { showToast("⚠️ Укажите марку и модель авто!"); goToStep(2); return; }
+    if (!phone) { showToast("⚠️ Укажите телефон!"); return; }
+    if (privacyAgree && !privacyAgree.checked) { showToast("⚠️ Примите Соглашение!"); return; }
 
     submitBtn.disabled = true;
-    submitBtn.innerHTML = `<span>⏳ Отправка...</span>`;
+    submitBtn.innerHTML = `<span>⏳ ОТПРАВКА...</span>`;
 
     try {
       if (!BACKEND_URL) {
-        showToast("⚠️ Ошибка: не указан адрес бэкенда (CONFIG_BACKEND_URL в app.js)!");
+        showToast("⚠️ Ошибка адреса бэкенда!");
         return;
       }
 
       const targetSlot = `${selectedSlot} (Мастер: ${selectedMasterName})`;
 
-      // If client is rescheduling an existing affected booking
       if (activeRescheduleBookingId) {
         const res = await fetch(`${BACKEND_URL}/api/booking/reschedule`, {
           method: "POST",
@@ -1274,14 +1029,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const data = await res.json();
         if (res.ok && data.success) {
-          showToast(`🎉 Запись №${activeRescheduleBookingId} успешно перенесена!`);
+          showToast(`🎉 ЗАПИСЬ №${activeRescheduleBookingId} ПЕРЕНЕСЕНА!`);
           activeRescheduleBookingId = null;
           switchTab("profile");
           return;
         } else {
-          showToast("⚠️ " + (data.error || "Не удалось перенести запись"));
+          showToast("⚠️ " + (data.error || "Ошибка переноса"));
           submitBtn.disabled = false;
-          submitBtn.innerHTML = `<span>🚀 Подтвердить запись</span>`;
+          submitBtn.innerHTML = `🚀 ПОДТВЕРДИТЬ ЗАПИСЬ`;
           return;
         }
       }
@@ -1303,32 +1058,27 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        showToast(`🎉 Заявка №${data.booking_id} успешно создана!`);
+        showToast(`🎉 ЗАЯВКА №${data.booking_id} СОЗДАНА!`);
         bookingForm.reset();
         selectedProblemsSet.clear();
-        // Clear custom inputs
         Object.keys(customCategoryInputs).forEach(k => delete customCategoryInputs[k]);
         renderCategoryAccordion();
         goToStep(1);
         setTimeout(() => {
           switchTab("profile");
-        }, 1200);
+        }, 1000);
       } else {
-
-        showToast("⚠️ " + (data.error || "Ошибка создания записи"));
+        showToast("⚠️ " + (data.error || "Ошибка создания"));
       }
     } catch (err) {
-      console.error("Ошибка при отправке формы:", err);
-      showToast("⚠️ Бэкенд недоступен! Проверьте CONFIG_BACKEND_URL в app.js");
+      console.error("Submit error:", err);
+      showToast("⚠️ Ошибка соединения с бэкендом");
     } finally {
       submitBtn.disabled = false;
-      submitBtn.innerHTML = `<span>🚀 Отправить заявку</span>`;
+      submitBtn.innerHTML = `🚀 ПОДТВЕРДИТЬ ЗАПИСЬ`;
     }
   });
 
-
-
-  // Toast Helper
   function showToast(msg) {
     const toast = document.getElementById("toast");
     if (!toast) return;
@@ -1336,13 +1086,11 @@ document.addEventListener("DOMContentLoaded", () => {
     toast.classList.remove("hidden");
     setTimeout(() => {
       toast.classList.add("hidden");
-    }, 3500);
+    }, 3200);
   }
 
-  // ==========================================
-  // ADMIN / MODERATION PANEL LOGIC
-  // ==========================================
-  const adminPills = document.querySelectorAll("#admin-status-pills .pill");
+  // ADMIN LOGIC
+  const adminPills = document.querySelectorAll("#admin-status-pills button");
   adminPills.forEach(pill => {
     pill.addEventListener("click", () => {
       adminPills.forEach(p => p.classList.remove("active"));
@@ -1367,7 +1115,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       renderAdminBookings(data.bookings || []);
     } catch (e) {
-      container.innerHTML = `<div class="info-card glass-card"><p style="text-align: center; color: var(--text-muted);">Не удалось загрузить данные модерации</p></div>`;
+      container.innerHTML = `<div class="cyber-card"><p style="text-align: center; color: var(--text-2);">Ошибка модерации</p></div>`;
     }
   }
 
@@ -1376,59 +1124,41 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!container) return;
 
     if (!bookings || bookings.length === 0) {
-      container.innerHTML = `<div class="info-card glass-card"><p style="text-align: center; color: var(--text-muted);">Заявок не найдено.</p></div>`;
+      container.innerHTML = `<div class="cyber-card"><p style="text-align: center; color: var(--text-2);">Заявок не найдено.</p></div>`;
       return;
     }
 
     container.innerHTML = bookings.map(b => {
-      let badgeClass = "badge-pending";
-      let statusIcon = "⏳";
-      let cardClass = "pending";
-      if (b.status === "Одобрена" || b.status === "Активна") {
-        badgeClass = "badge-approved";
-        statusIcon = "✅";
-        cardClass = "approved";
-      } else if (b.status.includes("Отменен") || b.status.includes("Отклонен")) {
-        badgeClass = "badge-cancelled";
-        statusIcon = "🔴";
-        cardClass = "rejected";
-      }
-
-      const isPending = b.status === "На рассмотрении";
-      const actionsHtml = isPending ? `
-        <div class="admin-actions-grid">
-          <button class="admin-btn admin-btn-approve" data-id="${b.id}">✅ Одобрить</button>
-          <button class="admin-btn admin-btn-reject" data-id="${b.id}">❌ Отклонить</button>
-          <button class="admin-btn admin-btn-delete" data-id="${b.id}">🗑 Удалить заявку</button>
+      let isPending = b.status === "На рассмотрении";
+      let actionsHtml = isPending ? `
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <button class="cyber-btn-primary admin-btn-approve" data-id="${b.id}" style="padding:6px 10px;font-size:11px;">✅ ОДОБРИТЬ</button>
+          <button class="cyber-btn-secondary admin-btn-reject" data-id="${b.id}" style="padding:6px 10px;font-size:11px;color:var(--red);">❌ ОТКЛОНИТЬ</button>
+          <button class="cyber-btn-secondary admin-btn-delete" data-id="${b.id}" style="padding:6px 10px;font-size:11px;">🗑 УДАЛИТЬ</button>
         </div>
       ` : `
-        <div class="admin-actions-grid">
-          <button class="admin-btn admin-btn-delete" data-id="${b.id}">🗑 Удалить заявку</button>
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <button class="cyber-btn-secondary admin-btn-delete" data-id="${b.id}" style="padding:6px 10px;font-size:11px;">🗑 УДАЛИТЬ</button>
         </div>
       `;
 
       return `
-        <div class="booking-card glass-card admin-card ${cardClass}">
-          <div class="booking-header">
-            <span class="booking-id">Запись №${b.id}</span>
-            <span class="badge ${badgeClass}">${statusIcon} ${b.status}</span>
+        <div class="cyber-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <span style="font-size:13px;font-weight:700;">ЗАПИСЬ №${b.id}</span>
+            <span style="font-size:11px;font-weight:700;color:var(--pink);">[ ${b.status} ]</span>
           </div>
-          <div class="admin-card-user">
-            👤 <strong>${b.user_name}</strong> (ID: ${b.user_id}) | 📞 ${b.phone}
+          <div style="font-size:11px;color:var(--text-2);">👤 <strong>${b.user_name}</strong> | 📞 ${b.phone}</div>
+          <div style="font-size:12px;color:var(--text-2);margin-top:4px;">
+            <div><strong>Услуга:</strong> ${b.problem}</div>
+            <div><strong>Авто:</strong> ${b.car_model} ${b.car_number ? `(${b.car_number})` : ''}</div>
+            <div><strong>Время:</strong> ${b.slot}</div>
+            ${b.comment ? `<div><strong>Прим.:</strong> <em>${b.comment}</em></div>` : ''}
           </div>
-          <div class="booking-details">
-            <p><strong>Услуга:</strong> ${b.problem}</p>
-            <p><strong>Автомобиль:</strong> ${b.car_model}</p>
-            ${b.car_number ? `<p><strong>Госномер:</strong> ${b.car_number}</p>` : ''}
-            <p><strong>Время:</strong> ${b.slot}</p>
-            ${b.comment ? `<p><strong>Прим. модератора:</strong> <em>${b.comment}</em></p>` : ''}
-          </div>
-
           ${actionsHtml}
         </div>
       `;
     }).join("");
-
 
     container.querySelectorAll(".admin-btn-approve").forEach(btn => {
       btn.addEventListener("click", () => openAdminModal(btn.dataset.id, "approve"));
@@ -1441,7 +1171,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Admin Modal Handling
   const modal = document.getElementById("admin-modal");
   const modalComment = document.getElementById("modal-comment");
   const modalConfirmBtn = document.getElementById("modal-confirm-btn");
@@ -1449,7 +1178,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function openAdminModal(bookingId, action) {
     pendingAdminAction = { bookingId, action };
-    const title = action === "approve" ? `Одобрить запись №${bookingId}` : `Отклонить запись №${bookingId}`;
+    const title = action === "approve" ? `ОДОБРИТЬ ЗАПИСЬ №${bookingId}` : `ОТКЛОНИТЬ ЗАПИСЬ №${bookingId}`;
     document.getElementById("modal-title").textContent = title;
     if (modalComment) modalComment.value = "";
     if (modal) modal.classList.remove("hidden");
@@ -1474,7 +1203,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function confirmDeleteBooking(bookingId) {
-    if (confirm(`Вы действительно хотите НАВСЕГДА удалить запись №${bookingId}?`)) {
+    if (confirm(`Удалить запись №${bookingId}?`)) {
       await executeAdminAction(bookingId, "delete", "");
     }
   }
@@ -1493,31 +1222,29 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        showToast(`✅ Действие по записи №${bookingId} выполнено`);
+        showToast(`✅ Выполнено`);
         loadAdminBookings(currentAdminFilter);
       } else {
-        showToast("⚠️ " + (data.error || "Ошибка выполнения"));
+        showToast("⚠️ " + (data.error || "Ошибка"));
       }
     } catch (e) {
-      showToast("⚠️ Ошибка соединения с сервером");
+      showToast("⚠️ Ошибка соединения");
     }
   }
 
-  // Admin Master & Date Selection Logic
   let selectedAdmMaster = "Алексей Смирнов";
 
   const admMasterSelector = document.getElementById("adm-masters-selector");
   if (admMasterSelector) {
-    admMasterSelector.querySelectorAll(".adm-master-chip").forEach(chip => {
+    admMasterSelector.querySelectorAll(".cyber-checkbox-row").forEach(chip => {
       chip.addEventListener("click", () => {
-        admMasterSelector.querySelectorAll(".adm-master-chip").forEach(c => c.classList.remove("active"));
-        chip.classList.add("active");
+        admMasterSelector.querySelectorAll(".cyber-checkbox-row").forEach(c => c.classList.remove("selected"));
+        chip.classList.add("selected");
         selectedAdmMaster = chip.dataset.master;
       });
     });
   }
 
-  // Set default date picker value to today
   const admOffDateInput = document.getElementById("adm-off-date");
   if (admOffDateInput && !admOffDateInput.value) {
     const todayStr = new Date().toISOString().split("T")[0];
@@ -1541,22 +1268,15 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      if (!selectedAdmMaster) {
-        showToast("⚠️ Выберите мастера!");
-        return;
-      }
-      if (!rawDate) {
-        showToast("⚠️ Укажите дату отсутствия мастера!");
-        return;
-      }
+      if (!selectedAdmMaster) { showToast("⚠️ Выберите мастера!"); return; }
+      if (!rawDate) { showToast("⚠️ Укажите дату!"); return; }
 
-      const dateNotice = formattedDateTarget ? `на ${formattedDateTarget}` : "";
-      if (!confirm(`Отменить смену мастера "${selectedAdmMaster}" ${dateNotice} и уведомить всех записанных клиентов?`)) {
+      if (!confirm(`Отменить смену мастера "${selectedAdmMaster}" на ${formattedDateTarget}?`)) {
         return;
       }
 
       admTriggerRescheduleBtn.disabled = true;
-      admTriggerRescheduleBtn.innerHTML = "<span>⏳ Отправка...</span>";
+      admTriggerRescheduleBtn.innerHTML = "<span>⏳ ОТПРАВКА...</span>";
 
       try {
         const res = await fetch(`${BACKEND_URL}/api/admin/master/reschedule`, {
@@ -1572,16 +1292,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const data = await res.json();
         if (res.ok && data.success) {
-          showToast(`✅ Записи к мастеру "${selectedAdmMaster}" ${dateNotice} отменены (затронуто ${data.affected_count} клиентов)!`);
+          showToast(`✅ Смена мастера отменена (${data.affected_count} затронуто)!`);
           loadAdminBookings(currentAdminFilter);
         } else {
-          showToast("⚠️ " + (data.error || "Ошибка смены мастера"));
+          showToast("⚠️ " + (data.error || "Ошибка"));
         }
       } catch (e) {
-        showToast("⚠️ Ошибка соединения с сервером");
+        showToast("⚠️ Ошибка соединения");
       } finally {
         admTriggerRescheduleBtn.disabled = false;
-        admTriggerRescheduleBtn.innerHTML = "<span>⚠️ Снять мастера на выбранную дату и уведомить клиентов</span>";
+        admTriggerRescheduleBtn.innerHTML = "⚠️ СНЯТЬ МАСТЕРА И УВЕДОМИТЬ КЛИЕНТОВ";
       }
     });
   }

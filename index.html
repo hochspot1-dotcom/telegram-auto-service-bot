@@ -3,319 +3,315 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Автосервис — Telegram Mini App</title>
+  <title>Автосервис — Cyber-Red Mini App</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=38.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,600;0,700;1,700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=40.0" />
 </head>
 <body>
 
   <!-- ══════════════════════════════════════════════
-       SCREEN 1 — TRITON ONBOARDING (Welcome Screen)
+       SCREEN 1 — CYBER ONBOARDING (Welcome Screen)
        ══════════════════════════════════════════════ -->
-  <div id="triton-onboarding-screen" class="triton-onboarding-overlay hidden">
-    <!-- Top bar: "Cancel" link -->
-    <div class="onboarding-top-bar">
-      <button type="button" class="onboarding-cancel-btn" id="onboarding-cancel-btn">Отмена</button>
+  <div id="triton-onboarding-screen" class="cyber-onboarding-overlay hidden">
+    <div class="cyber-onboarding-top">
+      <button type="button" class="cyber-cancel-btn" id="onboarding-cancel-btn">CANCEL</button>
     </div>
 
-    <!-- Center: 3D Logo + Title + Subtitle -->
-    <div class="onboarding-center-content">
-      <div class="triton-3d-logo-card">
-        <div class="logo-3d-main">🏎️</div>
-        <div class="floating-tag tag-top">ТО</div>
-        <div class="floating-tag tag-bottom">🔧</div>
+    <div class="cyber-onboarding-center">
+      <div class="cyber-3d-box">
+        🏎️
+        <div class="cyber-tag-float top">HOT</div>
+        <div class="cyber-tag-float bot">PRO</div>
       </div>
 
-      <h2 class="onboarding-title">Добро пожаловать в Автосервис.Pro</h2>
-      <p class="onboarding-subtitle">Запись на ремонт и ТО автомобиля прямо в Telegram — быстро, просто и без очередей!</p>
+      <h2 class="cyber-onboard-title">WELCOME TO AUTOSERVICE.PRO</h2>
+      <p class="cyber-onboard-sub">Быстрая запись на ТО и ремонт вашего автомобиля прямо в Telegram в пару кликов!</p>
     </div>
 
-    <!-- Bottom: Blue circle arrow button -->
-    <div class="onboarding-bottom-action">
-      <button type="button" class="onboarding-next-circle-btn" id="onboarding-next-btn">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-          <path d="M5 12h14M13 6l6 6-6 6" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
+    <div class="cyber-onboarding-bottom">
+      <button type="button" class="cyber-next-circle-btn" id="onboarding-next-btn">➔</button>
     </div>
   </div>
 
   <!-- ══════════════════════════════════════════════
-       SCREEN 2 — MAIN APP SHELL
+       SCREEN 2 — MAIN CYBER RED APP SHELL
        ══════════════════════════════════════════════ -->
   <div id="app">
 
-    <!-- Profile Row Header (like Triton: avatar + name left, status right) -->
-    <header class="triton-header">
-      <div class="triton-user-profile">
-        <div class="user-avatar-circle">
-          <span>👨‍🔧</span>
-        </div>
-        <span class="user-handle-name" id="user-greeting">Клиент</span>
+    <!-- Top Header Profile Row -->
+    <header class="cyber-header">
+      <div class="cyber-user-profile">
+        <div class="cyber-avatar-box">👨‍🔧</div>
+        <span class="cyber-user-name" id="user-greeting">КЛИЕНТ</span>
       </div>
-      <div class="triton-status-pill">
-        <span class="pill-dot"></span>
-        <span class="pill-status-text">Открыто</span>
+      <div class="cyber-status-pill">
+        <span class="cyber-pill-dot"></span>
+        <span class="cyber-pill-text">ONLINE</span>
       </div>
     </header>
 
-    <!-- Main Scrollable Content -->
+    <!-- Main Content Container -->
     <main class="content">
 
       <!-- ════════════════════════════════════════
-           🏠 HOME TAB (Triton Screen 2 Layout)
+           🏠 TAB 1: HOME (Reference Image 1)
            ════════════════════════════════════════ -->
       <section id="tab-home" class="tab-content active">
 
-        <!-- 1. Hero Banner Card (like "Spin & win!" card in Triton) -->
-        <div class="tr-hero-banner" id="home-start-booking-btn">
-          <div class="tr-hero-text">
-            <div>
-              <div class="tr-hero-label">Запись на ТО<br>в 1 клик!</div>
-              <div class="tr-hero-sub" style="margin-top:6px;">Быстрый выбор мастера и удобного времени без очередей</div>
-            </div>
-            <button class="tr-hero-play-btn" id="hero-play-btn">Записаться</button>
+        <!-- 1. Hot Discounts Banner (Reference Image 1 Top Banner) -->
+        <div class="cyber-promo-banner" id="home-start-booking-btn">
+          <div class="cyber-promo-text">
+            <span class="cyber-promo-tag">HOT DISCOUNTS!</span>
+            <h2 class="cyber-promo-title">ЗАПИСЬ НА ТО<br>В 1 КЛИК!</h2>
+            <p class="cyber-promo-sub">Быстрый выбор мастера и удобного времени без очередей</p>
+            <button class="cyber-promo-btn" id="hero-play-btn">ЗАПИСАТЬСЯ</button>
           </div>
-          <div class="tr-hero-img">
-            <div class="tr-hero-img-emoji">🏎️</div>
-          </div>
+          <div class="cyber-promo-graphic">🏎️</div>
         </div>
 
-        <!-- 2. Primary Blue Full-Width Button (like "Claim 50 💎" in Triton) -->
-        <button class="tr-claim-btn" id="triton-quick-booking-banner">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M12 5v14M5 12h14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-          </svg>
-          Выбрать мастера и время
+        <!-- 2. Primary Claim Action Button -->
+        <button class="cyber-btn-primary" id="triton-quick-booking-banner">
+          🚀 ВЫБРАТЬ СВОБОДНОГО МАСТЕРА И ВРЕМЯ
         </button>
 
-        <!-- 3. 2-Column Hub Cards (like "Shop" + "Craft" in Triton) -->
-        <div class="tr-grid-2">
-          <div class="tr-hub" data-tab="booking" data-step="1">
-            <div class="tr-hub-icon">🛒</div>
-            <div class="tr-hub-info">
-              <div class="tr-hub-title">Услуги</div>
-              <div class="tr-hub-sub">Каталог работ</div>
-            </div>
+        <!-- 3. 2-Column Quick Hub Grid (Reference Image 1 Middle Categories) -->
+        <div class="cyber-grid-2">
+          <div class="cyber-card" style="cursor:pointer;" data-tab="booking" data-step="1">
+            <div style="font-size:24px;margin-bottom:4px;">🛒</div>
+            <div style="font-size:13px;font-weight:700;text-transform:uppercase;">УСЛУГИ</div>
+            <div style="font-size:11px;color:var(--text-2);">Каталог работ</div>
           </div>
-          <div class="tr-hub" data-tab="booking" data-step="1">
-            <div class="tr-hub-icon">🛠️</div>
-            <div class="tr-hub-info">
-              <div class="tr-hub-title">Мой Гараж</div>
-              <div class="tr-hub-sub">Марка авто</div>
-            </div>
+          <div class="cyber-card" style="cursor:pointer;" data-tab="booking" data-step="1">
+            <div style="font-size:24px;margin-bottom:4px;">🛠️</div>
+            <div style="font-size:13px;font-weight:700;text-transform:uppercase;">МОЙ ГАРАЖ</div>
+            <div style="font-size:11px;color:var(--text-2);">Марка и госномер</div>
           </div>
         </div>
 
-        <!-- 4. 2-Column Feature Widgets (like "Tasks" + "Friends" in Triton) -->
-        <div class="tr-grid-2">
-          <!-- Bookings Widget -->
-          <div class="tr-widget" id="triton-widget-bookings" data-tab="profile">
-            <div class="tr-widget-title">Ваши Записи</div>
-            <div class="tr-widget-sub">Статус и отмены</div>
-            <div class="tr-widget-checks">
-              <div class="tr-check">✓</div>
-              <div class="tr-check">✓</div>
+        <!-- 4. "BEST OFFERS" Product-like Cards (Reference Image 1 Grid) -->
+        <div class="cyber-section-title">BEST OFFERS</div>
+
+        <div class="cyber-grid-2">
+
+          <!-- Product Card 1 -->
+          <div class="cyber-product-card" data-tab="booking" data-step="1">
+            <div class="cyber-product-img">
+              🔍
+              <span class="cyber-product-tag">ТОП</span>
+            </div>
+            <div class="cyber-product-title">КОМПЬЮТЕРНАЯ ДИАГНОСТИКА</div>
+            <div class="cyber-product-specs">
+              <span class="cyber-spec-chip">ЭЛЕКТРИКА</span>
+              <span class="cyber-spec-chip">30 МИН</span>
+            </div>
+            <div class="cyber-product-bottom">
+              <div class="cyber-product-price">1 000 ₽</div>
+              <button class="cyber-product-btn">ВЫБРАТЬ</button>
             </div>
           </div>
 
-          <!-- Masters Widget -->
-          <div class="tr-widget" id="triton-widget-masters" data-tab="booking" data-step="2">
-            <div class="tr-widget-avatars">
-              <div class="tr-avatar-sm">👨‍🔧</div>
-              <div class="tr-avatar-sm">⚡</div>
-              <div class="tr-avatar-sm">🛞</div>
+          <!-- Product Card 2 -->
+          <div class="cyber-product-card" data-tab="booking" data-step="1">
+            <div class="cyber-product-img">
+              🛢️
+              <span class="cyber-product-tag">ТОП</span>
             </div>
-            <div class="tr-widget-title">Специалисты</div>
-            <div class="tr-widget-sub">Опыт 12+ лет</div>
+            <div class="cyber-product-title">ЗАМЕНА МАСЛА И ФИЛЬТРОВ</div>
+            <div class="cyber-product-specs">
+              <span class="cyber-spec-chip">ДВИГАТЕЛЬ</span>
+              <span class="cyber-spec-chip">45 МИН</span>
+            </div>
+            <div class="cyber-product-bottom">
+              <div class="cyber-product-price">1 500 ₽</div>
+              <button class="cyber-product-btn">ВЫБРАТЬ</button>
+            </div>
           </div>
-        </div>
 
-        <!-- 5. Popular Services Label -->
-        <div class="tr-section-title">💡 Популярные услуги</div>
+          <!-- Product Card 3 -->
+          <div class="cyber-product-card" data-tab="booking" data-step="1">
+            <div class="cyber-product-img">
+              🔩
+            </div>
+            <div class="cyber-product-title">ДИАГНОСТИКА ХОДОВОЙ</div>
+            <div class="cyber-product-specs">
+              <span class="cyber-spec-chip">ПОДВЕСКА</span>
+              <span class="cyber-spec-chip">40 МИН</span>
+            </div>
+            <div class="cyber-product-bottom">
+              <div class="cyber-product-price">1 000 ₽</div>
+              <button class="cyber-product-btn">ВЫБРАТЬ</button>
+            </div>
+          </div>
 
-        <!-- 6. Service Cards (scrollable horizontal row like Triton items row) -->
-        <div class="tr-grid-2">
-          <div class="tr-hub" data-tab="booking" data-step="1" data-cat="cat_electric">
-            <div class="tr-hub-icon">🔍</div>
-            <div class="tr-hub-info">
-              <div class="tr-hub-title">Диагностика</div>
-              <div class="tr-hub-sub">от 1 000 ₽</div>
+          <!-- Product Card 4 -->
+          <div class="cyber-product-card" data-tab="booking" data-step="1">
+            <div class="cyber-product-img">
+              ❄️
+            </div>
+            <div class="cyber-product-title">ЗАПРАВКА КОНДИЦИОНЕРА</div>
+            <div class="cyber-product-specs">
+              <span class="cyber-spec-chip">КЛИМАТ</span>
+              <span class="cyber-spec-chip">35 МИН</span>
+            </div>
+            <div class="cyber-product-bottom">
+              <div class="cyber-product-price">2 000 ₽</div>
+              <button class="cyber-product-btn">ВЫБРАТЬ</button>
             </div>
           </div>
-          <div class="tr-hub" data-tab="booking" data-step="1" data-cat="cat_to">
-            <div class="tr-hub-icon">🛢️</div>
-            <div class="tr-hub-info">
-              <div class="tr-hub-title">Замена масла</div>
-              <div class="tr-hub-sub">от 1 500 ₽</div>
-            </div>
-          </div>
-          <div class="tr-hub" data-tab="booking" data-step="1" data-cat="cat_chassis">
-            <div class="tr-hub-icon">🔩</div>
-            <div class="tr-hub-info">
-              <div class="tr-hub-title">Ходовая</div>
-              <div class="tr-hub-sub">от 1 000 ₽</div>
-            </div>
-          </div>
-          <div class="tr-hub" data-tab="booking" data-step="1" data-cat="cat_climate">
-            <div class="tr-hub-icon">❄️</div>
-            <div class="tr-hub-info">
-              <div class="tr-hub-title">Кондиционер</div>
-              <div class="tr-hub-sub">от 2 000 ₽</div>
-            </div>
-          </div>
+
         </div>
 
       </section>
 
       <!-- ════════════════════════════════════════
-           📅 BOOKING TAB — Wizard
+           📅 TAB 2: BOOKING WIZARD (Reference Images 2 & 3)
            ════════════════════════════════════════ -->
       <section id="tab-booking" class="tab-content">
 
-        <div class="booking-header">
-          <div class="hero-badge">📅 Онлайн Бронирование</div>
-          <h2>Запись на обслуживание</h2>
-          <p>Пошаговое быстрое оформление заявки на ТО</p>
+        <div class="cyber-card" style="text-align:center;">
+          <h2 style="font-size:16px;text-transform:uppercase;margin-bottom:4px;">📅 ОНЛАЙН БРОНИРОВАНИЕ</h2>
+          <p style="font-size:12px;color:var(--text-2);">Быстрое пошаговое оформление записи в автосервис</p>
         </div>
 
-        <!-- Wizard Progress Bar (4 steps) -->
-        <div class="wizard-progress-bar">
-          <div class="wizard-step active" id="wizard-step-ind-1">
-            <span class="step-num">1</span>
-            <span class="step-lbl">Услуга</span>
+        <!-- Cyber Wizard Steps [ 01 ] [ 02 ] [ 03 ] [ 04 ] -->
+        <div class="cyber-wizard-bar">
+          <div class="cyber-step-item active" id="wizard-step-ind-1">
+            <div class="cyber-step-box">01</div>
+            <span class="cyber-step-lbl">Услуга</span>
           </div>
-          <div class="step-divider"></div>
-          <div class="wizard-step" id="wizard-step-ind-2">
-            <span class="step-num">2</span>
-            <span class="step-lbl">Мастер</span>
+          <div class="cyber-step-line"></div>
+          <div class="cyber-step-item" id="wizard-step-ind-2">
+            <div class="cyber-step-box">02</div>
+            <span class="cyber-step-lbl">Мастер</span>
           </div>
-          <div class="step-divider"></div>
-          <div class="wizard-step" id="wizard-step-ind-3">
-            <span class="step-num">3</span>
-            <span class="step-lbl">Авто</span>
+          <div class="cyber-step-line"></div>
+          <div class="cyber-step-item" id="wizard-step-ind-3">
+            <div class="cyber-step-box">03</div>
+            <span class="cyber-step-lbl">Авто</span>
           </div>
-          <div class="step-divider"></div>
-          <div class="wizard-step" id="wizard-step-ind-4">
-            <span class="step-num">4</span>
-            <span class="step-lbl">Запись</span>
+          <div class="cyber-step-line"></div>
+          <div class="cyber-step-item" id="wizard-step-ind-4">
+            <div class="cyber-step-box">04</div>
+            <span class="cyber-step-lbl">Итог</span>
           </div>
         </div>
 
-        <form id="booking-form" class="booking-form">
+        <form id="booking-form" style="display:flex;flex-direction:column;gap:12px;">
 
-          <!-- Step 1: Service Selection -->
+          <!-- Step 1: Categories & Cyber Checkboxes [ ■ ] -->
           <div class="wizard-step-content active" id="form-step-1">
-            <div class="form-group">
-              <label class="form-label">Шаг 1: Выберите услугу или проблему:</label>
-              <div class="search-box-wrapper">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="wizard-search-input" class="form-input search-input" placeholder="Поиск услуги (напр. ГРМ, диагност, фильтр)..." />
-              </div>
-              <div id="category-pills" class="category-accordion-container"></div>
+            <div class="cyber-form-group">
+              <label class="cyber-label">ШАГ 01: ВЫБЕРИТЕ УСЛУГУ ИЛИ ПРОБЛЕМУ:</label>
+              <input type="text" id="wizard-search-input" class="cyber-input" placeholder="Поиск работы (ГРМ, диагностика, фильтр)..." />
+              <!-- Rendered via JS: Categories with Square Neon Checkboxes [ ■ ] -->
+              <div id="category-pills" class="cyber-accordion"></div>
               <div id="selected-summary"></div>
             </div>
 
-            <div class="form-group hidden" id="custom-problem-group">
-              <label class="form-label" for="custom-problem">Описание проблемы:</label>
-              <input type="text" id="custom-problem" class="form-input" placeholder="Например: Стучит подвеска справа..." />
+            <div class="cyber-form-group hidden" id="custom-problem-group">
+              <label class="cyber-label" for="custom-problem">ОПИСАНИЕ ПРОБЛЕМЫ:</label>
+              <input type="text" id="custom-problem" class="cyber-input" placeholder="Например: Стучит подвеска справа..." />
             </div>
 
-            <div class="wizard-actions">
-              <button type="button" class="next-btn" id="to-step-2-btn">Далее: выбор мастера и времени ➔</button>
-            </div>
+            <button type="button" class="cyber-btn-primary" id="to-step-2-btn">
+              ДАЛЕЕ: ВЫБОР МАСТЕРА И ВРЕМЕНИ ➔
+            </button>
           </div>
 
-          <!-- Step 2: Master + Calendar + Time -->
+          <!-- Step 2: Master & Calendar View -->
           <div class="wizard-step-content hidden" id="form-step-2">
-            <div class="form-group">
-              <label class="form-label">Шаг 2: Выберите специалиста:</label>
-              <div class="masters-grid" id="masters-container">
+            <div class="cyber-form-group">
+              <label class="cyber-label">ШАГ 02: ВЫБЕРИТЕ СПЕЦИАЛИСТА:</label>
+              <div id="masters-container" style="display:flex;flex-direction:column;gap:8px;">
                 <!-- Masters rendered via JS -->
               </div>
             </div>
 
             <!-- Calendar -->
-            <div class="form-group" id="calendar-step-group">
-              <label class="form-label">Выберите дату записи на календаре:</label>
-              <div class="calendar-card" id="full-calendar-widget">
+            <div class="cyber-form-group" id="calendar-step-group">
+              <label class="cyber-label">ВЫБЕРИТЕ ДАТУ НА КАЛЕНДАРЕ:</label>
+              <div class="cyber-calendar-card" id="full-calendar-widget">
                 <!-- Full month calendar rendered via JS -->
               </div>
             </div>
 
             <!-- Time Slots -->
-            <div class="form-group hidden" id="slots-step-group">
-              <div class="slots-view-header">
-                <button type="button" class="change-date-btn" id="change-date-btn">← Изменить дату</button>
-                <span class="slots-selected-date-badge" id="slots-date-badge">28 июля</span>
+            <div class="cyber-form-group hidden" id="slots-step-group">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                <button type="button" class="cyber-btn-secondary" id="change-date-btn" style="padding:6px 12px;font-size:11px;">← ИЗМЕНИТЬ ДАТУ</button>
+                <span style="font-size:12px;font-weight:700;color:var(--pink);" id="slots-date-badge">28 ИЮЛЯ</span>
               </div>
-              <label class="form-label" id="slots-header-label">Выберите свободное время:</label>
-              <div class="slots-card">
-                <div class="slots-grid" id="slots-container">
-                  <!-- Time slots rendered via JS -->
+              <label class="cyber-label" id="slots-header-label">ВЫБЕРИТЕ СВОБОДНОЕ ВРЕМЯ:</label>
+              <div class="cyber-card">
+                <div class="cyber-slots-grid" id="slots-container">
+                  <!-- Slots rendered via JS -->
                 </div>
               </div>
             </div>
 
-            <div class="wizard-actions dual">
-              <button type="button" class="back-btn" id="back-to-step-1-btn">← Назад</button>
-              <button type="button" class="next-btn" id="to-step-3-btn">Далее к выбору авто ➔</button>
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:8px;">
+              <button type="button" class="cyber-btn-secondary" id="back-to-step-1-btn">← НАЗАД</button>
+              <button type="button" class="cyber-btn-primary" id="to-step-3-btn">ДАЛЕЕ: АВТОМОБИЛЬ ➔</button>
             </div>
           </div>
 
           <!-- Step 3: Car Details -->
           <div class="wizard-step-content hidden" id="form-step-3">
-            <div class="form-group">
-              <label class="form-label" for="car-model">Шаг 3: Укажите марку и модель авто:</label>
-              <input type="text" id="car-model" class="form-input" placeholder="Например: Toyota Camry, Tank 500, Opel Astra" />
-              <small class="form-hint">Укажите марку и модель вашего автомобиля</small>
+            <div class="cyber-form-group">
+              <label class="cyber-label" for="car-model">ШАГ 03: МАРКА И МОДЕЛЬ АВТОМОБИЛЯ:</label>
+              <input type="text" id="car-model" class="cyber-input" placeholder="Например: Toyota Camry, Tank 500, Opel Astra" />
             </div>
 
-            <div class="form-group">
-              <label class="form-label" for="car-number">Госномер автомобиля (необязательно):</label>
-              <input type="text" id="car-number" class="form-input uppercase-input" placeholder="А000АА180" maxlength="12" />
-              <small class="form-hint">Автоматически преобразуется в ЗАГЛАВНЫЕ БУКВЫ</small>
+            <div class="cyber-form-group">
+              <label class="cyber-label" for="car-number">ГОСНОМЕР (НЕОБЯЗАТЕЛЬНО):</label>
+              <input type="text" id="car-number" class="cyber-input" placeholder="А000АА180" maxlength="12" style="text-transform:uppercase;" />
             </div>
 
-            <div class="wizard-actions dual">
-              <button type="button" class="back-btn" id="back-to-step-2-btn">← Назад</button>
-              <button type="button" class="next-btn" id="to-step-4-btn">Далее к итогу ➔</button>
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:8px;">
+              <button type="button" class="cyber-btn-secondary" id="back-to-step-2-btn">← НАЗАД</button>
+              <button type="button" class="cyber-btn-primary" id="to-step-4-btn">ДАЛЕЕ: ИТОГ ➔</button>
             </div>
           </div>
 
-          <!-- Step 4: Confirmation -->
+          <!-- Step 4: Summary & Order Confirmation (Reference Image 2 Order Flow) -->
           <div class="wizard-step-content hidden" id="form-step-4">
-            <div class="form-group">
-              <label class="form-label">Шаг 4: Проверьте данные записи:</label>
-              <div class="booking-card" id="final-booking-summary" style="cursor:default;border-color:rgba(43,126,255,0.28);">
+            <div class="cyber-form-group">
+              <label class="cyber-label">ШАГ 04: ПРОВЕРЬТЕ ДАННЫЕ ЗАПИСИ:</label>
+
+              <!-- Cyber Order Summary Card -->
+              <div class="cyber-order-summary" id="final-booking-summary">
                 <!-- Rendered dynamically by JS -->
               </div>
             </div>
 
-            <div class="form-group">
-              <label class="form-label" for="phone-number">Ваш телефон для связи:</label>
-              <div style="display:flex;gap:8px;align-items:center;">
-                <input type="tel" id="phone-number" class="form-input" placeholder="+7 (999) 000-00-00" readonly required style="flex:1;" />
-                <button type="button" id="edit-phone-btn" style="padding:12px 14px;border-radius:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--text-2);font-size:16px;cursor:pointer;flex-shrink:0;">✏️</button>
+            <div class="cyber-form-group">
+              <label class="cyber-label" for="phone-number">ВАШ ТЕЛЕФОН ДЛЯ СВЯЗИ:</label>
+              <div style="display:flex;gap:8px;">
+                <input type="tel" id="phone-number" class="cyber-input" placeholder="+7 (999) 000-00-00" readonly required style="flex:1;" />
+                <button type="button" id="edit-phone-btn" class="cyber-btn-secondary" style="padding:10px 14px;">✏️</button>
               </div>
             </div>
 
-            <div class="booking-card" id="total-price-box" style="cursor:default;flex-direction:row;align-items:center;justify-content:space-between;">
-              <span style="font-size:13px;color:var(--text-2);">💰 Ориентировочная стоимость</span>
-              <span style="font-size:16px;font-weight:800;color:#2b7eff;" id="total-price-val">от 0 ₽</span>
+            <!-- Price total summary -->
+            <div class="cyber-card" id="total-price-box" style="display:flex;align-items:center;justify-content:space-between;">
+              <span class="cyber-label">ОРИЕНТИРОВОЧНАЯ СТОИМОСТЬ:</span>
+              <span style="font-size:16px;font-weight:700;color:var(--pink);" id="total-price-val">от 0 ₽</span>
             </div>
 
-            <div class="privacy-row">
-              <input type="checkbox" id="privacy-agree" />
-              <span class="privacy-text">Я согласен с <a href="#" id="privacy-link" class="privacy-link">Политикой конфиденциальности</a></span>
+            <!-- Privacy Policy check -->
+            <div style="display:flex;align-items:flex-start;gap:8px;padding:8px;background:rgba(255,42,95,0.06);border-radius:6px;">
+              <input type="checkbox" id="privacy-agree" style="width:16px;height:16px;accent-color:var(--pink);margin-top:2px;cursor:pointer;" />
+              <span style="font-size:11px;color:var(--text-2);">Я согласен с <a href="#" id="privacy-link" style="color:var(--pink);">Политикой конфиденциальности</a></span>
             </div>
 
-            <div class="wizard-actions dual">
-              <button type="button" class="back-btn" id="back-to-step-3-btn">← Назад</button>
-              <button type="submit" class="submit-btn" id="submit-booking-btn" disabled>🚀 Подтвердить запись</button>
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:8px;">
+              <button type="button" class="cyber-btn-secondary" id="back-to-step-3-btn">← НАЗАД</button>
+              <button type="submit" class="cyber-btn-primary" id="submit-booking-btn" disabled>
+                🚀 ПОДТВЕРДИТЬ ЗАПИСЬ
+              </button>
             </div>
           </div>
 
@@ -323,203 +319,162 @@
       </section>
 
       <!-- ════════════════════════════════════════
-           👤 PROFILE TAB
+           👤 TAB 3: PROFILE & HISTORY
            ════════════════════════════════════════ -->
       <section id="tab-profile" class="tab-content">
 
-        <div class="profile-user-card">
-          <div class="profile-avatar-lg" id="profile-avatar">👤</div>
+        <div class="cyber-card" style="display:flex;align-items:center;gap:12px;">
+          <div class="cyber-avatar-box" style="width:48px;height:48px;font-size:24px;" id="profile-avatar">👤</div>
           <div>
-            <div class="profile-name" id="profile-name">Клиент</div>
-            <div class="profile-id" id="profile-phone">Телефон: Не указан</div>
+            <div style="font-size:15px;font-weight:700;text-transform:uppercase;" id="profile-name">КЛИЕНТ</div>
+            <div style="font-size:11px;color:var(--text-2);" id="profile-phone">Телефон: Не указан</div>
           </div>
         </div>
 
-        <!-- Stats Row -->
-        <div class="tr-grid-2" style="grid-template-columns:1fr 1fr 1fr;">
-          <div class="tr-widget" style="cursor:default;min-height:70px;align-items:center;flex-direction:column;justify-content:center;">
-            <div style="font-size:22px;font-weight:900;color:#2b7eff;" id="stat-active">0</div>
-            <div style="font-size:11px;color:var(--text-2);">Активных</div>
+        <div class="cyber-grid-2" style="grid-template-columns:1fr 1fr 1fr;">
+          <div class="cyber-card" style="text-align:center;padding:10px;">
+            <div style="font-size:20px;font-weight:700;color:var(--pink);" id="stat-active">0</div>
+            <div style="font-size:9px;color:var(--text-2);text-transform:uppercase;">АКТИВНЫХ</div>
           </div>
-          <div class="tr-widget" style="cursor:default;min-height:70px;align-items:center;flex-direction:column;justify-content:center;">
-            <div style="font-size:22px;font-weight:900;color:#2b7eff;" id="stat-total">0</div>
-            <div style="font-size:11px;color:var(--text-2);">Всего</div>
+          <div class="cyber-card" style="text-align:center;padding:10px;">
+            <div style="font-size:20px;font-weight:700;color:var(--pink);" id="stat-total">0</div>
+            <div style="font-size:9px;color:var(--text-2);text-transform:uppercase;">ВСЕГО</div>
           </div>
-          <div class="tr-widget" style="cursor:default;min-height:70px;align-items:center;flex-direction:column;justify-content:center;">
-            <div style="font-size:22px;font-weight:900;color:var(--red);" id="stat-cancelled">0</div>
-            <div style="font-size:11px;color:var(--text-2);">Отклонено</div>
+          <div class="cyber-card" style="text-align:center;padding:10px;">
+            <div style="font-size:20px;font-weight:700;color:var(--red);" id="stat-cancelled">0</div>
+            <div style="font-size:9px;color:var(--text-2);text-transform:uppercase;">ОТКЛОНЕНО</div>
           </div>
         </div>
 
-        <!-- Admin button (hidden by default) -->
-        <button id="admin-profile-btn" class="tr-claim-btn hidden" style="background:linear-gradient(135deg,#ef4444,#b91c1c);">
-          🛡 Панель модератора
+        <!-- Admin button (hidden by default until checkAdminStatus) -->
+        <button id="admin-profile-btn" class="cyber-btn-primary hidden" style="background:linear-gradient(135deg,#ef4444,#b91c1c);">
+          🛡 ПАНЕЛЬ МОДЕРАТОРА
         </button>
 
-        <!-- Bookings History -->
-        <div class="tr-section-title">📋 Ваши записи</div>
-        <div class="bookings-list" id="user-bookings-list">
-          <!-- Loaded via JS -->
-        </div>
+        <div class="cyber-section-title">📋 ВАШИ ЗАПИСИ</div>
+        <div id="user-bookings-list" style="display:flex;flex-direction:column;gap:8px;"></div>
       </section>
 
       <!-- ════════════════════════════════════════
-           🛡 ADMIN TAB
+           🛡 TAB 4: ADMIN MODERATION
            ════════════════════════════════════════ -->
       <section id="tab-admin" class="tab-content">
 
-        <div class="booking-header">
-          <div class="hero-badge admin-badge">🛡 Панель Модератора</div>
-          <h2>Управление заявками</h2>
-          <p>Быстрое подтверждение, отмена и удаление записей</p>
+        <div class="cyber-card" style="text-align:center;">
+          <h2 style="font-size:16px;text-transform:uppercase;color:var(--pink);margin-bottom:4px;">🛡 ПАНЕЛЬ МОДЕРАТОРА</h2>
+          <p style="font-size:12px;color:var(--text-2);">Управление заявками и сменами мастеров</p>
         </div>
 
-        <!-- Admin Stats Row -->
-        <div class="tr-grid-2" style="grid-template-columns:1fr 1fr 1fr;">
-          <div class="tr-widget" style="cursor:default;min-height:70px;align-items:center;flex-direction:column;justify-content:center;">
-            <div style="font-size:22px;font-weight:900;color:var(--yellow);" id="adm-stat-pending">0</div>
-            <div style="font-size:11px;color:var(--text-2);">Ожидают</div>
+        <div class="cyber-grid-2" style="grid-template-columns:1fr 1fr 1fr;">
+          <div class="cyber-card" style="text-align:center;padding:10px;">
+            <div style="font-size:20px;font-weight:700;color:var(--yellow);" id="adm-stat-pending">0</div>
+            <div style="font-size:9px;color:var(--text-2);text-transform:uppercase;">ОЖИДАЮТ</div>
           </div>
-          <div class="tr-widget" style="cursor:default;min-height:70px;align-items:center;flex-direction:column;justify-content:center;">
-            <div style="font-size:22px;font-weight:900;color:var(--green);" id="adm-stat-approved">0</div>
-            <div style="font-size:11px;color:var(--text-2);">Одобрено</div>
+          <div class="cyber-card" style="text-align:center;padding:10px;">
+            <div style="font-size:20px;font-weight:700;color:var(--green-neon);" id="adm-stat-approved">0</div>
+            <div style="font-size:9px;color:var(--text-2);text-transform:uppercase;">ОДОБРЕНО</div>
           </div>
-          <div class="tr-widget" style="cursor:default;min-height:70px;align-items:center;flex-direction:column;justify-content:center;">
-            <div style="font-size:22px;font-weight:900;color:var(--red);" id="adm-stat-rejected">0</div>
-            <div style="font-size:11px;color:var(--text-2);">Отклонено</div>
+          <div class="cyber-card" style="text-align:center;padding:10px;">
+            <div style="font-size:20px;font-weight:700;color:var(--red);" id="adm-stat-rejected">0</div>
+            <div style="font-size:9px;color:var(--text-2);text-transform:uppercase;">ОТКЛОНЕНО</div>
           </div>
         </div>
 
-        <!-- Master Off-Duty Tool Card -->
-        <div class="booking-card admin-master-tool-card">
-          <div class="tool-card-title">👨‍🔧 Управление сменами мастеров (Отгул / Больничный)</div>
-          <p class="tool-card-desc">Укажите мастера и дату его отсутствия. Все записи на этот день будут сброшены с предложением клиенту выбрать другого мастера или время.</p>
+        <!-- Master Off-Duty Admin Tool Card -->
+        <div class="cyber-card">
+          <div style="font-size:14px;font-weight:700;color:var(--pink);text-transform:uppercase;margin-bottom:6px;">👨‍🔧 УПРАВЛЕНИЕ СМЕНАМИ МАСТЕРОВ</div>
+          <p style="font-size:11px;color:var(--text-2);margin-bottom:10px;">Укажите мастера и дату его отсутствия. Все записи на этот день будут отменены с предложением клиентам записаться на другое время.</p>
 
-          <div class="form-group">
-            <label class="form-label">1. Выберите мастера:</label>
-            <div class="adm-masters-grid" id="adm-masters-selector">
-              <div class="adm-master-chip active" data-master="Алексей Смирнов">
-                <span class="chip-avatar">👨‍🔧</span>
-                <div class="chip-info">
-                  <div class="chip-name">Алексей Смирнов</div>
-                  <div class="chip-role">Старший механик</div>
-                </div>
+          <div class="cyber-form-group" style="margin-bottom:8px;">
+            <label class="cyber-label">1. ВЫБЕРИТЕ МАСТЕРА:</label>
+            <div id="adm-masters-selector" style="display:flex;flex-direction:column;gap:6px;">
+              <div class="cyber-checkbox-row selected" data-master="Алексей Смирнов">
+                <span class="cyber-box-icon"><span class="cyber-box-inner"></span></span>
+                <span class="cyber-checkbox-label-text">Алексей Смирнов (Старший механик)</span>
               </div>
-              <div class="adm-master-chip" data-master="Дмитрий Ковалев">
-                <span class="chip-avatar">⚡</span>
-                <div class="chip-info">
-                  <div class="chip-name">Дмитрий Ковалев</div>
-                  <div class="chip-role">Диагност-электрик</div>
-                </div>
+              <div class="cyber-checkbox-row" data-master="Дмитрий Ковалев">
+                <span class="cyber-box-icon"><span class="cyber-box-inner"></span></span>
+                <span class="cyber-checkbox-label-text">Дмитрий Ковалев (Диагност)</span>
               </div>
-              <div class="adm-master-chip" data-master="Игорь Соколов">
-                <span class="chip-avatar">🛞</span>
-                <div class="chip-info">
-                  <div class="chip-name">Игорь Соколов</div>
-                  <div class="chip-role">Ходовая часть</div>
-                </div>
+              <div class="cyber-checkbox-row" data-master="Игорь Соколов">
+                <span class="cyber-box-icon"><span class="cyber-box-inner"></span></span>
+                <span class="cyber-checkbox-label-text">Игорь Соколов (Ходовая)</span>
               </div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="adm-off-date">2. Укажите дату отсутствия:</label>
-            <input type="date" id="adm-off-date" class="form-input date-input" />
+          <div class="cyber-form-group" style="margin-bottom:8px;">
+            <label class="cyber-label" for="adm-off-date">2. ДАТА ОТСУТСТВИЯ:</label>
+            <input type="date" id="adm-off-date" class="cyber-input" style="color-scheme:dark;" />
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="adm-master-reason">3. Причина (отобразится клиентам):</label>
-            <input type="text" id="adm-master-reason" class="form-input" placeholder="Например: Больничный мастера / Отгул" value="Больничный мастера" />
+          <div class="cyber-form-group" style="margin-bottom:10px;">
+            <label class="cyber-label" for="adm-master-reason">3. ПРИЧИНА (ОТОБРАЗИТСЯ КЛИЕНТАМ):</label>
+            <input type="text" id="adm-master-reason" class="cyber-input" placeholder="Больничный мастера / Отгул" value="Больничный мастера" />
           </div>
 
-          <button type="button" id="adm-trigger-reschedule-btn" class="tr-claim-btn" style="background:linear-gradient(135deg,#ef4444,#b91c1c);box-shadow:0 0 22px rgba(239,68,68,0.40);">
-            ⚠️ Снять мастера и уведомить клиентов
+          <button type="button" id="adm-trigger-reschedule-btn" class="cyber-btn-primary" style="background:linear-gradient(135deg,#ef4444,#b91c1c);">
+            ⚠️ СНЯТЬ МАСТЕРА И УВЕДОМИТЬ КЛИЕНТОВ
           </button>
         </div>
 
         <!-- Filter Pills -->
-        <div class="pills-grid" id="admin-status-pills">
-          <div class="pill active" data-status="all">Все записи</div>
-          <div class="pill" data-status="На рассмотрении">⏳ На рассмотрении</div>
-          <div class="pill" data-status="Одобрена">✅ Одобренные</div>
-          <div class="pill" data-status="Отклонена">🔴 Отклоненные</div>
+        <div style="display:flex;gap:6px;overflow-x:auto;" id="admin-status-pills">
+          <button type="button" class="cyber-btn-secondary active" data-status="all" style="padding:6px 10px;font-size:10px;">ВСЕ</button>
+          <button type="button" class="cyber-btn-secondary" data-status="На рассмотрении" style="padding:6px 10px;font-size:10px;">⏳ ОЖИДАЮТ</button>
+          <button type="button" class="cyber-btn-secondary" data-status="Одобрена" style="padding:6px 10px;font-size:10px;">✅ ОДОБРЕНЫ</button>
+          <button type="button" class="cyber-btn-secondary" data-status="Отклонена" style="padding:6px 10px;font-size:10px;">🔴 ОТКЛОНЕНЫ</button>
         </div>
 
-        <div class="bookings-list" id="admin-bookings-list">
-          <!-- Admin bookings rendered via JS -->
-        </div>
+        <div id="admin-bookings-list" style="display:flex;flex-direction:column;gap:8px;"></div>
       </section>
 
     </main>
 
     <!-- ════════════════════════════════════════
-         FLOATING NAVBAR (Triton 4-Tab + Center Circle)
+         CYBER BOTTOM NAVBAR (Reference Image 1 Bottom Bar)
          ════════════════════════════════════════ -->
-    <nav class="floating-navbar" id="main-nav">
-      <div class="nav-blob-pill" id="nav-blob-pill"></div>
-
-      <!-- 1. Home -->
-      <button class="nav-item active" data-tab="home">
-        <span class="nav-icon">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 11L12 3l9 8v9a1 1 0 0 1-1 1h-5v-5H9v5H4a1 1 0 0 1-1-1v-9z" stroke="currentColor"/>
-          </svg>
-        </span>
-        <span class="nav-label">Главная</span>
+    <nav class="cyber-navbar" id="main-nav">
+      <!-- 1. Main -->
+      <button class="cyber-nav-item active" data-tab="home">
+        <span class="cyber-nav-icon">✕</span>
+        <span class="cyber-nav-lbl">MAIN</span>
       </button>
 
-      <!-- 2. Services -->
-      <button class="nav-item" data-tab="booking" data-step="1">
-        <span class="nav-icon">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0" stroke="currentColor"/>
-          </svg>
-        </span>
-        <span class="nav-label">Услуги</span>
+      <!-- 2. Catalog -->
+      <button class="cyber-nav-item" data-tab="booking" data-step="1">
+        <span class="cyber-nav-icon">▢</span>
+        <span class="cyber-nav-lbl">CATALOG</span>
       </button>
 
-      <!-- 3. Center Floating Blue Circle (Booking) -->
-      <button class="nav-item nav-item-main" data-tab="booking" data-step="2">
-        <div class="nav-main-circle">
-          <svg class="nav-svg-main" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 5v14M5 12h14" stroke="white"/>
-          </svg>
-        </div>
-        <span class="nav-label main-label">Запись</span>
+      <!-- 3. Floating Center Circle (Booking) -->
+      <button class="cyber-nav-item cyber-nav-main" data-tab="booking" data-step="2">
+        <div class="cyber-nav-main-circle">+</div>
+        <span class="cyber-nav-lbl" style="color:var(--pink);margin-top:2px;">BOOKING</span>
       </button>
 
-      <!-- 4. Bookings -->
-      <button class="nav-item" data-tab="profile">
-        <span class="nav-icon">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor"/>
-            <path d="M8 21h8M12 17v4" stroke="currentColor"/>
-          </svg>
-        </span>
-        <span class="nav-label">Записи</span>
+      <!-- 4. Info / Bookings -->
+      <button class="cyber-nav-item" data-tab="profile">
+        <span class="cyber-nav-icon">ⓘ</span>
+        <span class="cyber-nav-lbl">INFO</span>
       </button>
 
-      <!-- 5. Profile -->
-      <button class="nav-item" data-tab="profile">
-        <span class="nav-icon">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="8" r="4" stroke="currentColor"/>
-            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor"/>
-          </svg>
-        </span>
-        <span class="nav-label">Профиль</span>
+      <!-- 5. Profile / Basket -->
+      <button class="cyber-nav-item" data-tab="profile">
+        <span class="cyber-nav-icon">🛒</span>
+        <span class="cyber-nav-lbl">BASKET</span>
       </button>
     </nav>
 
     <!-- Admin Comment Modal -->
     <div id="admin-modal" class="modal-overlay hidden">
       <div class="modal-card">
-        <h3 id="modal-title">Решение по заявке</h3>
-        <p id="modal-subtitle" class="form-hint">Укажите примечание клиенту (необязательно):</p>
+        <h3 id="modal-title">РЕШЕНИЕ ПО ЗАЯВКЕ</h3>
+        <p style="font-size:11px;color:var(--text-2);">Укажите примечание клиенту (необязательно):</p>
         <textarea id="modal-comment" class="modal-textarea" placeholder="Например: Ждем вас на посту №2..." rows="3"></textarea>
         <div class="modal-actions">
-          <button id="modal-cancel-btn" class="modal-btn btn-secondary">Отмена</button>
-          <button id="modal-confirm-btn" class="modal-btn btn-primary">Подтвердить</button>
+          <button id="modal-cancel-btn" class="cyber-btn-secondary" style="flex:1;">ОТМЕНА</button>
+          <button id="modal-confirm-btn" class="cyber-btn-primary" style="flex:1;">ПОДТВЕРДИТЬ</button>
         </div>
       </div>
     </div>
@@ -527,24 +482,18 @@
     <!-- Privacy Policy Modal -->
     <div id="privacy-modal" class="modal-overlay hidden">
       <div class="modal-card">
-        <div class="modal-header">
-          <h3>🔒 Политика конфиденциальности</h3>
+        <h3>🔒 ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ</h3>
+        <div style="font-size:11px;color:var(--text-2);line-height:1.5;">
+          <p>Мы собираем ваше имя, телефон и данные авто исключительно для оформления записи на ремонт и ТО.</p><br/>
+          <p>Данные хранятся в зашифрованном виде и не передаются третьим лицам.</p>
         </div>
-        <div class="modal-body privacy-modal-body">
-          <p>Настоящая Политика конфиденциальности определяет порядок обработки и защиты персональных данных клиентов автосервиса.</p><br/>
-          <p><strong>1. Сбор данных:</strong> Мы собираем ваше имя, номер телефона, марку и госномер автомобиля исключительно для оформления записи на техническое обслуживание.</p><br/>
-          <p><strong>2. Использование данных:</strong> Данные используются модераторами и мастерами автосервиса для связи с вами и подтверждения бронирования времени.</p><br/>
-          <p><strong>3. Безопасность:</strong> Ваши персональные данные хранятся в зашифрованном виде и не передаются третьим лицам.</p>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="modal-btn btn-primary" id="close-privacy-btn">Понятно, закрыть</button>
-        </div>
+        <button type="button" class="cyber-btn-primary" id="close-privacy-btn">ПОНЯТНО, ЗАКРЫТЬ</button>
       </div>
     </div>
 
     <div id="toast" class="glass-toast hidden"></div>
   </div>
 
-  <script src="app.js?v=38.0"></script>
+  <script src="app.js?v=40.0"></script>
 </body>
 </html>

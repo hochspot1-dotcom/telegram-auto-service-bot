@@ -4,44 +4,46 @@
    ========================================================================== */
 
 :root {
-  /* ── Palette ── */
-  --bg-deep:       #06080e;
-  --bg-layer:      #0b0e17;
+  /* ── Deep Void Space Navy Palette ── */
+  --bg-deep:       #07090e;
+  --bg-layer:      #0c1017;
 
-  /* Translucent frosted glass surfaces */
-  --glass-1:       rgba(255, 255, 255, 0.05);
-  --glass-2:       rgba(255, 255, 255, 0.09);
-  --glass-3:       rgba(255, 255, 255, 0.14);
-  --glass-border:  rgba(255, 255, 255, 0.12);
-  --glass-border-accent: rgba(249, 115, 22, 0.45);
+  /* ── Sleek Dark Squircle Surfaces (Triton UI) ── */
+  --glass-1:       rgba(18, 23, 34, 0.72);
+  --glass-2:       rgba(24, 31, 46, 0.88);
+  --glass-3:       rgba(32, 41, 60, 0.95);
+  --glass-border:  rgba(255, 255, 255, 0.08);
+  --glass-border-accent: rgba(0, 122, 255, 0.50);
 
-  /* Accents — Electric Orange + Steel Blue */
-  --accent:        #f97316;
-  --accent-2:      #3b82f6;
-  --accent-grad:   linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-  --accent-glow:   0 0 24px rgba(249, 115, 22, 0.45);
-  --accent-glow-sm: 0 0 14px rgba(249, 115, 22, 0.32);
+  /* ── Royal Electric Azure Blue Accents (Triton UI) ── */
+  --accent:        #007aff;
+  --accent-light:  #38bdf8;
+  --accent-2:      #0055ff;
+  --accent-grad:   linear-gradient(135deg, #007aff 0%, #0052d4 100%);
+  --accent-glow:   0 0 24px rgba(0, 122, 255, 0.50);
+  --accent-glow-sm: 0 0 14px rgba(0, 122, 255, 0.35);
 
-  /* Text */
+  /* ── Text Hierarchy ── */
   --text-primary:  #ffffff;
-  --text-second:   rgba(255, 255, 255, 0.75);
-  --text-muted:    rgba(255, 255, 255, 0.45);
+  --text-second:   rgba(255, 255, 255, 0.70);
+  --text-muted:    rgba(255, 255, 255, 0.42);
 
-  /* Status */
+  /* ── Status ── */
   --success:       #22c55e;
   --warning:       #f59e0b;
   --danger:        #ef4444;
   --info:          #38bdf8;
 
-  /* Shape */
-  --r-sm:  10px;
+  /* ── Squircle Shapes ── */
+  --r-sm:  12px;
   --r-md:  16px;
   --r-lg:  22px;
   --r-xl:  28px;
   --r-pill: 999px;
 
-  /* Motion */
+  /* ── Motion Curves ── */
   --ease:  cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --fast:  0.15s;
   --mid:   0.25s;
 
@@ -69,14 +71,14 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Ambient gradient — warm orange top-left + orange bottom-right */
+/* Ambient Royal Blue Space Glow (Matching Triton UI) */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 55% 42% at 12% 6%,  rgba(249, 115, 22, 0.18) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 35% at 88% 82%, rgba(249, 115, 22, 0.14) 0%, transparent 65%);
+    radial-gradient(ellipse 65% 45% at 50% -10%, rgba(0, 122, 255, 0.22) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 110%, rgba(0, 85, 255, 0.18) 0%, transparent 65%);
   pointer-events: none;
   z-index: 0;
 }
@@ -100,18 +102,19 @@ body {
 }
 
 /* ── Glass Card Base ────────────────────────────────────── */
-/* Lightweight translucent glass card */
+/* Sleek Dark Squircle Card (Triton UI) */
 .glass-card {
   background: var(--glass-1);
   border: 1px solid var(--glass-border);
   border-radius: var(--r-lg);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.10);
   transition: border-color var(--fast) var(--ease), transform var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
+  will-change: transform;
 }
 
 .glass-card:hover {
-  border-color: rgba(249, 115, 22, 0.35);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+  border-color: rgba(0, 122, 255, 0.40);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 /* Heavy glass (blur) — only on key surfaces */
@@ -240,23 +243,27 @@ body {
 .hidden { display: none !important; }
 
 /* ── Home Tab ───────────────────────────────────────────── */
+/* ── Home Tab (Triton Blue Hero) ─────────────────────────── */
 .home-hero-card {
   padding: 24px 20px;
-  background: linear-gradient(145deg, rgba(249,115,22,0.14) 0%, rgba(234,88,12,0.08) 100%);
-  border: 1px solid rgba(249, 115, 22, 0.28);
+  background: linear-gradient(135deg, #091c36 0%, #005acb 50%, #007aff 100%);
+  border: 1px solid rgba(0, 122, 255, 0.45);
   border-radius: var(--r-xl);
   text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 90, 203, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  position: relative;
+  overflow: hidden;
 }
 
 .hero-badge {
   display: inline-block;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.8px;
   text-transform: uppercase;
-  color: var(--accent);
-  background: rgba(249, 115, 22, 0.14);
-  border: 1px solid rgba(249, 115, 22, 0.30);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.30);
   border-radius: var(--r-pill);
   padding: 4px 12px;
   margin-bottom: 12px;
@@ -268,11 +275,12 @@ body {
   letter-spacing: -0.5px;
   line-height: 1.25;
   margin-bottom: 8px;
+  color: #ffffff;
 }
 
 .home-hero-card p {
   font-size: 14px;
-  color: var(--text-second);
+  color: rgba(255, 255, 255, 0.82);
   line-height: 1.55;
   margin-bottom: 18px;
 }
@@ -282,19 +290,19 @@ body {
   width: 100%;
   padding: 15px 24px;
   border: none;
-  border-radius: var(--r-lg);
-  background: var(--accent-grad);
-  color: #fff;
+  border-radius: var(--r-pill);
+  background: #ffffff;
+  color: #0052d4;
   font-size: 15px;
   font-weight: 800;
   letter-spacing: 0.2px;
   cursor: pointer;
-  box-shadow: var(--accent-glow);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
   transition: transform var(--fast) var(--ease), box-shadow var(--fast) var(--ease);
 }
 
 .home-cta-btn:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
   box-shadow: none;
 }
 
@@ -334,8 +342,8 @@ body {
 
 .home-square-card:hover {
   transform: translateY(-3px) scale(1.02);
-  border-color: rgba(249, 115, 22, 0.45);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6), 0 0 14px rgba(249, 115, 22, 0.25);
+  border-color: rgba(0, 122, 255, 0.50);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 122, 255, 0.30);
 }
 
 .home-square-card:active {
@@ -533,7 +541,8 @@ body {
 
 .form-input:focus, .glass-input:focus {
   border-color: var(--accent);
-  background: rgba(249, 115, 22, 0.08);
+  background: rgba(0, 122, 255, 0.08);
+  box-shadow: 0 0 12px rgba(0, 122, 255, 0.25);
 }
 
 .form-input::placeholder, .glass-input::placeholder {
@@ -587,7 +596,8 @@ body {
 }
 
 .accordion-category.open {
-  border-color: rgba(249, 115, 22, 0.35);
+  border-color: rgba(0, 122, 255, 0.45);
+  box-shadow: 0 0 16px rgba(0, 122, 255, 0.20);
 }
 
 .accordion-header {
@@ -780,7 +790,7 @@ body {
 .master-card:hover {
   background: var(--glass-2);
   transform: translateY(-2px);
-  border-color: rgba(249, 115, 22, 0.3);
+  border-color: rgba(0, 122, 255, 0.35);
 }
 
 .master-card:active {
@@ -788,9 +798,9 @@ body {
 }
 
 .master-card.selected {
-  background: rgba(249, 115, 22, 0.14);
+  background: rgba(0, 122, 255, 0.16);
   border-color: var(--accent);
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4), 0 0 14px rgba(249, 115, 22, 0.25);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4), 0 0 14px rgba(0, 122, 255, 0.30);
   animation: popSelect 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
@@ -929,7 +939,7 @@ body {
 }
 
 .cal-nav-btn:hover:not(:disabled) {
-  background: rgba(249, 115, 22, 0.2);
+  background: rgba(0, 122, 255, 0.20);
   border-color: var(--accent);
   color: var(--accent);
 }
@@ -1020,7 +1030,7 @@ body {
 
 .cal-day:hover:not(.past):not(.empty):not(.selected) {
   background: var(--glass-2);
-  border-color: rgba(249, 115, 22, 0.4);
+  border-color: rgba(0, 122, 255, 0.40);
 }
 
 /* ── Time Slots View (Swaps with Calendar) ────────────────── */
@@ -1045,7 +1055,7 @@ body {
 }
 
 .change-date-btn:active {
-  background: rgba(249, 115, 22, 0.16);
+  background: rgba(0, 122, 255, 0.16);
   border-color: var(--accent);
   color: var(--accent);
 }
@@ -1053,11 +1063,12 @@ body {
 .slots-selected-date-badge {
   font-size: 13px;
   font-weight: 800;
-  color: var(--accent);
-  background: rgba(249, 115, 22, 0.12);
-  border: 1px solid rgba(249, 115, 22, 0.30);
+  color: #ffffff;
+  background: var(--accent-grad);
+  border: 1px solid rgba(0, 122, 255, 0.50);
   border-radius: var(--r-pill);
-  padding: 4px 12px;
+  padding: 4px 14px;
+  box-shadow: var(--accent-glow-sm);
 }
 
 .slots-card {
@@ -1106,7 +1117,7 @@ body {
 }
 
 .slot-item.active {
-  background: rgba(249, 115, 22, 0.16);
+  background: rgba(0, 122, 255, 0.18);
   border-color: var(--accent);
   color: var(--accent);
   font-weight: 800;
@@ -1351,7 +1362,7 @@ body {
 
 .pill-icon { margin-right: 4px; }
 
-/* ── Floating Navbar ─────────────────────────────────────── */
+/* ── Floating Navbar (Triton Royal Electric Blue) ─────────── */
 .floating-navbar {
   position: fixed;
   bottom: max(16px, env(safe-area-inset-bottom, 16px));
@@ -1363,12 +1374,12 @@ body {
   align-items: flex-end;
   justify-content: space-around;
   padding: 10px 14px 12px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(14, 18, 28, 0.94);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 28px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.65), 0 0 20px rgba(0, 122, 255, 0.15);
   z-index: 50;
 }
 
@@ -1380,13 +1391,13 @@ body {
   left: 0;
   height: 48px;
   margin: auto 0;
-  background: rgba(249, 115, 22, 0.16);
-  border: 1px solid rgba(249, 115, 22, 0.40);
+  background: rgba(0, 122, 255, 0.20);
+  border: 1px solid rgba(0, 122, 255, 0.50);
   border-radius: 18px;
   pointer-events: none;
   transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.3s ease, opacity 0.2s ease;
   z-index: 0;
-  box-shadow: inset 0 0 12px rgba(249, 115, 22, 0.25);
+  box-shadow: inset 0 0 14px rgba(0, 122, 255, 0.30);
 }
 
 /* Sidebar nav items */
@@ -1733,7 +1744,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  border-color: rgba(249, 115, 22, 0.35);
+  border-color: rgba(0, 122, 255, 0.38);
 }
 
 .tool-card-title {
@@ -1778,9 +1789,9 @@ body {
 }
 
 .adm-master-chip.active {
-  background: rgba(249, 115, 22, 0.16);
+  background: rgba(0, 122, 255, 0.16);
   border-color: var(--accent);
-  box-shadow: 0 0 12px rgba(249, 115, 22, 0.25);
+  box-shadow: 0 0 14px rgba(0, 122, 255, 0.30);
 }
 
 .chip-avatar {
@@ -1911,9 +1922,9 @@ body {
   background: rgba(12, 16, 26, 0.96);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(249, 115, 22, 0.35);
+  border: 1px solid rgba(0, 122, 255, 0.45);
   border-radius: var(--r-xl) var(--r-xl) var(--r-lg) var(--r-lg);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.65), 0 0 20px rgba(249, 115, 22, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.65), 0 0 20px rgba(0, 122, 255, 0.20);
   animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
@@ -1989,7 +2000,7 @@ body {
 
 .btn-secondary:active { transform: scale(0.96); background: var(--glass-3); }
 
-/* ── Toast (Pure Dark Orange Accent — Zero Violet) ───────── */
+/* ── Toast (Triton Royal Electric Blue Accent) ───────────── */
 .glass-toast {
   position: fixed;
   bottom: calc(max(16px, env(safe-area-inset-bottom, 16px)) + 86px);
@@ -1998,7 +2009,7 @@ body {
   background: rgba(12, 16, 26, 0.96);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(249, 115, 22, 0.45);
+  border: 1px solid rgba(0, 122, 255, 0.50);
   border-radius: var(--r-pill);
   padding: 12px 22px;
   font-size: 14px;
@@ -2007,7 +2018,7 @@ body {
   white-space: nowrap;
   z-index: 200;
   max-width: calc(100vw - 32px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 18px rgba(249, 115, 22, 0.25);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 18px rgba(0, 122, 255, 0.30);
   animation: toastIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
@@ -2022,6 +2033,6 @@ body {
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(249, 115, 22, 0.30);
+  background: rgba(0, 122, 255, 0.35);
   border-radius: 4px;
 }

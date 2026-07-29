@@ -1072,20 +1072,20 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   WELCOME ONBOARDING OVERLAY (Exact Reference Match)
+   WELCOME ONBOARDING OVERLAY (AutoFriends Light/Charcoal Theme)
    ═══════════════════════════════════════════════════════════ */
 
 .af-welcome-overlay {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: #0b0e14;
+  background: var(--bg);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
   padding: max(48px, env(safe-area-inset-top)) 28px max(50px, env(safe-area-inset-bottom));
-  color: #ffffff;
+  color: var(--dark);
   text-align: center;
   transition: opacity 0.35s var(--ease), transform 0.35s var(--ease);
 }
@@ -1118,7 +1118,7 @@ body {
   position: absolute;
   inset: -10px;
   border-radius: 40px;
-  background: radial-gradient(circle, rgba(0, 122, 255, 0.45) 0%, rgba(11, 14, 20, 0) 70%);
+  background: radial-gradient(circle, rgba(28, 28, 30, 0.12) 0%, rgba(244, 245, 247, 0) 70%);
   filter: blur(14px);
 }
 
@@ -1129,14 +1129,14 @@ body {
   height: 140px;
   border-radius: 36px;
   object-fit: cover;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .af-welcome-title {
   font-size: 26px;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--dark);
   margin-bottom: 12px;
   letter-spacing: -0.4px;
   line-height: 1.25;
@@ -1144,7 +1144,7 @@ body {
 
 .af-welcome-sub {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--gray-2);
   line-height: 1.5;
   font-weight: 500;
 }
@@ -1162,13 +1162,13 @@ body {
   width: 84px;
   height: 84px;
   border-radius: 50%;
-  border: 1px solid rgba(0, 122, 255, 0.35);
+  border: 1.5px solid rgba(28, 28, 30, 0.2);
   animation: afPulse 2s infinite var(--ease);
 }
 
 @keyframes afPulse {
   0% { transform: scale(0.85); opacity: 0.8; }
-  50% { transform: scale(1.15); opacity: 0.3; }
+  50% { transform: scale(1.15); opacity: 0.2; }
   100% { transform: scale(0.85); opacity: 0.8; }
 }
 
@@ -1178,7 +1178,7 @@ body {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #007aff 0%, #0051a8 100%);
+  background: var(--dark);
   color: #ffffff;
   border: none;
   font-size: 22px;
@@ -1187,13 +1187,14 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0, 122, 255, 0.45);
-  transition: transform 0.18s var(--spring), box-shadow 0.18s var(--ease);
+  box-shadow: 0 8px 24px rgba(28, 28, 30, 0.3);
+  transition: transform 0.18s var(--spring), background 0.15s var(--ease), box-shadow 0.18s var(--ease);
 }
 
 .af-welcome-arrow-btn:active {
   transform: scale(0.92);
-  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+  background: var(--dark-hover);
+  box-shadow: 0 4px 16px rgba(28, 28, 30, 0.2);
 }
 
 .modal-overlay {

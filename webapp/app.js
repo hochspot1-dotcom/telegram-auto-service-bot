@@ -876,7 +876,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ═══════════════════════════════════════════════════════════
-  // HOME TAB ACTIVE BOOKING COUNTDOWN & REMINDER
+  // HOME TAB ACTIVE BOOKING PROGRESS TRACKER & REMINDER
   // ═══════════════════════════════════════════════════════════
   let activeCountdownInterval = null;
 
@@ -939,7 +939,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (activeCountdownInterval) clearInterval(activeCountdownInterval);
 
     const activeBooking = (bookings || []).find(b =>
-      b.status === "Одобрена" || b.status === "Активна" || b.status === "На рассмотрении"
+      ["Одобрена", "Активна", "На рассмотрении", "🛠 В работе", "🎉 Готов к выдаче"].includes(b.status)
     );
 
     if (!activeBooking) {
@@ -955,16 +955,42 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Rescheduled or approved bookings automatically show as confirmed
-    const isApproved = activeBooking.status === "Одобрена" || activeBooking.status === "Активна" || activeBooking.status.includes("Перенесена");
-    const statusClass = isApproved ? "approved" : "pending";
-    const statusLabel = isApproved ? "✅ Подтверждена" : "⏳ На рассмотрении";
+    let statusClass = "pending";
+    let statusLabel = "⏳ На рассмотрении";
+    let stepIndex = 1;
+
+    if (activeBooking.status === "Одобрена" || activeBooking.status === "Активна" || activeBooking.status.includes("Перенесена")) {
+      statusClass = "approved";
+      statusLabel = "✅ Подтверждена";
+      stepIndex = 2;
+    } else if (activeBooking.status.includes("В работе")) {
+      statusClass = "approved";
+      statusLabel = "🛠 В работе на подъёмнике";
+      stepIndex = 3;
+    } else if (activeBooking.status.includes("Готов")) {
+      statusClass = "approved";
+      statusLabel = "🎉 Готов к выдаче!";
+      stepIndex = 4;
+    }
 
     container.innerHTML = `
       <div class="af-reminder-card">
         <div class="af-reminder-header">
           <span class="af-reminder-badge">📅 Запись №${activeBooking.id}</span>
           <span class="af-reminder-status-tag ${statusClass}">${statusLabel}</span>
+        </div>
+
+        <!-- Real-time Progress Tracker Bar -->
+        <div class="af-progress-bar-wrap" style="margin: 10px 0;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--gray-2);margin-bottom:4px;">
+            <span style="${stepIndex>=1 ? 'color:var(--dark);font-weight:900;' : ''}">1. Создана</span>
+            <span style="${stepIndex>=2 ? 'color:var(--dark);font-weight:900;' : ''}">2. Принята</span>
+            <span style="${stepIndex>=3 ? 'color:var(--dark);font-weight:900;' : ''}">3. В работе</span>
+            <span style="${stepIndex>=4 ? 'color:var(--dark);font-weight:900;' : ''}">4. Готова</span>
+          </div>
+          <div style="height:6px;background:#e5e5ea;border-radius:4px;overflow:hidden;">
+            <div style="height:100%;background:var(--dark);width:${(stepIndex/4)*100}%;transition:width 0.4s ease;"></div>
+          </div>
         </div>
 
         <div class="af-reminder-title">${activeBooking.problem}</div>
@@ -979,7 +1005,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <span class="af-countdown-value" id="home-countdown-val">Считаем...</span>
         </div>
 
-        <div class="af-reminder-actions">
+        <div class="af-reminder-actions" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
           <button type="button" class="af-reminder-btn af-reminder-btn-secondary" id="home-view-bookings-btn">
             📋 Записи
           </button>
@@ -989,6 +1015,9 @@ document.addEventListener("DOMContentLoaded", () => {
           <button type="button" class="af-reminder-btn af-reminder-btn-secondary" id="home-cancel-booking-btn" data-id="${activeBooking.id}" style="color:var(--red);">
             ❌ Отменить
           </button>
+          <a href="https://t.me/autofriends_service" target="_blank" class="af-reminder-btn af-reminder-btn-secondary" style="text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;color:var(--dark);">
+            💬 Поддержка
+          </a>
         </div>
       </div>
     `;
@@ -1076,12 +1105,18 @@ document.addEventListener("DOMContentLoaded", () => {
       if (b.status === "Одобрена" || b.status === "Активна" || b.status.includes("Перенесена")) {
         displayStatus = "✅ Подтверждена";
         statusColor = "var(--green)";
+      } else if (b.status.includes("В работе")) {
+        displayStatus = "🛠 В работе на подъёмнике";
+        statusColor = "var(--dark)";
+      } else if (b.status.includes("Готов")) {
+        displayStatus = "🎉 Готов к выдаче";
+        statusColor = "var(--green)";
       } else if (isCancelled) {
         displayStatus = "❌ Отменена";
         statusColor = "var(--red)";
       }
 
-      const isCancelable = ["На рассмотрении", "Одобрена", "Активна"].includes(b.status) || isUnavailable;
+      const isCancelable = ["На рассмотрении", "Одобрена", "Активна", "🛠 В работе"].includes(b.status) || isUnavailable;
 
       return `
         <div class="af-card" style="${isCancelled ? 'opacity:0.75;' : ''}">
@@ -1089,14 +1124,14 @@ document.addEventListener("DOMContentLoaded", () => {
             <span style="font-size:14px;font-weight:800;">Запись №${b.id}</span>
             <span style="font-size:12px;font-weight:700;color:${statusColor};">${displayStatus}</span>
           </div>
-          <div style="font-size:13px;color:var(--gray-2);line-height:1.45;">
+          <div style="font-size:13px;color:var(--gray-2);line-height:1.45;margin-top:4px;">
             <div><strong>Услуга:</strong> ${b.problem}</div>
             <div><strong>Авто:</strong> ${b.car_model} ${b.car_number ? `(${b.car_number})` : ''}</div>
             <div><strong>Время:</strong> ${b.slot}</div>
             ${b.comment ? `<div style="margin-top:4px;padding:6px;background:var(--bg-pill);border-radius:6px;"><strong>Примечание:</strong> ${b.comment}</div>` : ''}
           </div>
           ${!isCancelled ? `
-            <div style="display:flex;gap:6px;margin-top:4px;">
+            <div style="display:flex;gap:6px;margin-top:6px;">
               ${isUnavailable ? `<button class="af-btn-primary reschedule-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">Выбрать другое время</button>` : `<button class="af-btn-secondary reschedule-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">🔄 Перенести</button>`}
               ${isCancelable ? `<button class="af-btn-secondary cancel-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;color:var(--red);">❌ Отменить</button>` : ''}
             </div>
@@ -1147,7 +1182,6 @@ document.addEventListener("DOMContentLoaded", () => {
         body: JSON.stringify(payload)
       });
 
-      // Fallback endpoint in case backend routes action through /api/booking/action
       fetch(`${BACKEND_URL}/api/booking/action`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1380,7 +1414,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 3200);
   }
 
-  // Admin moderation logic
+  // ═══════════════════════════════════════════════════════════
+  // MODERATOR SUPER-PANEL LOGIC (Expanded Control Actions & Statuses)
+  // ═══════════════════════════════════════════════════════════
+  const statusPillsContainer = document.getElementById("admin-status-pills");
+  if (statusPillsContainer) {
+    statusPillsContainer.querySelectorAll(".af-filter-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        statusPillsContainer.querySelectorAll(".af-filter-chip").forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
+        currentAdminFilter = chip.dataset.status;
+        loadAdminBookings(currentAdminFilter);
+      });
+    });
+  }
+
   async function loadAdminBookings(statusFilter = "all") {
     const container = document.getElementById("admin-bookings-list");
     if (!container) return;
@@ -1405,44 +1453,75 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     container.innerHTML = bookings.map(b => {
-      let isPending = b.status === "На рассмотрении";
-      let isApproved = b.status === "Одобрена" || b.status === "Активна";
       let isCancelled = b.status.includes("Отменен") || b.status.includes("Отклонен");
+      let isApproved = b.status === "Одобрена" || b.status === "Активна";
+      let isInProgress = b.status.includes("В работе");
+      let isReady = b.status.includes("Готов");
 
       let statusColor = "var(--yellow)";
-      let statusTag = "⏳ Ожидает";
+      let statusTag = "⏳ На рассмотрении";
+
       if (isApproved) { statusColor = "var(--green)"; statusTag = "✅ Одобрена"; }
+      if (isInProgress) { statusColor = "var(--dark)"; statusTag = "🛠 В работе"; }
+      if (isReady) { statusColor = "var(--green)"; statusTag = "🎉 Готов к выдаче"; }
       if (isCancelled) { statusColor = "var(--red)"; statusTag = "❌ Отменена"; }
 
-      let actionsHtml = isPending ? `
-        <div style="display:flex;gap:6px;margin-top:6px;">
-          <button class="af-btn-primary admin-btn-approve" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">✅ Одобрить</button>
-          <button class="af-btn-secondary admin-btn-reject" data-id="${b.id}" style="padding:6px 12px;font-size:12px;color:var(--red);">❌ Отклонить</button>
-        </div>
-      ` : ``;
+      const phoneClean = (b.phone || "").replace(/[^\d+]/g, "");
 
       return `
         <div class="af-card" style="${isCancelled ? 'opacity:0.7;' : ''}">
-          <div style="display:flex;justify-content:space-between;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
             <span style="font-size:14px;font-weight:800;">Заявка №${b.id}</span>
             <span style="font-size:12px;font-weight:700;color:${statusColor};">${statusTag}</span>
           </div>
-          <div style="font-size:13px;color:var(--gray-2);">
-            <div><strong>Клиент:</strong> ${b.user_name} (${b.phone})</div>
+          <div style="font-size:13px;color:var(--gray-2);margin-top:4px;line-height:1.45;">
+            <div><strong>Клиент:</strong> ${b.user_name} (ID: ${b.user_id})</div>
+            <div><strong>Телефон:</strong> ${b.phone || 'Не указан'}</div>
             <div><strong>Услуга:</strong> ${b.problem}</div>
-            <div><strong>Авто:</strong> ${b.car_model}</div>
+            <div><strong>Авто:</strong> ${b.car_model} ${b.car_number ? `(${b.car_number})` : ''}</div>
             <div><strong>Время:</strong> ${b.slot}</div>
+            ${b.comment ? `<div style="margin-top:4px;padding:6px;background:var(--bg-pill);border-radius:6px;"><strong>Комментарий:</strong> ${b.comment}</div>` : ''}
           </div>
-          ${actionsHtml}
+
+          <!-- Direct Communication Quick Actions -->
+          <div style="display:flex;gap:6px;margin-top:8px;">
+            ${phoneClean ? `<a href="tel:${phoneClean}" class="af-btn-secondary" style="padding:5px 10px;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">📞 Звонок</a>` : ''}
+            <a href="https://t.me/${b.user_id}" target="_blank" class="af-btn-secondary" style="padding:5px 10px;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">💬 Telegram</a>
+          </div>
+
+          <!-- Extended Moderator Control Actions -->
+          ${!isCancelled ? `
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
+              <button class="af-btn-primary admin-btn-action" data-id="${b.id}" data-act="approve" style="padding:5px 10px;font-size:11.5px;background:var(--green);">✅ Одобрить</button>
+              <button class="af-btn-secondary admin-btn-action" data-id="${b.id}" data-act="in_progress" style="padding:5px 10px;font-size:11.5px;background:var(--dark);color:#fff;">🛠 В работу</button>
+              <button class="af-btn-secondary admin-btn-action" data-id="${b.id}" data-act="ready" style="padding:5px 10px;font-size:11.5px;background:#34c759;color:#fff;">🎉 Готов</button>
+              <button class="af-btn-secondary admin-btn-action" data-id="${b.id}" data-act="reject" style="padding:5px 10px;font-size:11.5px;color:var(--red);">❌ Отклонить</button>
+              <button class="af-btn-secondary admin-btn-action" data-id="${b.id}" data-act="cancel" style="padding:5px 10px;font-size:11.5px;color:var(--red);">⚠️ Отменить</button>
+            </div>
+          ` : `
+            <div style="margin-top:8px;">
+              <button class="af-btn-secondary admin-btn-action" data-id="${b.id}" data-act="delete" style="padding:5px 10px;font-size:11.5px;color:var(--red);">🗑 Удалить из базы</button>
+            </div>
+          `}
         </div>
       `;
     }).join("");
 
-    container.querySelectorAll(".admin-btn-approve").forEach(btn => {
-      btn.addEventListener("click", () => openAdminModal(btn.dataset.id, "approve"));
-    });
-    container.querySelectorAll(".admin-btn-reject").forEach(btn => {
-      btn.addEventListener("click", () => openAdminModal(btn.dataset.id, "reject"));
+    container.querySelectorAll(".admin-btn-action").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const bId = btn.dataset.id;
+        const act = btn.dataset.act;
+
+        if (act === "cancel" || act === "delete") {
+          if (!confirm(`Вы уверены, что хотите ${act === 'delete' ? 'удалить' : 'отменить'} запись №${bId}?`)) return;
+        }
+
+        if (act === "approve" || act === "reject") {
+          openAdminModal(bId, act);
+        } else {
+          await executeAdminAction(bId, act, "");
+        }
+      });
     });
   }
 
@@ -1478,8 +1557,11 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        showToast("✅ Действие выполнено");
+        showToast("✅ Действие модератора выполнено!");
         loadAdminBookings(currentAdminFilter);
+        loadUserProfile();
+      } else {
+        showToast("⚠️ " + (data.error || "Ошибка"));
       }
     } catch (e) {
       showToast("⚠️ Ошибка вызова API");
@@ -1512,7 +1594,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         const data = await res.json();
         if (res.ok && data.success) {
-          showToast(`✅ Смена мастера отменена!`);
+          showToast(`✅ Смена мастера отменена! Клиенты уведомлены.`);
           loadAdminBookings(currentAdminFilter);
         }
       } catch (e) {

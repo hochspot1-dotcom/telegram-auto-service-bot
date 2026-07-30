@@ -20,6 +20,26 @@ routes = web.RouteTableDef()
 async def handle_index(request: web.Request):
     return web.FileResponse(os.path.join(os.path.dirname(__file__), "webapp", "index.html"))
 
+@routes.get("/images/{filename:.*}")
+async def handle_images(request: web.Request):
+    filename = request.match_info["filename"]
+    filepath = os.path.join(os.path.dirname(__file__), "webapp", "images", filename)
+    if not os.path.exists(filepath):
+        filepath = os.path.join(os.path.dirname(__file__), "images", filename)
+    if os.path.exists(filepath) and os.path.isfile(filepath):
+        return web.FileResponse(filepath)
+    return web.HTTPNotFound()
+
+@routes.get("/img/{filename:.*}")
+async def handle_img(request: web.Request):
+    filename = request.match_info["filename"]
+    filepath = os.path.join(os.path.dirname(__file__), "webapp", "img", filename)
+    if not os.path.exists(filepath):
+        filepath = os.path.join(os.path.dirname(__file__), "img", filename)
+    if os.path.exists(filepath) and os.path.isfile(filepath):
+        return web.FileResponse(filepath)
+    return web.HTTPNotFound()
+
 @routes.get("/webapp/{filename:.*}")
 async def handle_static(request: web.Request):
     filename = request.match_info["filename"]
@@ -32,6 +52,8 @@ async def handle_static(request: web.Request):
 async def handle_root_assets(request: web.Request):
     filename = request.match_info["filename"]
     filepath = os.path.join(os.path.dirname(__file__), "webapp", filename)
+    if not os.path.exists(filepath):
+        filepath = os.path.join(os.path.dirname(__file__), filename)
     if os.path.exists(filepath) and os.path.isfile(filepath):
         return web.FileResponse(filepath)
     return web.HTTPNotFound()

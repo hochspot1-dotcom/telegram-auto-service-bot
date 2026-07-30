@@ -1,10 +1,6 @@
 // ==========================================
-// НАСТРОЙКА АДРЕСА БЭКЕНДА (Bot API URL)
+// CONFIG & BACKEND API URL
 // ==========================================
-// Если Mini App размещен на отдельном хостинге (например GitHub Pages, Vercel, Netlify):
-// Укажите здесь HTTPS-адрес хостинга вашего бота (куда вы задеплоили main.py/web_server.py)!
-// Пример: const CONFIG_BACKEND_URL = "https://my-bot-backend.onrender.com";
-// Также можно передавать параметр в URL кнопки WebApp: https://your-miniapp.vercel.app?backend=https://my-bot-backend.onrender.com
 const CONFIG_BACKEND_URL = "https://carservicegorlovka.de1.netrun.io";
 
 function getBackendUrl() {
@@ -16,7 +12,6 @@ function getBackendUrl() {
     return CONFIG_BACKEND_URL.trim().replace(/\/$/, "");
   }
 
-  // Если открыто как локальный файл или через браузер без указывания порт/домена
   if (window.location.protocol === "file:" || window.location.hostname === "") {
     return "";
   }
@@ -28,13 +23,12 @@ const BACKEND_URL = getBackendUrl();
 
 document.addEventListener("DOMContentLoaded", () => {
   const tg = window.Telegram?.WebApp;
-  
+
   if (tg) {
     tg.ready();
     tg.expand();
   }
 
-  // Current user info (from Telegram or test fallback)
   const tgUser = tg?.initDataUnsafe?.user || {
     id: 123456789,
     first_name: "Посетитель",
@@ -44,66 +38,107 @@ document.addEventListener("DOMContentLoaded", () => {
   const userId = tgUser.id;
   const userName = tgUser.first_name + (tgUser.last_name ? " " + tgUser.last_name : "");
 
-  // Update greeting
   const greetingEl = document.getElementById("user-greeting");
-  if (greetingEl) {
-    greetingEl.textContent = `Привет, ${userName}!`;
-  }
+  if (greetingEl) greetingEl.textContent = userName;
+
   const profileNameEl = document.getElementById("profile-name");
-  if (profileNameEl) {
-    profileNameEl.textContent = userName;
-  }
+  if (profileNameEl) profileNameEl.textContent = userName;
 
   let isAdmin = false;
   let currentAdminFilter = "all";
   let pendingAdminAction = null;
 
-  // Triton Onboarding Overlay Handler
-  const onboardingOverlay = document.getElementById("triton-onboarding-screen");
-  const onboardingNextBtn = document.getElementById("onboarding-next-btn");
-  const onboardingCancelBtn = document.getElementById("onboarding-cancel-btn");
+  // Active Rescheduling Booking ID state
+  let activeRescheduleBookingId = null;
 
-  const isOnboarded = localStorage.getItem("triton_onboarded");
-  if (!isOnboarded && onboardingOverlay) {
-    onboardingOverlay.classList.add("visible");
-  }
+  // Auto-Sliding Carousel Controller
+  const carouselTrack = document.getElementById("carousel-track");
+  const dots = document.querySelectorAll(".af-dot");
+  let currentSlide = 0;
+  const totalSlides = 3;
+  let autoSlideTimer = null;
 
-  function closeOnboarding() {
-    if (onboardingOverlay) {
-      onboardingOverlay.classList.add("closing");
-      setTimeout(() => {
-        onboardingOverlay.classList.remove("visible", "closing");
-        onboardingOverlay.classList.add("hidden");
-      }, 300);
+  function updateCarousel(slideIndex) {
+    currentSlide = (slideIndex + totalSlides) % totalSlides;
+    if (carouselTrack) {
+      carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
     }
-    localStorage.setItem("triton_onboarded", "true");
-  }
-
-  if (onboardingNextBtn) {
-    onboardingNextBtn.addEventListener("click", () => {
-      // Prompt Telegram phone contact share
-      if (tg?.requestContact) {
-        tg.requestContact((sent, response) => {
-          if (sent && response?.responseUnsafe?.contact?.phone_number) {
-            const rawPhone = response.responseUnsafe.contact.phone_number;
-            const formatted = "+" + rawPhone.replace(/\D/g, "");
-            localStorage.setItem("user_phone_saved", formatted);
-            if (phoneInputEl) phoneInputEl.value = formatted;
-            showToast("✅ Номер телефона сохранен!");
-          }
-        });
-      }
-      closeOnboarding();
+    dots.forEach((dot, idx) => {
+      dot.classList.toggle("active", idx === currentSlide);
     });
   }
 
-  if (onboardingCancelBtn) {
-    onboardingCancelBtn.addEventListener("click", closeOnboarding);
+  function startAutoSlide() {
+    stopAutoSlide();
+    autoSlideTimer = setInterval(() => {
+      updateCarousel(currentSlide + 1);
+    }, 4000);
+  }
+
+  function stopAutoSlide() {
+    if (autoSlideTimer) clearInterval(autoSlideTimer);
+  }
+
+  dots.forEach(dot => {
+    dot.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const idx = parseInt(dot.dataset.index, 10);
+      updateCarousel(idx);
+      startAutoSlide();
+    });
+  });
+
+  if (carouselTrack) {
+    startAutoSlide();
+    carouselTrack.addEventListener("mouseenter", stopAutoSlide);
+    carouselTrack.addEventListener("mouseleave", startAutoSlide);
+    carouselTrack.addEventListener("touchstart", stopAutoSlide);
+    carouselTrack.addEventListener("touchend", startAutoSlide);
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // WELCOME SCREEN HANDLER (Always shows on open)
+  // Arrow button requests phone if new user, or proceeds to main menu
+  // ═══════════════════════════════════════════════════════════
+  const welcomeOverlay = document.getElementById("triton-onboarding-screen");
+  const welcomeArrowBtn = document.getElementById("onboarding-next-btn");
+
+  if (welcomeOverlay) {
+    welcomeOverlay.classList.remove("hidden");
+  }
+
+  function closeWelcomeScreen() {
+    if (welcomeOverlay) {
+      welcomeOverlay.classList.add("hidden");
+    }
+  }
+
+  if (welcomeArrowBtn) {
+    welcomeArrowBtn.addEventListener("click", () => {
+      const savedPhone = localStorage.getItem("user_phone_saved");
+
+      if (!savedPhone && tg && typeof tg.requestContact === "function") {
+        tg.requestContact((sent, event) => {
+          if (sent && event && event.responseUnsafe && event.responseUnsafe.contact) {
+            const raw = event.responseUnsafe.contact.phone_number;
+            const formatted = "+" + raw.replace(/\D/g, "");
+            localStorage.setItem("user_phone_saved", formatted);
+            const phoneInputEl = document.getElementById("phone-number");
+            if (phoneInputEl) phoneInputEl.value = formatted;
+            showToast("✅ Номер телефона сохранен!");
+          }
+          closeWelcomeScreen();
+        });
+      } else {
+        closeWelcomeScreen();
+      }
+    });
   }
 
   function initAutoPhoneRequest() {
     const savedPhone = localStorage.getItem("user_phone_saved");
     const tgPhone = tg?.initDataUnsafe?.user?.phone_number || "";
+    const phoneInputEl = document.getElementById("phone-number");
 
     if (savedPhone && phoneInputEl) {
       phoneInputEl.value = savedPhone;
@@ -116,23 +151,11 @@ document.addEventListener("DOMContentLoaded", () => {
       phoneInputEl.value = formatted;
       return;
     }
-
-    // First time launch: request phone via Telegram WebApp API if supported
-    if (tg && typeof tg.requestContact === "function" && !localStorage.getItem("tg_contact_requested")) {
-      localStorage.setItem("tg_contact_requested", "true");
-      tg.requestContact((sent, event) => {
-        if (sent && event && event.responseUnsafe && event.responseUnsafe.contact) {
-          const num = "+" + event.responseUnsafe.contact.phone_number.replace(/\D/g, "");
-          localStorage.setItem("user_phone_saved", num);
-          if (phoneInputEl) phoneInputEl.value = num;
-          showToast("✅ Номер телефона получен из Telegram!");
-        }
-      });
-    }
   }
 
   initAutoPhoneRequest();
 
+  const phoneInputEl = document.getElementById("phone-number");
   if (phoneInputEl) {
     phoneInputEl.addEventListener("input", () => {
       if (phoneInputEl.value.trim()) {
@@ -148,12 +171,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       if (data.is_admin) {
         isAdmin = true;
-        // Show admin button ONLY inside Profile tab
         const adminProfileBtn = document.getElementById("admin-profile-btn");
+        const adminPanelSection = document.getElementById("admin-panel-section");
         if (adminProfileBtn) {
           adminProfileBtn.classList.remove("hidden");
           adminProfileBtn.addEventListener("click", () => {
-            switchTab("admin");
+            if (adminPanelSection) adminPanelSection.classList.toggle("hidden");
+            loadAdminBookings(currentAdminFilter);
           });
         }
       }
@@ -163,57 +187,31 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   checkAdminStatus();
 
-
-  // Floating Navbar Tab switching & Liquid Blob animation
-  const navItems = document.querySelectorAll(".nav-item");
+  // Navigation Tab Switching
+  const navItems = document.querySelectorAll(".af-nav-item");
   const tabContents = document.querySelectorAll(".tab-content");
-  const navBlobPill = document.getElementById("nav-blob-pill");
-  const mainNav = document.getElementById("main-nav");
-
-  function updateNavBlobPosition() {
-    if (!navBlobPill || !mainNav) return;
-    const activeNav = mainNav.querySelector(".nav-item.active");
-    if (!activeNav || activeNav.classList.contains("nav-item-main")) {
-      navBlobPill.style.opacity = "0";
-      return;
-    }
-
-    const navRect = mainNav.getBoundingClientRect();
-    const activeRect = activeNav.getBoundingClientRect();
-
-    // Compact width capsule centered over tab item
-    const targetWidth = Math.min(activeRect.width - 20, 64);
-    const left = activeRect.left - navRect.left + (activeRect.width - targetWidth) / 2;
-
-    navBlobPill.style.opacity = "1";
-    navBlobPill.style.transform = `translateX(${left}px)`;
-    navBlobPill.style.width = `${targetWidth}px`;
-  }
 
   function switchTab(tabName) {
     navItems.forEach(item => {
       item.classList.toggle("active", item.dataset.tab === tabName);
     });
     tabContents.forEach(content => {
-      content.classList.toggle("active", content.id === `tab-${tabName}`);
+      const targetId = content.id === `tab-${tabName}` || (tabName === "bookings-list" && content.id === "tab-bookings-list");
+      content.classList.toggle("active", targetId);
     });
 
-    updateNavBlobPosition();
-
-    if (tabName === "profile") {
+    if (tabName === "profile" || tabName === "home" || tabName === "bookings-list") {
       loadUserProfile();
     } else if (tabName === "booking") {
       loadSlots();
-    } else if (tabName === "admin" && isAdmin) {
-      loadAdminBookings(currentAdminFilter);
     }
   }
 
-  window.addEventListener("resize", updateNavBlobPosition);
-  setTimeout(updateNavBlobPosition, 100);
-
   navItems.forEach(item => {
     item.addEventListener("click", () => {
+      if (item.dataset.tab !== "booking" && activeRescheduleBookingId) {
+        clearRescheduleMode();
+      }
       switchTab(item.dataset.tab);
       if (item.dataset.tab === "booking" && item.dataset.step) {
         goToStep(parseInt(item.dataset.step, 10));
@@ -221,58 +219,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ── Home CTA Button Handlers (new Triton classes) ──────────────────────
-
-  // Hero banner & hero play button → booking step 1
-  const homeStartBookingBtn = document.getElementById("home-start-booking-btn");
-  if (homeStartBookingBtn) {
-    homeStartBookingBtn.addEventListener("click", (e) => {
-      // Only trigger if the click wasn't on the "Записаться" button itself (handled separately)
-      if (!e.target.closest('.tr-hero-play-btn')) {
-        switchTab("booking");
-        goToStep(1);
-      }
-    });
-  }
-
-  const heroPlayBtn = document.getElementById("hero-play-btn");
-  if (heroPlayBtn) {
-    heroPlayBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      switchTab("booking");
-      goToStep(1);
-    });
-  }
-
-  // Primary claim button → booking step 2
-  const quickBookingBanner = document.getElementById("triton-quick-booking-banner");
-  if (quickBookingBanner) {
-    quickBookingBanner.addEventListener("click", () => {
-      switchTab("booking");
-      goToStep(2);
-    });
-  }
-
-  // Widget: Ваши Записи → profile tab
-  const widgetBookings = document.getElementById("triton-widget-bookings");
-  if (widgetBookings) {
-    widgetBookings.addEventListener("click", () => {
+  const topUserProfileBtn = document.getElementById("top-user-profile-btn");
+  if (topUserProfileBtn) {
+    topUserProfileBtn.addEventListener("click", () => {
+      if (activeRescheduleBookingId) clearRescheduleMode();
       switchTab("profile");
     });
   }
 
-  // Widget: Специалисты → booking step 2
-  const widgetMasters = document.getElementById("triton-widget-masters");
-  if (widgetMasters) {
-    widgetMasters.addEventListener("click", () => {
-      switchTab("booking");
-      goToStep(2);
-    });
-  }
-
-  // tr-hub cards → respect data-tab & data-step attributes
-  document.querySelectorAll(".tr-hub[data-tab], .tr-widget[data-tab]").forEach(card => {
+  document.querySelectorAll("[data-tab]").forEach(card => {
     card.addEventListener("click", () => {
+      if (card.classList.contains("af-nav-item")) return;
       const tab = card.dataset.tab;
       const step = card.dataset.step ? parseInt(card.dataset.step, 10) : null;
       if (tab) switchTab(tab);
@@ -280,19 +237,24 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Privacy Checkbox Enable/Disable Submit Button Handler
+  // Privacy Checkbox Handler
   const privacyAgreeCheckbox = document.getElementById("privacy-agree");
   const submitBookingBtn = document.getElementById("submit-booking-btn");
 
   if (privacyAgreeCheckbox && submitBookingBtn) {
     submitBookingBtn.disabled = !privacyAgreeCheckbox.checked;
+    privacyAgreeCheckbox.addEventListener("change", () => {
+      submitBookingBtn.disabled = !privacyAgreeCheckbox.checked;
+    });
+  }
 
-  // Services Categories & Subservices Tree
+  // Services Categories Data
   const SERVICE_CATEGORIES = [
     {
       id: "cat_engine",
-      title: "🔧 Двигатель и выхлопная система",
       icon: "🔧",
+      title: "Двигатель и выхлопная система",
+      sub: "Диагностика, ГРМ, масло, выхлоп",
       items: [
         { title: "Замена моторного масла и фильтра", price: "от 1 500 ₽" },
         { title: "Компьютерная диагностика двигателя", price: "от 1 000 ₽" },
@@ -304,8 +266,9 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "cat_chassis",
-      title: "🛞 Подвеска и тормозная система",
       icon: "🛞",
+      title: "Подвеска и тормозная система",
+      sub: "Колодки, диски, амортизаторы, шиномонтаж",
       items: [
         { title: "Замена тормозных колодок (пара)", price: "от 1 500 ₽" },
         { title: "Замена тормозных дисков", price: "от 2 500 ₽" },
@@ -317,8 +280,9 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "cat_electric",
-      title: "⚡ Электрика и автоэлектроника",
       icon: "⚡",
+      title: "Электрика и автоэлектроника",
+      sub: "Диагностика, АКБ, стартер, сигнализация",
       items: [
         { title: "Полная компьютерная диагностика", price: "от 1 000 ₽" },
         { title: "Замена генератора / стартера", price: "от 2 500 ₽" },
@@ -329,8 +293,9 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "cat_to",
-      title: "🛢 Регулярное ТО и масляный сервис",
       icon: "🛢",
+      title: "Регулярное ТО и масляный сервис",
+      sub: "Комплексное ТО, замена жидкостей",
       items: [
         { title: "Комплексное ТО (масло + 3 фильтра)", price: "от 3 500 ₽" },
         { title: "Замена масла в АКПП / МКПП", price: "от 3 000 ₽" },
@@ -340,8 +305,9 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "cat_climate",
-      title: "❄️ Климат и кондиционер",
       icon: "❄️",
+      title: "Климат и кондиционер",
+      sub: "Заправка, дезинфекция, радиаторы",
       items: [
         { title: "Диагностика и заправка кондиционера", price: "от 2 000 ₽" },
         { title: "Антибактериальная чистка кондиционера", price: "от 1 500 ₽" },
@@ -351,8 +317,17 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   const selectedProblemsSet = new Set();
-  // Map: catId -> custom problem text entered by user
   const customCategoryInputs = {};
+
+  let activeCategoryId = null;
+
+  const catOverviewView = document.getElementById("cat-overview-view");
+  const catSubservicesView = document.getElementById("cat-subservices-view");
+  const categoriesCardsContainer = document.getElementById("categories-cards-container");
+  const subservicesListContainer = document.getElementById("subservices-list-container");
+  const selectedCatTitleBadge = document.getElementById("selected-cat-title-badge");
+  const backToCategoriesBtn = document.getElementById("back-to-categories-btn");
+  const wizardSearchInput = document.getElementById("wizard-search-input");
 
   function updateEstimatedTotalPrice() {
     const priceValEl = document.getElementById("total-price-val");
@@ -376,7 +351,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Renders summary list of selected problems below the accordion
   function renderSelectedSummary() {
     const summaryEl = document.getElementById("selected-summary");
     if (!summaryEl) return;
@@ -391,263 +365,151 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     summaryEl.innerHTML = `
-      <div class="selected-summary-box glass-card">
-        <div class="selected-summary-title">✅ Выбранные услуги:</div>
-        <ul class="selected-summary-list">
-          ${items.map(i => `<li>${i}</li>`).join("")}
+      <div class="af-card" style="margin-top:8px;">
+        <div style="font-size:13px;font-weight:800;color:var(--green);">✅ Выбранные услуги (${items.length}):</div>
+        <ul style="font-size:13px;color:var(--dark);padding-left:18px;margin-top:4px;">
+          ${items.map(i => `<li style="margin-bottom:3px;">${i}</li>`).join("")}
         </ul>
       </div>
     `;
   }
 
-  function toggleProblemSelection(title) {
-    if (selectedProblemsSet.has(title)) {
-      selectedProblemsSet.delete(title);
-    } else {
-      selectedProblemsSet.add(title);
-    }
-    updateEstimatedTotalPrice();
-    renderSelectedSummary();
+  function renderCategoryCardsOverview(query = "") {
+    if (!categoriesCardsContainer) return;
+    const filterQuery = query.toLowerCase().trim();
+
+    categoriesCardsContainer.innerHTML = SERVICE_CATEGORIES.map(cat => {
+      const matchQuery = !filterQuery ||
+        cat.title.toLowerCase().includes(filterQuery) ||
+        cat.items.some(i => i.title.toLowerCase().includes(filterQuery));
+
+      if (!matchQuery) return "";
+
+      const countSelected = cat.items.filter(i => selectedProblemsSet.has(i.title)).length;
+      const badgeText = countSelected > 0 ? ` · Выбрано: ${countSelected}` : "";
+
+      return `
+        <div class="af-cat-card" data-cat-id="${cat.id}">
+          <div class="af-cat-card-left">
+            <div class="af-cat-icon">${cat.icon}</div>
+            <div class="af-cat-info">
+              <div class="af-cat-title">${cat.title}</div>
+              <div class="af-cat-count">${cat.items.length} услуг${badgeText}</div>
+            </div>
+          </div>
+          <div class="af-cat-arrow">➔</div>
+        </div>
+      `;
+    }).join("");
+
+    categoriesCardsContainer.querySelectorAll(".af-cat-card").forEach(card => {
+      card.addEventListener("click", () => {
+        const id = card.dataset.catId;
+        openCategorySubservices(id);
+      });
+    });
   }
 
+  function openCategorySubservices(catId) {
+    const cat = SERVICE_CATEGORIES.find(c => c.id === catId);
+    if (!cat) return;
 
-  function renderServicesAccordion(filterQuery = "") {
-    const container = document.getElementById("category-pills");
-    if (!container) return;
+    activeCategoryId = catId;
 
-    const query = filterQuery.toLowerCase().trim();
-
-    if (query) {
-      // Search Results View
-      const matched = [];
-      SERVICE_CATEGORIES.forEach(cat => {
-        cat.items.forEach(item => {
-          if (item.title.toLowerCase().includes(query) || cat.title.toLowerCase().includes(query)) {
-            matched.push({ ...item, catTitle: cat.title });
-          }
-        });
-      });
-
-      if (matched.length === 0) {
-        container.innerHTML = `<div class="info-card glass-card"><p style="text-align: center; color: var(--text-muted);">По вашему запросу «${filterQuery}» ничего не найдено. Попробуйте сформулировать иначе.</p></div>`;
-        return;
-      }
-
-      container.innerHTML = matched.map(m => {
-        const isChecked = selectedProblemsSet.has(m.title);
-        return `
-          <div class="service-card glass-card ${isChecked ? 'selected' : ''}">
-            <div class="service-info">
-              <input type="checkbox" class="subservice-checkbox" ${isChecked ? 'checked' : ''} data-title="${m.title}" />
-              <div>
-                <div class="service-title">${m.title}</div>
-                <div class="service-price">${m.price} (${m.catTitle})</div>
-              </div>
-            </div>
-            <button class="service-action-btn select-subservice-btn" data-title="${m.title}">
-              ${isChecked ? '✓ Выбрано' : '+ Выбрать'}
-            </button>
-          </div>
-        `;
-      }).join("");
-    } else {
-      // Accordion Categories View with Multi-Select Checkboxes
-      container.innerHTML = SERVICE_CATEGORIES.map(cat => `
-        <div class="accordion-category glass-card">
-          <div class="accordion-header">
-            <span>${cat.title}</span>
-            <span class="accordion-arrow">▼</span>
-          </div>
-          <div class="accordion-body">
-            ${cat.items.map(item => {
-              const isChecked = selectedProblemsSet.has(item.title);
-              return `
-                <div class="subservice-item ${isChecked ? 'selected' : ''}" data-title="${item.title}">
-                  <label class="subservice-checkbox-label" onclick="event.stopPropagation();">
-                    <input type="checkbox" class="subservice-checkbox" ${isChecked ? 'checked' : ''} data-title="${item.title}" />
-                    <span class="subservice-title">${item.title}</span>
-                  </label>
-                  <span class="subservice-price">${item.price}</span>
-                </div>
-              `;
-            }).join("")}
-          </div>
-        </div>
-      `).join("");
+    if (selectedCatTitleBadge) {
+      selectedCatTitleBadge.textContent = `${cat.icon} ${cat.title}`;
     }
 
-    // Bind Accordion Header Click Handlers
-    container.querySelectorAll(".accordion-header").forEach(header => {
-      header.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const parent = header.parentElement;
-        parent.classList.toggle("open");
-      });
-    });
+    renderSubservicesList(cat);
 
-    // Bind Subservice Checkbox Handlers WITHOUT closing accordion!
-    container.querySelectorAll(".subservice-item").forEach(itemEl => {
-      itemEl.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const title = itemEl.dataset.title;
-        if (title) {
-          toggleProblemSelection(title);
-          const checkbox = itemEl.querySelector(".subservice-checkbox");
-          const isChecked = selectedProblemsSet.has(title);
-          if (checkbox) checkbox.checked = isChecked;
-          itemEl.classList.toggle("selected", isChecked);
-        }
-      });
-    });
+    if (catOverviewView) catOverviewView.classList.add("hidden");
+    if (catSubservicesView) catSubservicesView.classList.remove("hidden");
+  }
 
-  } // end renderServicesAccordion
+  function renderSubservicesList(cat) {
+    if (!subservicesListContainer) return;
 
-  renderCategoryAccordion();
+    const customVal = customCategoryInputs[cat.id] || "";
 
-  // Wizard Step 1 Accordion + Search Setup
-  const wizardSearchInput = document.getElementById("wizard-search-input");
-  const customProblemGroup = document.getElementById("custom-problem-group");
-  let selectedCategory = "";
-
-  function renderCategoryAccordion(filterQuery = "") {
-    const container = document.getElementById("category-pills");
-    if (!container) return;
-    const query = filterQuery.toLowerCase().trim();
-
-    if (query) {
-      // Search results: flat list with checkboxes
-      const matched = [];
-      SERVICE_CATEGORIES.forEach(cat => {
-        cat.items.forEach(item => {
-          if (item.title.toLowerCase().includes(query) || cat.title.toLowerCase().includes(query)) {
-            matched.push({ ...item, catTitle: cat.title });
-          }
-        });
-      });
-
-      if (matched.length === 0) {
-        container.innerHTML = `<div class="info-card glass-card"><p style="text-align:center;color:var(--text-muted);">По запросу «${filterQuery}» ничего не найдено.</p></div>`;
-        renderSelectedSummary();
-        return;
-      }
-
-      container.innerHTML = matched.map(m => {
-        const isChecked = selectedProblemsSet.has(m.title);
+    subservicesListContainer.innerHTML = `
+      ${cat.items.map(item => {
+        const isChecked = selectedProblemsSet.has(item.title);
         return `
-          <div class="subservice-item ${isChecked ? 'selected' : ''}" data-title="${m.title}">
-            <label class="subservice-checkbox-label">
-              <input type="checkbox" class="subservice-checkbox" ${isChecked ? 'checked' : ''} data-title="${m.title}" />
-              <span class="subservice-title">${m.title}</span>
-            </label>
-            <span class="subservice-price">${m.price}</span>
+          <div class="af-service-check-row ${isChecked ? 'selected' : ''}" data-title="${item.title}">
+            <div class="af-service-check-left">
+              <div class="af-checkbox-badge">${isChecked ? '✓' : ''}</div>
+              <span class="af-service-name">${item.title}</span>
+            </div>
+            <span class="af-service-tag-price">${item.price}</span>
           </div>
         `;
-      }).join("");
-    } else {
-      // Accordion categories view — each has checkboxes + a text input at the bottom
-      container.innerHTML = SERVICE_CATEGORIES.map(cat => {
-        const customVal = customCategoryInputs[cat.id] || "";
-        return `
-          <div class="accordion-category glass-card" data-cat-id="${cat.id}">
-            <div class="accordion-header">
-              <span>${cat.title}</span>
-              <span class="accordion-arrow">▼</span>
-            </div>
-            <div class="accordion-body">
-              ${cat.items.map(item => {
-                const isChecked = selectedProblemsSet.has(item.title);
-                return `
-                  <div class="subservice-item ${isChecked ? 'selected' : ''}" data-title="${item.title}">
-                    <label class="subservice-checkbox-label">
-                      <input type="checkbox" class="subservice-checkbox" ${isChecked ? 'checked' : ''} data-title="${item.title}" />
-                      <span class="subservice-title">${item.title}</span>
-                    </label>
-                    <span class="subservice-price">${item.price}</span>
-                  </div>
-                `;
-              }).join('')}
-              <div class="custom-cat-input-row" onclick="event.stopPropagation();">
-                <input
-                  type="text"
-                  class="form-input glass-input custom-cat-input"
-                  data-cat-id="${cat.id}"
-                  placeholder="Другая проблема..."
-                  value="${customVal}"
-                />
-              </div>
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
+      }).join("")}
 
-    // Bind accordion header toggles
-    container.querySelectorAll(".accordion-header").forEach(header => {
-      header.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const parent = header.parentElement;
-        parent.classList.toggle("open");
-        const arrow = header.querySelector(".accordion-arrow");
-        if (arrow) arrow.textContent = parent.classList.contains("open") ? "▲" : "▼";
-      });
-    });
+      <div class="af-card" style="margin-top:4px;">
+        <label class="af-label">Или опишите проблему своими словами:</label>
+        <input
+          type="text"
+          id="custom-cat-input-field"
+          class="af-input"
+          placeholder="Например: Стук справа при повороте руля..."
+          value="${customVal}"
+        />
+      </div>
+    `;
 
-    // Bind subservice checkboxes — use change event on checkbox as source of truth
-    container.querySelectorAll(".subservice-item").forEach(itemEl => {
-      itemEl.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const title = itemEl.dataset.title;
+    subservicesListContainer.querySelectorAll(".af-service-check-row").forEach(rowEl => {
+      rowEl.addEventListener("click", () => {
+        const title = rowEl.dataset.title;
         if (!title) return;
 
-        const checkbox = itemEl.querySelector(".subservice-checkbox");
-        if (!checkbox) return;
-
-        // If click landed on checkbox or its label, the browser already toggled checkbox.checked.
-        // If click was on price or row padding, we need to manually toggle.
-        const throughLabel = !!e.target.closest('label');
-        const onCheckbox   = e.target === checkbox;
-
-        if (!throughLabel && !onCheckbox) {
-          // Manual toggle for clicks on the price tag or row bg
-          checkbox.checked = !checkbox.checked;
-        }
-
-        // Sync Set with current checkbox state (browser may have already toggled)
-        if (checkbox.checked) {
-          selectedProblemsSet.add(title);
-        } else {
+        if (selectedProblemsSet.has(title)) {
           selectedProblemsSet.delete(title);
+          rowEl.classList.remove("selected");
+          rowEl.querySelector(".af-checkbox-badge").textContent = "";
+        } else {
+          selectedProblemsSet.add(title);
+          rowEl.classList.add("selected");
+          rowEl.querySelector(".af-checkbox-badge").textContent = "✓";
         }
 
-        itemEl.classList.toggle("selected", checkbox.checked);
         updateEstimatedTotalPrice();
         renderSelectedSummary();
+        renderCategoryCardsOverview(wizardSearchInput ? wizardSearchInput.value : "");
       });
     });
 
-    // Bind custom text inputs per category
-    container.querySelectorAll(".custom-cat-input").forEach(input => {
-      input.addEventListener("input", (e) => {
-        e.stopPropagation();
-        const catId = input.dataset.catId;
-        customCategoryInputs[catId] = input.value;
+    const customInput = document.getElementById("custom-cat-input-field");
+    if (customInput) {
+      customInput.addEventListener("input", (e) => {
+        customCategoryInputs[cat.id] = e.target.value;
         renderSelectedSummary();
       });
-      input.addEventListener("click", (e) => e.stopPropagation());
-    });
-
-    renderSelectedSummary();
+    }
   }
 
-  renderCategoryAccordion();
+  function showCategoriesOverview() {
+    activeCategoryId = null;
+    if (catOverviewView) catOverviewView.classList.remove("hidden");
+    if (catSubservicesView) catSubservicesView.classList.add("hidden");
+    renderCategoryCardsOverview(wizardSearchInput ? wizardSearchInput.value : "");
+  }
+
+  if (backToCategoriesBtn) {
+    backToCategoriesBtn.addEventListener("click", showCategoriesOverview);
+  }
+
+  renderCategoryCardsOverview();
 
   if (wizardSearchInput) {
     wizardSearchInput.addEventListener("input", (e) => {
-      renderCategoryAccordion(e.target.value);
+      const val = e.target.value.trim();
+      if (val.length > 0) {
+        showCategoriesOverview();
+      }
+      renderCategoryCardsOverview(val);
     });
   }
 
-  // Car Number Input Auto-Caps
   const carNumberInput = document.getElementById("car-number");
   if (carNumberInput) {
     carNumberInput.addEventListener("input", () => {
@@ -655,7 +517,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Privacy Policy Modal Handlers
   const privacyLink = document.getElementById("privacy-link");
   const privacyModal = document.getElementById("privacy-modal");
   const closePrivacyBtn = document.getElementById("close-privacy-btn");
@@ -673,8 +534,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-
-  // Full Interactive Month Calendar & Time Slots
   const MONTH_NAMES_RU = [
     "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
     "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
@@ -691,7 +550,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedDateObj = new Date(todayObj.getFullYear(), todayObj.getMonth(), todayObj.getDate());
   let selectedDateLabel = `${todayObj.getDate()} ${MONTH_NAMES_RU_GENITIVE[todayObj.getMonth()]} ${todayObj.getFullYear()}`;
 
-  // Daily schedule slots (clean time display)
   const DAILY_TIME_SLOTS = ["09:00", "10:30", "12:00", "13:30", "15:00", "16:30", "18:00"];
 
   const BUSY_SLOTS_MAP = {
@@ -705,29 +563,25 @@ document.addEventListener("DOMContentLoaded", () => {
       id: "master_any",
       name: "🌟 Любой свободный мастер",
       role: "Ближайшее доступное время",
-      avatar: "👨‍🔧",
-      badge: "⚡ Быстрый выбор"
+      avatar: "👨‍🔧"
     },
     {
       id: "master_alexey",
       name: "Алексей Смирнов",
       role: "Старший механик (Двигатель и ТО)",
-      avatar: "👨‍🔧",
-      badge: "Опыт 12 лет"
+      avatar: "👨‍🔧"
     },
     {
       id: "master_dmitry",
       name: "Дмитрий Ковалев",
       role: "Диагност-автоэлектрик",
-      avatar: "⚡",
-      badge: "Опыт 9 лет"
+      avatar: "⚡"
     },
     {
       id: "master_igor",
       name: "Игорь Соколов",
       role: "Мастер по ходовой части",
-      avatar: "🛞",
-      badge: "Опыт 8 лет"
+      avatar: "🛞"
     }
   ];
 
@@ -742,18 +596,17 @@ document.addEventListener("DOMContentLoaded", () => {
     container.innerHTML = MASTERS_DATA.map(m => {
       const isSelected = m.id === selectedMasterId;
       return `
-        <div class="master-card glass-card ${isSelected ? 'selected' : ''}" data-master-id="${m.id}">
-          <div class="master-avatar">${m.avatar}</div>
-          <div class="master-info">
-            <div class="master-name">${m.name}</div>
-            <div class="master-role">${m.role}</div>
+        <div class="af-master-card ${isSelected ? 'selected' : ''}" data-master-id="${m.id}">
+          <div class="af-master-avatar">${m.avatar}</div>
+          <div>
+            <div class="af-master-name">${m.name}</div>
+            <div class="af-master-role">${m.role}</div>
           </div>
-          <div class="master-badge">${m.badge}</div>
         </div>
       `;
     }).join("");
 
-    container.querySelectorAll(".master-card").forEach(card => {
+    container.querySelectorAll(".af-master-card").forEach(card => {
       card.addEventListener("click", () => {
         const id = card.dataset.masterId;
         const master = MASTERS_DATA.find(m => m.id === id);
@@ -775,7 +628,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const lastDayOfMonth = new Date(calendarYear, calendarMonth + 1, 0);
     const totalDays = lastDayOfMonth.getDate();
 
-    // Calculate day offset (Monday = 0, Sunday = 6)
     let startDayOfWeek = firstDayOfMonth.getDay() - 1;
     if (startDayOfWeek === -1) startDayOfWeek = 6;
 
@@ -783,20 +635,18 @@ document.addEventListener("DOMContentLoaded", () => {
                            (calendarYear === todayObj.getFullYear() && calendarMonth <= todayObj.getMonth());
 
     let daysHtml = "";
-    // Empty padding cells for first week
     for (let i = 0; i < startDayOfWeek; i++) {
-      daysHtml += `<div class="cal-day empty"></div>`;
+      daysHtml += `<div class="af-cal-day empty"></div>`;
     }
 
-    // Days 1..totalDays
     for (let day = 1; day <= totalDays; day++) {
       const cellDate = new Date(calendarYear, calendarMonth, day);
       const isToday = (cellDate.toDateString() === todayObj.toDateString());
       const isPast = (cellDate < new Date(todayObj.getFullYear(), todayObj.getMonth(), todayObj.getDate()));
       const isSelected = (cellDate.toDateString() === selectedDateObj.toDateString());
 
-      let classes = "cal-day";
-      if (isPast) classes += " past disabled";
+      let classes = "af-cal-day";
+      if (isPast) classes += " past";
       if (isToday) classes += " today";
       if (isSelected) classes += " selected";
 
@@ -808,20 +658,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     container.innerHTML = `
-      <div class="cal-header">
-        <button type="button" class="cal-nav-btn" id="cal-prev-month" ${isPrevDisabled ? 'disabled' : ''}>‹</button>
-        <span class="cal-month-title">${MONTH_NAMES_RU[calendarMonth]} ${calendarYear}</span>
-        <button type="button" class="cal-nav-btn" id="cal-next-month">›</button>
+      <div class="af-cal-header">
+        <button type="button" class="af-cal-btn" id="cal-prev-month" ${isPrevDisabled ? 'disabled' : ''}>‹</button>
+        <span class="af-cal-title">${MONTH_NAMES_RU[calendarMonth]} ${calendarYear}</span>
+        <button type="button" class="af-cal-btn" id="cal-next-month">›</button>
       </div>
-      <div class="cal-weekdays">
+      <div class="af-cal-weekdays">
         <span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span>
       </div>
-      <div class="cal-days-grid">
+      <div class="af-cal-grid">
         ${daysHtml}
       </div>
     `;
 
-    // Month Navigation Handlers
     const prevBtn = document.getElementById("cal-prev-month");
     const nextBtn = document.getElementById("cal-next-month");
 
@@ -849,8 +698,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Day Selection Click Handlers — Swaps calendar view for time slots view!
-    container.querySelectorAll(".cal-day:not(.past):not(.empty)").forEach(cell => {
+    container.querySelectorAll(".af-cal-day:not(.past):not(.empty)").forEach(cell => {
       cell.addEventListener("click", () => {
         const y = parseInt(cell.dataset.year);
         const m = parseInt(cell.dataset.month);
@@ -871,7 +719,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const dateBadge = document.getElementById("slots-date-badge");
 
     if (dateBadge) {
-      dateBadge.textContent = `📅 ${selectedDateLabel}`;
+      dateBadge.textContent = selectedDateLabel;
     }
 
     renderSlotsForMasterAndDate();
@@ -888,7 +736,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (slotsGroup) slotsGroup.classList.add("hidden");
   }
 
-  // Bind "← Изменить дату" button
   const changeDateBtn = document.getElementById("change-date-btn");
   if (changeDateBtn) {
     changeDateBtn.addEventListener("click", showCalendarView);
@@ -900,7 +747,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!container) return;
 
     if (label) {
-      label.textContent = `Время записи на ${selectedDateLabel} (${selectedMasterName}):`;
+      label.textContent = `Свободное время на ${selectedDateLabel} (${selectedMasterName}):`;
     }
 
     const busyMap = BUSY_SLOTS_MAP[selectedMasterId] || {};
@@ -916,25 +763,16 @@ document.addEventListener("DOMContentLoaded", () => {
         selectedSlot = `${selectedDateLabel} в ${time}`;
       }
 
-      // Simple line-through grayed out style for occupied slots (no locks, no tags)
       if (isBusy) {
-        return `
-          <div class="slot-item busy disabled" title="Время занято">
-            ${time}
-          </div>
-        `;
+        return `<div class="af-slot-item booked">${time}</div>`;
       }
 
-      return `
-        <div class="slot-item ${isSelected ? 'active' : ''}" data-time="${time}">
-          ${time}
-        </div>
-      `;
+      return `<div class="af-slot-item ${isSelected ? 'active' : ''}" data-time="${time}">${time}</div>`;
     }).join("");
 
-    container.querySelectorAll(".slot-item:not(.busy)").forEach(item => {
+    container.querySelectorAll(".af-slot-item:not(.booked)").forEach(item => {
       item.addEventListener("click", () => {
-        container.querySelectorAll(".slot-item").forEach(i => i.classList.remove("active"));
+        container.querySelectorAll(".af-slot-item").forEach(i => i.classList.remove("active"));
         item.classList.add("active");
         selectedSlot = `${selectedDateLabel} в ${item.dataset.time}`;
       });
@@ -947,7 +785,274 @@ document.addEventListener("DOMContentLoaded", () => {
     showCalendarView();
   }
 
-  // User Profile loading
+  // ═══════════════════════════════════════════════════════════
+  // RESCHEDULING FAST-TRACK LOGIC (Automatic Approval & Notification)
+  // ═══════════════════════════════════════════════════════════
+
+  function startRescheduleMode(bookingId) {
+    activeRescheduleBookingId = parseInt(bookingId, 10);
+
+    const noticeBadge = document.getElementById("reschedule-notice-badge");
+    const noticeTitle = document.getElementById("reschedule-notice-title");
+    const toStep3Btn = document.getElementById("to-step-3-btn");
+    const confirmRescheduleBtn = document.getElementById("confirm-reschedule-btn");
+    const backToStep1Btn = document.getElementById("back-to-step-1-btn");
+
+    if (noticeBadge) noticeBadge.classList.remove("hidden");
+    if (noticeTitle) noticeTitle.textContent = `🔄 Перенос записи №${activeRescheduleBookingId}`;
+    if (toStep3Btn) toStep3Btn.classList.add("hidden");
+    if (confirmRescheduleBtn) confirmRescheduleBtn.classList.remove("hidden");
+    if (backToStep1Btn) backToStep1Btn.textContent = "❌ Отмена";
+
+    switchTab("booking");
+    goToStep(2);
+    loadSlots();
+  }
+
+  function clearRescheduleMode() {
+    activeRescheduleBookingId = null;
+
+    const noticeBadge = document.getElementById("reschedule-notice-badge");
+    const toStep3Btn = document.getElementById("to-step-3-btn");
+    const confirmRescheduleBtn = document.getElementById("confirm-reschedule-btn");
+    const backToStep1Btn = document.getElementById("back-to-step-1-btn");
+
+    if (noticeBadge) noticeBadge.classList.add("hidden");
+    if (toStep3Btn) toStep3Btn.classList.remove("hidden");
+    if (confirmRescheduleBtn) confirmRescheduleBtn.classList.add("hidden");
+    if (backToStep1Btn) backToStep1Btn.textContent = "← Назад";
+  }
+
+  const confirmRescheduleBtn = document.getElementById("confirm-reschedule-btn");
+  if (confirmRescheduleBtn) {
+    confirmRescheduleBtn.addEventListener("click", async () => {
+      if (!selectedSlot) {
+        showToast("⚠️ Выберите новое время записи!");
+        return;
+      }
+      if (!activeRescheduleBookingId) return;
+
+      confirmRescheduleBtn.disabled = true;
+      confirmRescheduleBtn.textContent = "⏳ Сохранение...";
+
+      try {
+        const targetSlot = `${selectedSlot} (Мастер: ${selectedMasterName})`;
+        const res = await fetch(`${BACKEND_URL}/api/booking/reschedule`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            booking_id: activeRescheduleBookingId,
+            id: activeRescheduleBookingId,
+            user_id: userId,
+            telegram_id: userId,
+            chat_id: userId,
+            user_name: userName,
+            name: userName,
+            new_slot: targetSlot,
+            status: "Одобрена",
+            init_data: tg?.initData || "",
+            initData: tg?.initData || "",
+            notify_client: true,
+            notify_admin: true
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast(`🎉 Запись №${activeRescheduleBookingId} подтверждена на ${selectedSlot}!`);
+          clearRescheduleMode();
+          await loadUserProfile();
+          switchTab("bookings-list");
+        } else {
+          showToast("⚠️ " + (data.error || "Ошибка переноса"));
+        }
+      } catch (e) {
+        showToast("⚠️ Ошибка соединения");
+      } finally {
+        confirmRescheduleBtn.disabled = false;
+        confirmRescheduleBtn.textContent = "🔄 Подтвердить перенос записи";
+      }
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // HOME TAB ACTIVE BOOKING PROGRESS TRACKER & REMINDER
+  // ═══════════════════════════════════════════════════════════
+  let activeCountdownInterval = null;
+
+  function parseBookingDate(slotStr) {
+    if (!slotStr) return null;
+    const months = {
+      "января": 0, "февраля": 1, "марта": 2, "апреля": 3, "мая": 4, "июня": 5,
+      "июля": 6, "августа": 7, "сентября": 8, "октября": 9, "ноября": 10, "декабря": 11
+    };
+
+    const cleanStr = slotStr.toLowerCase();
+    const parts = cleanStr.match(/(\d{1,2})\s+([а-я]+)(?:\s+(\d{4}))?\s+в\s+(\d{1,2}):(\d{2})/);
+    if (!parts) return null;
+
+    const day = parseInt(parts[1], 10);
+    const month = months[parts[2]];
+    if (month === undefined) return null;
+    const year = parts[3] ? parseInt(parts[3], 10) : new Date().getFullYear();
+    const hours = parseInt(parts[4], 10);
+    const minutes = parseInt(parts[5], 10);
+
+    return new Date(year, month, day, hours, minutes);
+  }
+
+  function startCountdownTimer(targetDate, valElement) {
+    if (activeCountdownInterval) clearInterval(activeCountdownInterval);
+
+    function update() {
+      const now = new Date();
+      const diffMs = targetDate - now;
+
+      if (diffMs <= 0) {
+        valElement.textContent = "🚗 Визит на автосервис!";
+        clearInterval(activeCountdownInterval);
+        return;
+      }
+
+      const totalSec = Math.floor(diffMs / 1000);
+      const days = Math.floor(totalSec / 86400);
+      const hours = Math.floor((totalSec % 86400) / 3600);
+      const mins = Math.floor((totalSec % 3600) / 60);
+      const secs = totalSec % 60;
+
+      if (days > 0) {
+        valElement.textContent = `${days} дн. ${hours} ч. ${mins} мин.`;
+      } else {
+        const pad = (n) => String(n).padStart(2, '0');
+        valElement.textContent = `${pad(hours)}:${pad(mins)}:${pad(secs)}`;
+      }
+    }
+
+    update();
+    activeCountdownInterval = setInterval(update, 1000);
+  }
+
+  function updateHomeActiveBookingCard(bookings) {
+    const container = document.getElementById("home-active-booking-container");
+    if (!container) return;
+
+    if (activeCountdownInterval) clearInterval(activeCountdownInterval);
+
+    const activeBooking = (bookings || []).find(b =>
+      ["Одобрена", "Активна", "На рассмотрении", "🛠 В работе", "🎉 Готов к выдаче"].includes(b.status)
+    );
+
+    if (!activeBooking) {
+      container.innerHTML = `
+        <div class="af-no-booking-card">
+          <div class="af-no-booking-icon">📅</div>
+          <div class="af-no-booking-text">
+            <strong>Нет ближайших записей</strong><br>
+            Запишитесь на ТО или ремонт в 2 клика!
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    let statusClass = "pending";
+    let statusLabel = "⏳ На рассмотрении";
+    let stepIndex = 1;
+
+    if (activeBooking.status === "Одобрена" || activeBooking.status === "Активна" || activeBooking.status.includes("Перенесена")) {
+      statusClass = "approved";
+      statusLabel = "✅ Подтверждена";
+      stepIndex = 2;
+    } else if (activeBooking.status.includes("В работе")) {
+      statusClass = "approved";
+      statusLabel = "🛠 В работе на подъёмнике";
+      stepIndex = 3;
+    } else if (activeBooking.status.includes("Готов")) {
+      statusClass = "approved";
+      statusLabel = "🎉 Готов к выдаче!";
+      stepIndex = 4;
+    }
+
+    container.innerHTML = `
+      <div class="af-reminder-card">
+        <div class="af-reminder-header">
+          <span class="af-reminder-badge">📅 Запись №${activeBooking.id}</span>
+          <span class="af-reminder-status-tag ${statusClass}">${statusLabel}</span>
+        </div>
+
+        <!-- Real-time Progress Tracker Bar -->
+        <div class="af-progress-bar-wrap" style="margin: 10px 0;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--gray-2);margin-bottom:4px;">
+            <span style="${stepIndex>=1 ? 'color:var(--dark);font-weight:900;' : ''}">1. Создана</span>
+            <span style="${stepIndex>=2 ? 'color:var(--dark);font-weight:900;' : ''}">2. Принята</span>
+            <span style="${stepIndex>=3 ? 'color:var(--dark);font-weight:900;' : ''}">3. В работе</span>
+            <span style="${stepIndex>=4 ? 'color:var(--dark);font-weight:900;' : ''}">4. Готова</span>
+          </div>
+          <div style="height:6px;background:#e5e5ea;border-radius:4px;overflow:hidden;">
+            <div style="height:100%;background:var(--dark);width:${(stepIndex/4)*100}%;transition:width 0.4s ease;"></div>
+          </div>
+        </div>
+
+        <div class="af-reminder-title">${activeBooking.problem}</div>
+
+        <div class="af-reminder-meta">
+          <div>📍 AutoFriends Service · ${activeBooking.slot}</div>
+          <div>🚘 Авто: ${activeBooking.car_model} ${activeBooking.car_number ? `(${activeBooking.car_number})` : ''}</div>
+        </div>
+
+        <div class="af-countdown-box">
+          <span class="af-countdown-label">⏳ До визита:</span>
+          <span class="af-countdown-value" id="home-countdown-val">Считаем...</span>
+        </div>
+
+        <div class="af-reminder-actions" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          <button type="button" class="af-reminder-btn af-reminder-btn-secondary" id="home-view-bookings-btn">
+            📋 Записи
+          </button>
+          <button type="button" class="af-reminder-btn af-reminder-btn-secondary" id="home-reschedule-btn" data-id="${activeBooking.id}">
+            🔄 Перенести
+          </button>
+          <button type="button" class="af-reminder-btn af-reminder-btn-secondary" id="home-cancel-booking-btn" data-id="${activeBooking.id}" style="color:var(--red);">
+            ❌ Отменить
+          </button>
+          <a href="https://t.me/autofriends_service" target="_blank" class="af-reminder-btn af-reminder-btn-secondary" style="text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;color:var(--dark);">
+            💬 Поддержка
+          </a>
+        </div>
+      </div>
+    `;
+
+    const countdownValEl = document.getElementById("home-countdown-val");
+    const targetDate = parseBookingDate(activeBooking.slot);
+
+    if (targetDate && countdownValEl) {
+      startCountdownTimer(targetDate, countdownValEl);
+    } else if (countdownValEl) {
+      countdownValEl.textContent = activeBooking.slot;
+    }
+
+    const viewBtn = document.getElementById("home-view-bookings-btn");
+    if (viewBtn) {
+      viewBtn.addEventListener("click", () => switchTab("bookings-list"));
+    }
+
+    const rescheduleBtn = document.getElementById("home-reschedule-btn");
+    if (rescheduleBtn) {
+      rescheduleBtn.addEventListener("click", () => {
+        startRescheduleMode(activeBooking.id);
+      });
+    }
+
+    const cancelBtn = document.getElementById("home-cancel-booking-btn");
+    if (cancelBtn) {
+      cancelBtn.addEventListener("click", async () => {
+        if (confirm(`Отменить запись №${activeBooking.id}?`)) {
+          await cancelBooking(activeBooking.id);
+        }
+      });
+    }
+  }
+
   async function loadUserProfile() {
     try {
       const res = await fetch(`${BACKEND_URL}/api/user/info?user_id=${userId}`);
@@ -959,7 +1064,6 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("stat-cancelled").textContent = data.stats.cancelled || 0;
       document.getElementById("profile-phone").textContent = `Телефон: ${data.stats.phone || 'Не указан'}`;
 
-      // Auto-fill phone from profile if not yet set
       if (data.stats.phone && data.stats.phone !== "Не указан") {
         const phoneInput = document.getElementById("phone-number");
         if (phoneInput && !phoneInput.value) {
@@ -974,68 +1078,71 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       renderUserBookings(data.bookings || []);
+      updateHomeActiveBookingCard(data.bookings || []);
     } catch (e) {
       console.error(e);
     }
   }
+
+  // Load user profile on startup
+  loadUserProfile();
 
   function renderUserBookings(bookings) {
     const container = document.getElementById("user-bookings-list");
     if (!container) return;
 
     if (!bookings || bookings.length === 0) {
-      container.innerHTML = `<div class="info-card glass-card"><p style="text-align: center; color: var(--text-muted);">У вас пока нет оформленных записей.</p></div>`;
+      container.innerHTML = `<div class="af-card"><p style="text-align: center; color: var(--gray-3);">У вас пока нет активных записей.</p></div>`;
       return;
     }
 
-    let activeRescheduleBookingId = null;
-
     container.innerHTML = bookings.map(b => {
-      let badgeClass = "badge-pending";
-      let statusIcon = "⏳";
       let isUnavailable = b.status.includes("недоступен") || b.status.includes("Перенос");
-
-      if (isUnavailable) {
-        badgeClass = "badge-pending";
-        statusIcon = "⚠️";
-      } else if (b.status === "Одобрена" || b.status === "Активна") {
-        badgeClass = "badge-approved";
-        statusIcon = "✅";
-      } else if (b.status.includes("Отменен") || b.status.includes("Отклонен")) {
-        badgeClass = "badge-cancelled";
-        statusIcon = "🔴";
+      let displayStatus = b.status;
+      let statusColor = "var(--yellow)";
+      let isCancelled = b.status.includes("Отменен") || b.status.includes("Отклонен");
+      
+      if (b.status === "Одобрена" || b.status === "Активна" || b.status.includes("Перенесена")) {
+        displayStatus = "✅ Подтверждена";
+        statusColor = "var(--green)";
+      } else if (b.status.includes("В работе")) {
+        displayStatus = "🛠 В работе на подъёмнике";
+        statusColor = "var(--dark)";
+      } else if (b.status.includes("Готов")) {
+        displayStatus = "🎉 Готов к выдаче";
+        statusColor = "var(--green)";
+      } else if (isCancelled) {
+        displayStatus = "❌ Отменена";
+        statusColor = "var(--red)";
       }
 
-      const isCancelable = ["На рассмотрении", "Одобрена", "Активна"].includes(b.status) || isUnavailable;
+      const isCancelable = ["На рассмотрении", "Одобрена", "Активна", "🛠 В работе"].includes(b.status) || isUnavailable;
 
       return `
-        <div class="booking-card" style="${isUnavailable ? 'border-color:rgba(245,158,11,0.38);' : ''}">
-          <div class="booking-card-header">
-            <span class="booking-card-title">Запись №${b.id}</span>
-            <span class="booking-badge ${badgeClass}">${statusIcon} ${b.status}</span>
+        <div class="af-card" style="${isCancelled ? 'opacity:0.75;' : ''}">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:14px;font-weight:800;">Запись №${b.id}</span>
+            <span style="font-size:12px;font-weight:700;color:${statusColor};">${displayStatus}</span>
           </div>
-          <div class="booking-card-meta">
-            <div><strong style="color:var(--text-1);">Услуга:</strong> ${b.problem}</div>
-            <div><strong style="color:var(--text-1);">Автомобиль:</strong> ${b.car_model}</div>
-            ${b.car_number ? `<div><strong style="color:var(--text-1);">Госномер:</strong> ${b.car_number}</div>` : ''}
-            <div><strong style="color:var(--text-1);">Время:</strong> ${b.slot}</div>
-            ${b.comment ? `<div style="margin-top:4px;padding:8px 10px;background:rgba(43,126,255,0.07);border-radius:10px;border:1px solid rgba(43,126,255,0.18);"><strong style="color:#2b7eff;">Сообщение:</strong> <em>${b.comment}</em></div>` : ''}
+          <div style="font-size:13px;color:var(--gray-2);line-height:1.45;margin-top:4px;">
+            <div><strong>Услуга:</strong> ${b.problem}</div>
+            <div><strong>Авто:</strong> ${b.car_model} ${b.car_number ? `(${b.car_number})` : ''}</div>
+            <div><strong>Время:</strong> ${b.slot}</div>
+            ${b.comment ? `<div style="margin-top:4px;padding:6px;background:var(--bg-pill);border-radius:6px;"><strong>Примечание:</strong> ${b.comment}</div>` : ''}
           </div>
-          <div class="booking-card-actions">
-            ${isUnavailable ? `<button class="reschedule-btn" data-id="${b.id}">🔄 Выбрать другого мастера / время</button>` : ''}
-            ${isCancelable ? `<button class="cancel-btn" data-id="${b.id}">Отменить</button>` : ''}
-          </div>
+          ${!isCancelled ? `
+            <div style="display:flex;gap:6px;margin-top:6px;">
+              ${isUnavailable ? `<button class="af-btn-primary reschedule-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">Выбрать другое время</button>` : `<button class="af-btn-secondary reschedule-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">🔄 Перенести</button>`}
+              ${isCancelable ? `<button class="af-btn-secondary cancel-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;color:var(--red);">❌ Отменить</button>` : ''}
+            </div>
+          ` : ''}
         </div>
       `;
     }).join("");
 
-
     container.querySelectorAll(".reschedule-btn").forEach(btn => {
       btn.addEventListener("click", () => {
-        activeRescheduleBookingId = parseInt(btn.dataset.id);
-        switchTab("booking");
-        goToStep(2);
-        showToast(`🔄 Перенос записи №${activeRescheduleBookingId}: выберите мастера и время`);
+        startRescheduleMode(btn.dataset.id);
       });
     });
 
@@ -1051,24 +1158,62 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function cancelBooking(bookingId) {
     try {
+      const bId = parseInt(bookingId, 10);
+      const payload = {
+        booking_id: bId,
+        id: bId,
+        user_id: userId,
+        telegram_id: userId,
+        chat_id: userId,
+        user_name: userName,
+        name: userName,
+        init_data: tg?.initData || "",
+        initData: tg?.initData || "",
+        status: "Отменена",
+        action: "cancel",
+        notify_client: true,
+        notify_admin: true,
+        notify: true
+      };
+
       const res = await fetch(`${BACKEND_URL}/api/booking/cancel`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ booking_id: parseInt(bookingId), user_id: userId })
+        body: JSON.stringify(payload)
       });
-      const data = await res.json();
-      if (data.success) {
-        showToast("✅ Запись успешно отменена");
-        loadUserProfile();
+
+      fetch(`${BACKEND_URL}/api/booking/action`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          booking_id: bId,
+          id: bId,
+          user_id: userId,
+          telegram_id: userId,
+          chat_id: userId,
+          user_name: userName,
+          action: "cancel",
+          status: "Отменена",
+          init_data: tg?.initData || ""
+        })
+      }).catch(() => {});
+
+      let data = {};
+      try { data = await res.json(); } catch (e) {}
+
+      if (res.ok || data.success) {
+        showToast("✅ Запись отменена! Уведомление отправлено.");
+        await loadUserProfile();
+        if (isAdmin) loadAdminBookings(currentAdminFilter);
       } else {
-        showToast("⚠️ " + (data.error || "Не удалось отменить"));
+        showToast("⚠️ " + (data.error || "Ошибка отмены"));
       }
     } catch (e) {
+      console.error(e);
       showToast("⚠️ Ошибка соединения");
     }
   }
 
-  // Multi-Step Wizard Logic (4 steps)
   let currentStep = 1;
   const toStep2Btn = document.getElementById("to-step-2-btn");
   const toStep3Btn = document.getElementById("to-step-3-btn");
@@ -1111,192 +1256,127 @@ document.addEventListener("DOMContentLoaded", () => {
     const carNumber = document.getElementById("car-number") ? document.getElementById("car-number").value.trim().toUpperCase() : "";
 
     summaryContainer.innerHTML = `
-      <div class="summary-item">
-        <span class="summary-label">🛠 Выбранные работы:</span>
-        <span class="summary-val">${problemText}</span>
+      <div class="af-summary-row">
+        <span class="af-summary-lbl">Услуги:</span>
+        <span class="af-summary-val">${problemText}</span>
       </div>
-      <div class="summary-item">
-        <span class="summary-label">👨‍🔧 Специалист:</span>
-        <span class="summary-val highlight">${selectedMasterName}</span>
+      <div class="af-summary-row">
+        <span class="af-summary-lbl">Мастер:</span>
+        <span class="af-summary-val">${selectedMasterName}</span>
       </div>
-      <div class="summary-item">
-        <span class="summary-label">📅 Дата и время:</span>
-        <span class="summary-val highlight">${selectedSlot || "Не выбрано"}</span>
+      <div class="af-summary-row">
+        <span class="af-summary-lbl">Дата и время:</span>
+        <span class="af-summary-val">${selectedSlot || "Не выбрано"}</span>
       </div>
-      <div class="summary-item">
-        <span class="summary-label">🚗 Автомобиль:</span>
-        <span class="summary-val">${carModel || "Не указан"} ${carNumber ? `(${carNumber})` : ""}</span>
+      <div class="af-summary-row">
+        <span class="af-summary-lbl">Автомобиль:</span>
+        <span class="af-summary-val">${carModel || "Не указан"} ${carNumber ? `(${carNumber})` : ""}</span>
       </div>
     `;
   }
 
-  // Phone Edit Pencil Handler
   const editPhoneBtn = document.getElementById("edit-phone-btn");
   const phoneInput = document.getElementById("phone-number");
-  const phoneHint = document.getElementById("phone-hint");
 
   if (editPhoneBtn && phoneInput) {
     editPhoneBtn.addEventListener("click", () => {
       phoneInput.removeAttribute("readonly");
       phoneInput.focus();
       phoneInput.select();
-      if (phoneHint) {
-        phoneHint.textContent = "✏️ Режим редактирования. Введите нужный номер.";
-        phoneHint.style.color = "#38bdf8";
-      }
-      showToast("✏️ Вы можете изменить номер телефона");
+      showToast("✏️ Введите нужный номер");
     });
   }
 
-  // Step 1 -> Step 2
   if (toStep2Btn) {
     toStep2Btn.addEventListener("click", () => {
       const checkedProblems = Array.from(selectedProblemsSet);
       const customProblems = Object.values(customCategoryInputs).map(v => v.trim()).filter(v => v.length > 0);
       const allProblems = [...checkedProblems, ...customProblems];
 
-      let problem = "";
-      if (allProblems.length > 0) {
-        problem = allProblems.join(", ");
-      } else if (selectedCategory === "cat_custom") {
-        const customProblemInput = document.getElementById("custom-problem");
-        problem = customProblemInput ? customProblemInput.value.trim() : "";
-      }
-
-      if (!problem) {
-        showToast("⚠️ Пожалуйста, выберите или опишите вашу проблему!");
+      if (allProblems.length === 0) {
+        showToast("⚠️ Выберите хотя бы одну услугу!");
         return;
       }
       goToStep(2);
     });
   }
 
-  // Step 2 -> Step 3
   if (toStep3Btn) {
     toStep3Btn.addEventListener("click", () => {
       if (!selectedSlot) {
-        showToast("⚠️ Пожалуйста, выберите удобное время записи!");
+        showToast("⚠️ Выберите время записи!");
         return;
       }
       goToStep(3);
-      setTimeout(() => {
-        const carInput = document.getElementById("car-model");
-        if (carInput) carInput.focus();
-      }, 100);
     });
   }
 
-  // Step 3 -> Step 4
   if (toStep4Btn) {
     toStep4Btn.addEventListener("click", () => {
       const carModel = document.getElementById("car-model").value.trim();
       if (!carModel || carModel.length < 2) {
-        showToast("⚠️ Пожалуйста, укажите марку и модель авто!");
-        const carInput = document.getElementById("car-model");
-        if (carInput) carInput.focus();
+        showToast("⚠️ Укажите марку и модель авто!");
         return;
       }
       goToStep(4);
     });
   }
 
-  if (backToStep1Btn) backToStep1Btn.addEventListener("click", () => goToStep(1));
+  if (backToStep1Btn) {
+    backToStep1Btn.addEventListener("click", () => {
+      if (activeRescheduleBookingId) {
+        clearRescheduleMode();
+        switchTab("bookings-list");
+      } else {
+        goToStep(1);
+      }
+    });
+  }
+
   if (backToStep2Btn) backToStep2Btn.addEventListener("click", () => goToStep(2));
   if (backToStep3Btn) backToStep3Btn.addEventListener("click", () => goToStep(3));
 
-  // Booking Form Submission
   const bookingForm = document.getElementById("booking-form");
   const submitBtn = document.getElementById("submit-booking-btn");
 
   bookingForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    // Collect all problems (checkboxes + custom text inputs)
     const checkedProblems = Array.from(selectedProblemsSet);
     const customProblems = Object.values(customCategoryInputs).map(v => v.trim()).filter(v => v.length > 0);
     const allProblems = [...checkedProblems, ...customProblems];
-
-    let problem = "";
-    if (allProblems.length > 0) {
-      problem = allProblems.join(", ");
-    } else if (selectedCategory === "cat_custom") {
-      const customProblemInput = document.getElementById("custom-problem");
-      problem = customProblemInput ? customProblemInput.value.trim() : "";
-    }
-
+    const problem = allProblems.join(", ");
 
     const carModel = document.getElementById("car-model").value.trim();
     const carNumber = document.getElementById("car-number") ? document.getElementById("car-number").value.trim().toUpperCase() : "";
     const phone = document.getElementById("phone-number").value.trim();
     const privacyAgree = document.getElementById("privacy-agree");
 
-    if (!problem) {
-      showToast("⚠️ Опишите вашу проблему!");
-      goToStep(1);
-      return;
-    }
-    if (!carModel) {
-      showToast("⚠️ Укажите марку и модель авто!");
-      goToStep(2);
-      return;
-    }
-    if (!phone) {
-      showToast("⚠️ Укажите ваш телефон!");
-      return;
-    }
-    if (privacyAgree && !privacyAgree.checked) {
-      showToast("⚠️ Необходимо согласие с Политикой конфиденциальности!");
-      return;
-    }
+    if (!problem) { showToast("⚠️ Выберите услугу!"); goToStep(1); return; }
+    if (!carModel) { showToast("⚠️ Укажите марку авто!"); goToStep(3); return; }
+    if (!phone) { showToast("⚠️ Укажите телефон!"); return; }
+    if (privacyAgree && !privacyAgree.checked) { showToast("⚠️ Примите Соглашение!"); return; }
 
     submitBtn.disabled = true;
     submitBtn.innerHTML = `<span>⏳ Отправка...</span>`;
 
     try {
-      if (!BACKEND_URL) {
-        showToast("⚠️ Ошибка: не указан адрес бэкенда (CONFIG_BACKEND_URL в app.js)!");
-        return;
-      }
-
       const targetSlot = `${selectedSlot} (Мастер: ${selectedMasterName})`;
-
-      // If client is rescheduling an existing affected booking
-      if (activeRescheduleBookingId) {
-        const res = await fetch(`${BACKEND_URL}/api/booking/reschedule`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            booking_id: activeRescheduleBookingId,
-            user_id: userId,
-            new_slot: targetSlot
-          })
-        });
-
-        const data = await res.json();
-        if (res.ok && data.success) {
-          showToast(`🎉 Запись №${activeRescheduleBookingId} успешно перенесена!`);
-          activeRescheduleBookingId = null;
-          switchTab("profile");
-          return;
-        } else {
-          showToast("⚠️ " + (data.error || "Не удалось перенести запись"));
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = `<span>🚀 Подтвердить запись</span>`;
-          return;
-        }
-      }
 
       const res = await fetch(`${BACKEND_URL}/api/booking/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           user_id: userId,
+          telegram_id: userId,
+          chat_id: userId,
           user_name: userName,
           problem: problem,
           car_model: carModel,
           car_number: carNumber,
           slot: targetSlot,
-          phone: phone
+          phone: phone,
+          init_data: tg?.initData || ""
         })
       });
 
@@ -1306,29 +1386,24 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast(`🎉 Заявка №${data.booking_id} успешно создана!`);
         bookingForm.reset();
         selectedProblemsSet.clear();
-        // Clear custom inputs
         Object.keys(customCategoryInputs).forEach(k => delete customCategoryInputs[k]);
-        renderCategoryAccordion();
+        showCategoriesOverview();
         goToStep(1);
         setTimeout(() => {
-          switchTab("profile");
-        }, 1200);
+          switchTab("bookings-list");
+        }, 1000);
       } else {
-
-        showToast("⚠️ " + (data.error || "Ошибка создания записи"));
+        showToast("⚠️ " + (data.error || "Ошибка создания"));
       }
     } catch (err) {
-      console.error("Ошибка при отправке формы:", err);
-      showToast("⚠️ Бэкенд недоступен! Проверьте CONFIG_BACKEND_URL в app.js");
+      console.error(err);
+      showToast("⚠️ Ошибка соединения с серверным API");
     } finally {
       submitBtn.disabled = false;
-      submitBtn.innerHTML = `<span>🚀 Отправить заявку</span>`;
+      submitBtn.innerHTML = `🚀 Подтвердить запись`;
     }
   });
 
-
-
-  // Toast Helper
   function showToast(msg) {
     const toast = document.getElementById("toast");
     if (!toast) return;
@@ -1336,21 +1411,23 @@ document.addEventListener("DOMContentLoaded", () => {
     toast.classList.remove("hidden");
     setTimeout(() => {
       toast.classList.add("hidden");
-    }, 3500);
+    }, 3200);
   }
 
-  // ==========================================
-  // ADMIN / MODERATION PANEL LOGIC
-  // ==========================================
-  const adminPills = document.querySelectorAll("#admin-status-pills .pill");
-  adminPills.forEach(pill => {
-    pill.addEventListener("click", () => {
-      adminPills.forEach(p => p.classList.remove("active"));
-      pill.classList.add("active");
-      currentAdminFilter = pill.dataset.status;
-      loadAdminBookings(currentAdminFilter);
+  // ═══════════════════════════════════════════════════════════
+  // MODERATOR SUPER-PANEL LOGIC (Expanded Control Actions & Statuses)
+  // ═══════════════════════════════════════════════════════════
+  const statusPillsContainer = document.getElementById("admin-status-pills");
+  if (statusPillsContainer) {
+    statusPillsContainer.querySelectorAll(".af-filter-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        statusPillsContainer.querySelectorAll(".af-filter-chip").forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
+        currentAdminFilter = chip.dataset.status;
+        loadAdminBookings(currentAdminFilter);
+      });
     });
-  });
+  }
 
   async function loadAdminBookings(statusFilter = "all") {
     const container = document.getElementById("admin-bookings-list");
@@ -1360,14 +1437,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch(`${BACKEND_URL}/api/admin/bookings?user_id=${userId}&status=${statusFilter}`);
       if (!res.ok) throw new Error("Access denied");
       const data = await res.json();
-
-      document.getElementById("adm-stat-pending").textContent = data.stats.pending || 0;
-      document.getElementById("adm-stat-approved").textContent = data.stats.approved || 0;
-      document.getElementById("adm-stat-rejected").textContent = data.stats.rejected || 0;
-
       renderAdminBookings(data.bookings || []);
     } catch (e) {
-      container.innerHTML = `<div class="info-card glass-card"><p style="text-align: center; color: var(--text-muted);">Не удалось загрузить данные модерации</p></div>`;
+      container.innerHTML = `<div class="af-card"><p style="text-align:center;color:var(--gray-3);">Ошибка загрузки заявок</p></div>`;
     }
   }
 
@@ -1376,72 +1448,83 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!container) return;
 
     if (!bookings || bookings.length === 0) {
-      container.innerHTML = `<div class="info-card glass-card"><p style="text-align: center; color: var(--text-muted);">Заявок не найдено.</p></div>`;
+      container.innerHTML = `<div class="af-card"><p style="text-align:center;color:var(--gray-3);">Заявок нет.</p></div>`;
       return;
     }
 
     container.innerHTML = bookings.map(b => {
-      let badgeClass = "badge-pending";
-      let statusIcon = "⏳";
-      let cardClass = "pending";
-      if (b.status === "Одобрена" || b.status === "Активна") {
-        badgeClass = "badge-approved";
-        statusIcon = "✅";
-        cardClass = "approved";
-      } else if (b.status.includes("Отменен") || b.status.includes("Отклонен")) {
-        badgeClass = "badge-cancelled";
-        statusIcon = "🔴";
-        cardClass = "rejected";
-      }
+      let isCancelled = b.status.includes("Отменен") || b.status.includes("Отклонен");
+      let isApproved = b.status === "Одобрена" || b.status === "Активна";
+      let isInProgress = b.status.includes("В работе");
+      let isReady = b.status.includes("Готов");
 
-      const isPending = b.status === "На рассмотрении";
-      const actionsHtml = isPending ? `
-        <div class="admin-actions-grid">
-          <button class="admin-btn admin-btn-approve" data-id="${b.id}">✅ Одобрить</button>
-          <button class="admin-btn admin-btn-reject" data-id="${b.id}">❌ Отклонить</button>
-          <button class="admin-btn admin-btn-delete" data-id="${b.id}">🗑 Удалить заявку</button>
-        </div>
-      ` : `
-        <div class="admin-actions-grid">
-          <button class="admin-btn admin-btn-delete" data-id="${b.id}">🗑 Удалить заявку</button>
-        </div>
-      `;
+      let statusColor = "var(--yellow)";
+      let statusTag = "⏳ На рассмотрении";
+
+      if (isApproved) { statusColor = "var(--green)"; statusTag = "✅ Одобрена"; }
+      if (isInProgress) { statusColor = "var(--dark)"; statusTag = "🛠 В работе"; }
+      if (isReady) { statusColor = "var(--green)"; statusTag = "🎉 Готов к выдаче"; }
+      if (isCancelled) { statusColor = "var(--red)"; statusTag = "❌ Отменена"; }
+
+      const phoneClean = (b.phone || "").replace(/[^\d+]/g, "");
 
       return `
-        <div class="booking-card glass-card admin-card ${cardClass}">
-          <div class="booking-header">
-            <span class="booking-id">Запись №${b.id}</span>
-            <span class="badge ${badgeClass}">${statusIcon} ${b.status}</span>
+        <div class="af-card" style="${isCancelled ? 'opacity:0.7;' : ''}">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:14px;font-weight:800;">Заявка №${b.id}</span>
+            <span style="font-size:12px;font-weight:700;color:${statusColor};">${statusTag}</span>
           </div>
-          <div class="admin-card-user">
-            👤 <strong>${b.user_name}</strong> (ID: ${b.user_id}) | 📞 ${b.phone}
-          </div>
-          <div class="booking-details">
-            <p><strong>Услуга:</strong> ${b.problem}</p>
-            <p><strong>Автомобиль:</strong> ${b.car_model}</p>
-            ${b.car_number ? `<p><strong>Госномер:</strong> ${b.car_number}</p>` : ''}
-            <p><strong>Время:</strong> ${b.slot}</p>
-            ${b.comment ? `<p><strong>Прим. модератора:</strong> <em>${b.comment}</em></p>` : ''}
+          <div style="font-size:13px;color:var(--gray-2);margin-top:4px;line-height:1.45;">
+            <div><strong>Клиент:</strong> ${b.user_name} (ID: ${b.user_id})</div>
+            <div><strong>Телефон:</strong> ${b.phone || 'Не указан'}</div>
+            <div><strong>Услуга:</strong> ${b.problem}</div>
+            <div><strong>Авто:</strong> ${b.car_model} ${b.car_number ? `(${b.car_number})` : ''}</div>
+            <div><strong>Время:</strong> ${b.slot}</div>
+            ${b.comment ? `<div style="margin-top:4px;padding:6px;background:var(--bg-pill);border-radius:6px;"><strong>Комментарий:</strong> ${b.comment}</div>` : ''}
           </div>
 
-          ${actionsHtml}
+          <!-- Direct Communication Quick Actions -->
+          <div style="display:flex;gap:6px;margin-top:8px;">
+            ${phoneClean ? `<a href="tel:${phoneClean}" class="af-btn-secondary" style="padding:5px 10px;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">📞 Звонок</a>` : ''}
+            <a href="https://t.me/${b.user_id}" target="_blank" class="af-btn-secondary" style="padding:5px 10px;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">💬 Telegram</a>
+          </div>
+
+          <!-- Extended Moderator Control Actions -->
+          ${!isCancelled ? `
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
+              <button class="af-btn-primary admin-btn-action" data-id="${b.id}" data-act="approve" style="padding:5px 10px;font-size:11.5px;background:var(--green);">✅ Одобрить</button>
+              <button class="af-btn-secondary admin-btn-action" data-id="${b.id}" data-act="in_progress" style="padding:5px 10px;font-size:11.5px;background:var(--dark);color:#fff;">🛠 В работу</button>
+              <button class="af-btn-secondary admin-btn-action" data-id="${b.id}" data-act="ready" style="padding:5px 10px;font-size:11.5px;background:#34c759;color:#fff;">🎉 Готов</button>
+              <button class="af-btn-secondary admin-btn-action" data-id="${b.id}" data-act="reject" style="padding:5px 10px;font-size:11.5px;color:var(--red);">❌ Отклонить</button>
+              <button class="af-btn-secondary admin-btn-action" data-id="${b.id}" data-act="cancel" style="padding:5px 10px;font-size:11.5px;color:var(--red);">⚠️ Отменить</button>
+            </div>
+          ` : `
+            <div style="margin-top:8px;">
+              <button class="af-btn-secondary admin-btn-action" data-id="${b.id}" data-act="delete" style="padding:5px 10px;font-size:11.5px;color:var(--red);">🗑 Удалить из базы</button>
+            </div>
+          `}
         </div>
       `;
     }).join("");
 
+    container.querySelectorAll(".admin-btn-action").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const bId = btn.dataset.id;
+        const act = btn.dataset.act;
 
-    container.querySelectorAll(".admin-btn-approve").forEach(btn => {
-      btn.addEventListener("click", () => openAdminModal(btn.dataset.id, "approve"));
-    });
-    container.querySelectorAll(".admin-btn-reject").forEach(btn => {
-      btn.addEventListener("click", () => openAdminModal(btn.dataset.id, "reject"));
-    });
-    container.querySelectorAll(".admin-btn-delete").forEach(btn => {
-      btn.addEventListener("click", () => confirmDeleteBooking(btn.dataset.id));
+        if (act === "cancel" || act === "delete") {
+          if (!confirm(`Вы уверены, что хотите ${act === 'delete' ? 'удалить' : 'отменить'} запись №${bId}?`)) return;
+        }
+
+        if (act === "approve" || act === "reject") {
+          openAdminModal(bId, act);
+        } else {
+          await executeAdminAction(bId, act, "");
+        }
+      });
     });
   }
 
-  // Admin Modal Handling
   const modal = document.getElementById("admin-modal");
   const modalComment = document.getElementById("modal-comment");
   const modalConfirmBtn = document.getElementById("modal-confirm-btn");
@@ -1449,34 +1532,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function openAdminModal(bookingId, action) {
     pendingAdminAction = { bookingId, action };
-    const title = action === "approve" ? `Одобрить запись №${bookingId}` : `Отклонить запись №${bookingId}`;
-    document.getElementById("modal-title").textContent = title;
+    document.getElementById("modal-title").textContent = action === "approve" ? `Одобрить запись №${bookingId}` : `Отклонить запись №${bookingId}`;
     if (modalComment) modalComment.value = "";
     if (modal) modal.classList.remove("hidden");
   }
 
-  if (modalCancelBtn) {
-    modalCancelBtn.addEventListener("click", () => {
-      if (modal) modal.classList.add("hidden");
-      pendingAdminAction = null;
-    });
-  }
-
+  if (modalCancelBtn) modalCancelBtn.addEventListener("click", () => modal.classList.add("hidden"));
   if (modalConfirmBtn) {
     modalConfirmBtn.addEventListener("click", async () => {
       if (!pendingAdminAction) return;
       const { bookingId, action } = pendingAdminAction;
       const comment = modalComment ? modalComment.value.trim() : "";
-      if (modal) modal.classList.add("hidden");
+      modal.classList.add("hidden");
       await executeAdminAction(bookingId, action, comment);
-      pendingAdminAction = null;
     });
-  }
-
-  async function confirmDeleteBooking(bookingId) {
-    if (confirm(`Вы действительно хотите НАВСЕГДА удалить запись №${bookingId}?`)) {
-      await executeAdminAction(bookingId, "delete", "");
-    }
   }
 
   async function executeAdminAction(bookingId, action, comment) {
@@ -1484,104 +1553,52 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch(`${BACKEND_URL}/api/admin/booking/action`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          admin_id: userId,
-          booking_id: parseInt(bookingId),
-          action: action,
-          comment: comment
-        })
+        body: JSON.stringify({ admin_id: userId, booking_id: parseInt(bookingId), action: action, comment: comment })
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        showToast(`✅ Действие по записи №${bookingId} выполнено`);
+        showToast("✅ Действие модератора выполнено!");
         loadAdminBookings(currentAdminFilter);
+        loadUserProfile();
       } else {
-        showToast("⚠️ " + (data.error || "Ошибка выполнения"));
+        showToast("⚠️ " + (data.error || "Ошибка"));
       }
     } catch (e) {
-      showToast("⚠️ Ошибка соединения с сервером");
+      showToast("⚠️ Ошибка вызова API");
     }
-  }
-
-  // Admin Master & Date Selection Logic
-  let selectedAdmMaster = "Алексей Смирнов";
-
-  const admMasterSelector = document.getElementById("adm-masters-selector");
-  if (admMasterSelector) {
-    admMasterSelector.querySelectorAll(".adm-master-chip").forEach(chip => {
-      chip.addEventListener("click", () => {
-        admMasterSelector.querySelectorAll(".adm-master-chip").forEach(c => c.classList.remove("active"));
-        chip.classList.add("active");
-        selectedAdmMaster = chip.dataset.master;
-      });
-    });
-  }
-
-  // Set default date picker value to today
-  const admOffDateInput = document.getElementById("adm-off-date");
-  if (admOffDateInput && !admOffDateInput.value) {
-    const todayStr = new Date().toISOString().split("T")[0];
-    admOffDateInput.value = todayStr;
   }
 
   const admTriggerRescheduleBtn = document.getElementById("adm-trigger-reschedule-btn");
   if (admTriggerRescheduleBtn) {
     admTriggerRescheduleBtn.addEventListener("click", async () => {
+      const masterSelect = document.getElementById("adm-master-select");
+      const dateInput = document.getElementById("adm-off-date");
       const reasonInput = document.getElementById("adm-master-reason");
-      const rawDate = admOffDateInput ? admOffDateInput.value : "";
+
+      const masterName = masterSelect ? masterSelect.value : "";
+      const rawDate = dateInput ? dateInput.value : "";
       const reason = reasonInput ? reasonInput.value.trim() : "";
 
-      let formattedDateTarget = "";
-      if (rawDate) {
-        const [year, monthStr, dayStr] = rawDate.split("-");
-        const monthIdx = parseInt(monthStr, 10) - 1;
-        const day = parseInt(dayStr, 10);
-        if (MONTH_NAMES_RU_GENITIVE[monthIdx]) {
-          formattedDateTarget = `${day} ${MONTH_NAMES_RU_GENITIVE[monthIdx]}`;
-        }
-      }
+      if (!rawDate) { showToast("⚠️ Укажите дату!"); return; }
 
-      if (!selectedAdmMaster) {
-        showToast("⚠️ Выберите мастера!");
-        return;
-      }
-      if (!rawDate) {
-        showToast("⚠️ Укажите дату отсутствия мастера!");
-        return;
-      }
+      const [y, m, d] = rawDate.split("-");
+      const formattedDate = `${parseInt(d)} ${MONTH_NAMES_RU_GENITIVE[parseInt(m)-1]}`;
 
-      const dateNotice = formattedDateTarget ? `на ${formattedDateTarget}` : "";
-      if (!confirm(`Отменить смену мастера "${selectedAdmMaster}" ${dateNotice} и уведомить всех записанных клиентов?`)) {
-        return;
-      }
-
-      admTriggerRescheduleBtn.disabled = true;
-      admTriggerRescheduleBtn.innerHTML = "<span>⏳ Отправка...</span>";
+      if (!confirm(`Отменить смену мастера "${masterName}" на ${formattedDate}?`)) return;
 
       try {
         const res = await fetch(`${BACKEND_URL}/api/admin/master/reschedule`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            admin_id: userId,
-            master_name: selectedAdmMaster,
-            target_date: formattedDateTarget,
-            reason: reason
-          })
+          body: JSON.stringify({ admin_id: userId, master_name: masterName, target_date: formattedDate, reason: reason })
         });
-
         const data = await res.json();
         if (res.ok && data.success) {
-          showToast(`✅ Записи к мастеру "${selectedAdmMaster}" ${dateNotice} отменены (затронуто ${data.affected_count} клиентов)!`);
+          showToast(`✅ Смена мастера отменена! Клиенты уведомлены.`);
           loadAdminBookings(currentAdminFilter);
-        } else {
-          showToast("⚠️ " + (data.error || "Ошибка смены мастера"));
         }
       } catch (e) {
-        showToast("⚠️ Ошибка соединения с сервером");
-      } finally {
-        admTriggerRescheduleBtn.disabled = false;
-        admTriggerRescheduleBtn.innerHTML = "<span>⚠️ Снять мастера на выбранную дату и уведомить клиентов</span>";
+        showToast("⚠️ Ошибка соединения");
       }
     });
   }

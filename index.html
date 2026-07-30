@@ -3,319 +3,269 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Автосервис — Telegram Mini App</title>
+  <title>AutoFriends — Автосервис</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=38.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=67.0" />
 </head>
 <body>
 
   <!-- ══════════════════════════════════════════════
-       SCREEN 1 — TRITON ONBOARDING (Welcome Screen)
+       WELCOME ONBOARDING SCREEN (AutoFriends Style)
        ══════════════════════════════════════════════ -->
-  <div id="triton-onboarding-screen" class="triton-onboarding-overlay hidden">
-    <!-- Top bar: "Cancel" link -->
-    <div class="onboarding-top-bar">
-      <button type="button" class="onboarding-cancel-btn" id="onboarding-cancel-btn">Отмена</button>
-    </div>
-
-    <!-- Center: 3D Logo + Title + Subtitle -->
-    <div class="onboarding-center-content">
-      <div class="triton-3d-logo-card">
-        <div class="logo-3d-main">🏎️</div>
-        <div class="floating-tag tag-top">ТО</div>
-        <div class="floating-tag tag-bottom">🔧</div>
+  <div id="triton-onboarding-screen" class="af-welcome-overlay">
+    
+    <div class="af-welcome-content">
+      <!-- 3D Auto Service Badge -->
+      <div class="af-welcome-graphic">
+        <div class="af-graphic-glow"></div>
+        <img src="images/hero.jpg" alt="AutoFriends Logo" class="af-graphic-img" />
       </div>
 
-      <h2 class="onboarding-title">Добро пожаловать в Автосервис.Pro</h2>
-      <p class="onboarding-subtitle">Запись на ремонт и ТО автомобиля прямо в Telegram — быстро, просто и без очередей!</p>
+      <!-- Welcome Title & Description -->
+      <h1 class="af-welcome-title">Добро пожаловать в AutoFriends</h1>
+      <p class="af-welcome-sub">Удобная и быстрая онлайн-запись на техническое обслуживание и ремонт авто прямо в Telegram!</p>
     </div>
 
-    <!-- Bottom: Blue circle arrow button -->
-    <div class="onboarding-bottom-action">
-      <button type="button" class="onboarding-next-circle-btn" id="onboarding-next-btn">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-          <path d="M5 12h14M13 6l6 6-6 6" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+    <!-- Bottom Circular Arrow Button with Ripple Ring -->
+    <div class="af-welcome-action">
+      <div class="af-arrow-ripple"></div>
+      <button type="button" class="af-welcome-arrow-btn" id="onboarding-next-btn">
+        <span>➔</span>
       </button>
     </div>
+
   </div>
 
   <!-- ══════════════════════════════════════════════
-       SCREEN 2 — MAIN APP SHELL
+       MAIN APP SHELL
        ══════════════════════════════════════════════ -->
   <div id="app">
 
-    <!-- Profile Row Header (like Triton: avatar + name left, status right) -->
-    <header class="triton-header">
-      <div class="triton-user-profile">
-        <div class="user-avatar-circle">
-          <span>👨‍🔧</span>
-        </div>
-        <span class="user-handle-name" id="user-greeting">Клиент</span>
+    <!-- Top Header with Interactive Profile Chip -->
+    <header class="af-header">
+      <div class="af-header-title-box">
+        <span class="af-header-sub">ОФИЦИАЛЬНЫЙ СЕРВИС</span>
+        <h1 class="af-header-title">AutoFriends</h1>
       </div>
-      <div class="triton-status-pill">
-        <span class="pill-dot"></span>
-        <span class="pill-status-text">Открыто</span>
+
+      <!-- User Profile Chip in Top Right Header -->
+      <div class="af-user-chip" id="top-user-profile-btn" data-tab="profile">
+        <div class="af-user-avatar">👤</div>
+        <span class="af-user-name" id="user-greeting">Клиент</span>
       </div>
     </header>
 
-    <!-- Main Scrollable Content -->
+    <!-- Main Content Tabs -->
     <main class="content">
 
       <!-- ════════════════════════════════════════
-           🏠 HOME TAB (Triton Screen 2 Layout)
+           🏠 TAB 1: ГЛАВНАЯ (Promo Banner + Booking Reminder + Redesigned CTA Button)
            ════════════════════════════════════════ -->
       <section id="tab-home" class="tab-content active">
 
-        <!-- 1. Hero Banner Card (like "Spin & win!" card in Triton) -->
-        <div class="tr-hero-banner" id="home-start-booking-btn">
-          <div class="tr-hero-text">
-            <div>
-              <div class="tr-hero-label">Запись на ТО<br>в 1 клик!</div>
-              <div class="tr-hero-sub" style="margin-top:6px;">Быстрый выбор мастера и удобного времени без очередей</div>
+        <!-- 1. Top Auto-Sliding Promo Carousel -->
+        <div class="af-carousel-wrapper" id="home-promo-carousel">
+          <div class="af-carousel-track" id="carousel-track">
+
+            <!-- Slide 1 -->
+            <div class="af-carousel-slide" style="background-image: url('images/hero.jpg');" data-tab="booking" data-step="1">
+              <div class="af-slide-glass-panel">
+                <span class="af-slide-tag">🔥 АКЦИЯ МЕСЯЦА</span>
+                <h2 class="af-slide-title">Комплексное ТО со скидкой 15%</h2>
+                <p class="af-slide-sub">Замена масла + 3 фильтра с гарантией 12 месяцев</p>
+              </div>
             </div>
-            <button class="tr-hero-play-btn" id="hero-play-btn">Записаться</button>
+
+            <!-- Slide 2 -->
+            <div class="af-carousel-slide" style="background-image: url('images/susp.jpg');" data-tab="booking" data-step="1">
+              <div class="af-slide-glass-panel">
+                <span class="af-slide-tag">⚡ СПЕЦПРЕДЛОЖЕНИЕ</span>
+                <h2 class="af-slide-title">Бесплатная диагностика подвески</h2>
+                <p class="af-slide-sub">При ремонте ходовой части от 3 000 ₽</p>
+              </div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="af-carousel-slide" style="background-image: url('images/ac.jpg');" data-tab="booking" data-step="1">
+              <div class="af-slide-glass-panel">
+                <span class="af-slide-tag">❄️ КЛИМАТ СЕРВИС</span>
+                <h2 class="af-slide-title">Заправка кондиционера за 1 990 ₽</h2>
+                <p class="af-slide-sub">Полная антибактериальная обработка системы</p>
+              </div>
+            </div>
+
           </div>
-          <div class="tr-hero-img">
-            <div class="tr-hero-img-emoji">🏎️</div>
+
+          <!-- Carousel Dots -->
+          <div class="af-carousel-dots">
+            <span class="af-dot active" data-index="0"></span>
+            <span class="af-dot" data-index="1"></span>
+            <span class="af-dot" data-index="2"></span>
           </div>
         </div>
 
-        <!-- 2. Primary Blue Full-Width Button (like "Claim 50 💎" in Triton) -->
-        <button class="tr-claim-btn" id="triton-quick-booking-banner">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M12 5v14M5 12h14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-          </svg>
-          Выбрать мастера и время
+        <!-- 2. Upcoming Active Booking Reminder & Live Countdown Card -->
+        <div id="home-active-booking-container">
+          <!-- Populated dynamically via app.js -->
+        </div>
+
+        <!-- 3. Big Distinct Action CTA Button -->
+        <button type="button" class="af-home-cta-btn" data-tab="booking" data-step="1">
+          <div class="af-cta-text-group">
+            <span class="af-cta-main-title">🚀 Записаться на обслуживание</span>
+            <span class="af-cta-sub-title">Выбор мастера, даты и удобного времени</span>
+          </div>
+          <div class="af-cta-arrow-badge">➔</div>
         </button>
-
-        <!-- 3. 2-Column Hub Cards (like "Shop" + "Craft" in Triton) -->
-        <div class="tr-grid-2">
-          <div class="tr-hub" data-tab="booking" data-step="1">
-            <div class="tr-hub-icon">🛒</div>
-            <div class="tr-hub-info">
-              <div class="tr-hub-title">Услуги</div>
-              <div class="tr-hub-sub">Каталог работ</div>
-            </div>
-          </div>
-          <div class="tr-hub" data-tab="booking" data-step="1">
-            <div class="tr-hub-icon">🛠️</div>
-            <div class="tr-hub-info">
-              <div class="tr-hub-title">Мой Гараж</div>
-              <div class="tr-hub-sub">Марка авто</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 4. 2-Column Feature Widgets (like "Tasks" + "Friends" in Triton) -->
-        <div class="tr-grid-2">
-          <!-- Bookings Widget -->
-          <div class="tr-widget" id="triton-widget-bookings" data-tab="profile">
-            <div class="tr-widget-title">Ваши Записи</div>
-            <div class="tr-widget-sub">Статус и отмены</div>
-            <div class="tr-widget-checks">
-              <div class="tr-check">✓</div>
-              <div class="tr-check">✓</div>
-            </div>
-          </div>
-
-          <!-- Masters Widget -->
-          <div class="tr-widget" id="triton-widget-masters" data-tab="booking" data-step="2">
-            <div class="tr-widget-avatars">
-              <div class="tr-avatar-sm">👨‍🔧</div>
-              <div class="tr-avatar-sm">⚡</div>
-              <div class="tr-avatar-sm">🛞</div>
-            </div>
-            <div class="tr-widget-title">Специалисты</div>
-            <div class="tr-widget-sub">Опыт 12+ лет</div>
-          </div>
-        </div>
-
-        <!-- 5. Popular Services Label -->
-        <div class="tr-section-title">💡 Популярные услуги</div>
-
-        <!-- 6. Service Cards (scrollable horizontal row like Triton items row) -->
-        <div class="tr-grid-2">
-          <div class="tr-hub" data-tab="booking" data-step="1" data-cat="cat_electric">
-            <div class="tr-hub-icon">🔍</div>
-            <div class="tr-hub-info">
-              <div class="tr-hub-title">Диагностика</div>
-              <div class="tr-hub-sub">от 1 000 ₽</div>
-            </div>
-          </div>
-          <div class="tr-hub" data-tab="booking" data-step="1" data-cat="cat_to">
-            <div class="tr-hub-icon">🛢️</div>
-            <div class="tr-hub-info">
-              <div class="tr-hub-title">Замена масла</div>
-              <div class="tr-hub-sub">от 1 500 ₽</div>
-            </div>
-          </div>
-          <div class="tr-hub" data-tab="booking" data-step="1" data-cat="cat_chassis">
-            <div class="tr-hub-icon">🔩</div>
-            <div class="tr-hub-info">
-              <div class="tr-hub-title">Ходовая</div>
-              <div class="tr-hub-sub">от 1 000 ₽</div>
-            </div>
-          </div>
-          <div class="tr-hub" data-tab="booking" data-step="1" data-cat="cat_climate">
-            <div class="tr-hub-icon">❄️</div>
-            <div class="tr-hub-info">
-              <div class="tr-hub-title">Кондиционер</div>
-              <div class="tr-hub-sub">от 2 000 ₽</div>
-            </div>
-          </div>
-        </div>
 
       </section>
 
       <!-- ════════════════════════════════════════
-           📅 BOOKING TAB — Wizard
+           🏷 TAB 2: УСЛУГИ / БРОНИРОВАНИЕ (Clean Navigation & Reschedule Fast-Track)
            ════════════════════════════════════════ -->
       <section id="tab-booking" class="tab-content">
 
-        <div class="booking-header">
-          <div class="hero-badge">📅 Онлайн Бронирование</div>
-          <h2>Запись на обслуживание</h2>
-          <p>Пошаговое быстрое оформление заявки на ТО</p>
+        <div class="af-card">
+          <h2 style="font-size:17px;font-weight:800;color:var(--dark);">📅 Онлайн-запись</h2>
+          <p style="font-size:13px;color:var(--gray-3);">Выберите категорию, добавьте услуги и выберите время</p>
         </div>
 
-        <!-- Wizard Progress Bar (4 steps) -->
-        <div class="wizard-progress-bar">
-          <div class="wizard-step active" id="wizard-step-ind-1">
-            <span class="step-num">1</span>
-            <span class="step-lbl">Услуга</span>
-          </div>
-          <div class="step-divider"></div>
-          <div class="wizard-step" id="wizard-step-ind-2">
-            <span class="step-num">2</span>
-            <span class="step-lbl">Мастер</span>
-          </div>
-          <div class="step-divider"></div>
-          <div class="wizard-step" id="wizard-step-ind-3">
-            <span class="step-num">3</span>
-            <span class="step-lbl">Авто</span>
-          </div>
-          <div class="step-divider"></div>
-          <div class="wizard-step" id="wizard-step-ind-4">
-            <span class="step-num">4</span>
-            <span class="step-lbl">Запись</span>
-          </div>
+        <!-- Wizard Step Bar -->
+        <div class="af-wizard-bar">
+          <div class="af-step-pill active" id="wizard-step-ind-1">1. Услуга</div>
+          <div class="af-step-pill" id="wizard-step-ind-2">2. Мастер</div>
+          <div class="af-step-pill" id="wizard-step-ind-3">3. Авто</div>
+          <div class="af-step-pill" id="wizard-step-ind-4">4. Итог</div>
         </div>
 
-        <form id="booking-form" class="booking-form">
+        <form id="booking-form" style="display:flex;flex-direction:column;gap:16px;">
 
-          <!-- Step 1: Service Selection -->
+          <!-- Step 1: Big Rounded Rectangles Categories -->
           <div class="wizard-step-content active" id="form-step-1">
-            <div class="form-group">
-              <label class="form-label">Шаг 1: Выберите услугу или проблему:</label>
-              <div class="search-box-wrapper">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="wizard-search-input" class="form-input search-input" placeholder="Поиск услуги (напр. ГРМ, диагност, фильтр)..." />
+
+            <!-- Level 1 View: Main Categories Cards -->
+            <div id="cat-overview-view" class="af-form-group">
+              <label class="af-label">Выберите категорию услуг:</label>
+              <input type="text" id="wizard-search-input" class="af-input" placeholder="🔍 Быстрый поиск услуги (ГРМ, масло, колодки)..." />
+              
+              <!-- Container for Big Rectangle Category Cards -->
+              <div id="categories-cards-container" class="af-category-grid" style="margin-top:6px;"></div>
+            </div>
+
+            <!-- Level 2 View: Subservices of Selected Category -->
+            <div id="cat-subservices-view" class="af-form-group hidden">
+              <div class="af-subservices-header-box">
+                <button type="button" id="back-to-categories-btn" class="af-back-cat-btn">
+                  <span>← Все категории</span>
+                </button>
+                <div id="selected-cat-title-badge" class="af-cat-header-title"></div>
               </div>
-              <div id="category-pills" class="category-accordion-container"></div>
-              <div id="selected-summary"></div>
+              
+              <div id="subservices-list-container" class="af-subservices-container"></div>
             </div>
 
-            <div class="form-group hidden" id="custom-problem-group">
-              <label class="form-label" for="custom-problem">Описание проблемы:</label>
-              <input type="text" id="custom-problem" class="form-input" placeholder="Например: Стучит подвеска справа..." />
-            </div>
+            <!-- Summary of Selected Services -->
+            <div id="selected-summary"></div>
 
-            <div class="wizard-actions">
-              <button type="button" class="next-btn" id="to-step-2-btn">Далее: выбор мастера и времени ➔</button>
-            </div>
+            <button type="button" class="af-btn-primary" id="to-step-2-btn">
+              Далее: Выбор мастера и времени ➔
+            </button>
           </div>
 
-          <!-- Step 2: Master + Calendar + Time -->
+          <!-- Step 2: Master & Calendar (Supports Fast-Track Rescheduling) -->
           <div class="wizard-step-content hidden" id="form-step-2">
-            <div class="form-group">
-              <label class="form-label">Шаг 2: Выберите специалиста:</label>
-              <div class="masters-grid" id="masters-container">
-                <!-- Masters rendered via JS -->
+
+            <!-- Reschedule Banner (Shown only when rescheduling an existing booking) -->
+            <div id="reschedule-notice-badge" class="af-card hidden" style="background: rgba(255, 204, 0, 0.14); border-color: rgba(255, 204, 0, 0.4); padding: 14px 16px;">
+              <div style="font-size:14px; font-weight:800; color: var(--dark);" id="reschedule-notice-title">🔄 Перенос записи</div>
+              <div style="font-size:12.5px; color: var(--gray-2); margin-top:2px;">Выберите новую дату и время. Марка авто, услуги и телефон будут сохранены автоматически.</div>
+            </div>
+
+            <div class="af-form-group">
+              <label class="af-label">Выберите мастера:</label>
+              <div id="masters-container" style="display:flex;flex-direction:column;gap:10px;"></div>
+            </div>
+
+            <div class="af-form-group" id="calendar-step-group">
+              <label class="af-label">Выберите дату:</label>
+              <div class="af-calendar-card" id="full-calendar-widget"></div>
+            </div>
+
+            <div class="af-form-group hidden" id="slots-step-group">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                <button type="button" class="af-btn-secondary" id="change-date-btn" style="padding:8px 14px;font-size:13px;">← Изменить дату</button>
+                <span style="font-size:14px;font-weight:800;color:var(--dark);" id="slots-date-badge">28 ИЮЛЯ</span>
+              </div>
+              <label class="af-label" id="slots-header-label">Свободное время:</label>
+              <div class="af-card">
+                <div class="af-slots-grid" id="slots-container"></div>
               </div>
             </div>
 
-            <!-- Calendar -->
-            <div class="form-group" id="calendar-step-group">
-              <label class="form-label">Выберите дату записи на календаре:</label>
-              <div class="calendar-card" id="full-calendar-widget">
-                <!-- Full month calendar rendered via JS -->
-              </div>
-            </div>
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:10px;">
+              <button type="button" class="af-btn-secondary" id="back-to-step-1-btn">← Назад</button>
+              
+              <!-- Normal flow button -->
+              <button type="button" class="af-btn-primary" id="to-step-3-btn">Далее: Данные авто ➔</button>
 
-            <!-- Time Slots -->
-            <div class="form-group hidden" id="slots-step-group">
-              <div class="slots-view-header">
-                <button type="button" class="change-date-btn" id="change-date-btn">← Изменить дату</button>
-                <span class="slots-selected-date-badge" id="slots-date-badge">28 июля</span>
-              </div>
-              <label class="form-label" id="slots-header-label">Выберите свободное время:</label>
-              <div class="slots-card">
-                <div class="slots-grid" id="slots-container">
-                  <!-- Time slots rendered via JS -->
-                </div>
-              </div>
-            </div>
-
-            <div class="wizard-actions dual">
-              <button type="button" class="back-btn" id="back-to-step-1-btn">← Назад</button>
-              <button type="button" class="next-btn" id="to-step-3-btn">Далее к выбору авто ➔</button>
+              <!-- Reschedule Fast-Track Confirm Button -->
+              <button type="button" class="af-btn-primary hidden" id="confirm-reschedule-btn" style="background:var(--dark);">
+                🔄 Подтвердить перенос записи
+              </button>
             </div>
           </div>
 
-          <!-- Step 3: Car Details -->
+          <!-- Step 3: Car Info -->
           <div class="wizard-step-content hidden" id="form-step-3">
-            <div class="form-group">
-              <label class="form-label" for="car-model">Шаг 3: Укажите марку и модель авто:</label>
-              <input type="text" id="car-model" class="form-input" placeholder="Например: Toyota Camry, Tank 500, Opel Astra" />
-              <small class="form-hint">Укажите марку и модель вашего автомобиля</small>
+            <div class="af-form-group">
+              <label class="af-label" for="car-model">Марка и модель авто:</label>
+              <input type="text" id="car-model" class="af-input" placeholder="Например: Audi Q5, BMW 5, Toyota Camry" />
             </div>
 
-            <div class="form-group">
-              <label class="form-label" for="car-number">Госномер автомобиля (необязательно):</label>
-              <input type="text" id="car-number" class="form-input uppercase-input" placeholder="А000АА180" maxlength="12" />
-              <small class="form-hint">Автоматически преобразуется в ЗАГЛАВНЫЕ БУКВЫ</small>
+            <div class="af-form-group">
+              <label class="af-label" for="car-number">Госномер (необязательно):</label>
+              <input type="text" id="car-number" class="af-input" placeholder="А000АА180" maxlength="12" style="text-transform:uppercase;" />
             </div>
 
-            <div class="wizard-actions dual">
-              <button type="button" class="back-btn" id="back-to-step-2-btn">← Назад</button>
-              <button type="button" class="next-btn" id="to-step-4-btn">Далее к итогу ➔</button>
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:10px;">
+              <button type="button" class="af-btn-secondary" id="back-to-step-2-btn">← Назад</button>
+              <button type="button" class="af-btn-primary" id="to-step-4-btn">Далее: Проверка ➔</button>
             </div>
           </div>
 
-          <!-- Step 4: Confirmation -->
+          <!-- Step 4: Summary -->
           <div class="wizard-step-content hidden" id="form-step-4">
-            <div class="form-group">
-              <label class="form-label">Шаг 4: Проверьте данные записи:</label>
-              <div class="booking-card" id="final-booking-summary" style="cursor:default;border-color:rgba(43,126,255,0.28);">
-                <!-- Rendered dynamically by JS -->
+            <div class="af-form-group">
+              <label class="af-label">Детали записи:</label>
+              <div class="af-summary-card" id="final-booking-summary"></div>
+            </div>
+
+            <div class="af-form-group">
+              <label class="af-label" for="phone-number">Телефон для связи:</label>
+              <div style="display:flex;gap:8px;">
+                <input type="tel" id="phone-number" class="af-input" placeholder="+7 (999) 000-00-00" readonly required style="flex:1;" />
+                <button type="button" id="edit-phone-btn" class="af-btn-secondary" style="padding:12px 16px;">✏️</button>
               </div>
             </div>
 
-            <div class="form-group">
-              <label class="form-label" for="phone-number">Ваш телефон для связи:</label>
-              <div style="display:flex;gap:8px;align-items:center;">
-                <input type="tel" id="phone-number" class="form-input" placeholder="+7 (999) 000-00-00" readonly required style="flex:1;" />
-                <button type="button" id="edit-phone-btn" style="padding:12px 14px;border-radius:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:var(--text-2);font-size:16px;cursor:pointer;flex-shrink:0;">✏️</button>
-              </div>
+            <div class="af-card" id="total-price-box" style="display:flex;align-items:center;justify-content:space-between;padding:18px;">
+              <span class="af-label">Ориентировочно:</span>
+              <span style="font-size:20px;font-weight:800;color:var(--dark);" id="total-price-val">от 0 ₽</span>
             </div>
 
-            <div class="booking-card" id="total-price-box" style="cursor:default;flex-direction:row;align-items:center;justify-content:space-between;">
-              <span style="font-size:13px;color:var(--text-2);">💰 Ориентировочная стоимость</span>
-              <span style="font-size:16px;font-weight:800;color:#2b7eff;" id="total-price-val">от 0 ₽</span>
+            <div style="display:flex;align-items:center;gap:10px;padding:4px;">
+              <input type="checkbox" id="privacy-agree" style="width:20px;height:20px;accent-color:var(--dark);cursor:pointer;" />
+              <span style="font-size:12.5px;color:var(--gray-2);">Согласен с <a href="#" id="privacy-link" style="color:var(--dark);font-weight:700;">Политикой конфиденциальности</a></span>
             </div>
 
-            <div class="privacy-row">
-              <input type="checkbox" id="privacy-agree" />
-              <span class="privacy-text">Я согласен с <a href="#" id="privacy-link" class="privacy-link">Политикой конфиденциальности</a></span>
-            </div>
-
-            <div class="wizard-actions dual">
-              <button type="button" class="back-btn" id="back-to-step-3-btn">← Назад</button>
-              <button type="submit" class="submit-btn" id="submit-booking-btn" disabled>🚀 Подтвердить запись</button>
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:10px;">
+              <button type="button" class="af-btn-secondary" id="back-to-step-3-btn">← Назад</button>
+              <button type="submit" class="af-btn-primary" id="submit-booking-btn" disabled>
+                🚀 Подтвердить запись
+              </button>
             </div>
           </div>
 
@@ -323,228 +273,153 @@
       </section>
 
       <!-- ════════════════════════════════════════
-           👤 PROFILE TAB
+           📅 TAB 3: ЗАПИСИ (User Bookings List)
            ════════════════════════════════════════ -->
-      <section id="tab-profile" class="tab-content">
-
-        <div class="profile-user-card">
-          <div class="profile-avatar-lg" id="profile-avatar">👤</div>
-          <div>
-            <div class="profile-name" id="profile-name">Клиент</div>
-            <div class="profile-id" id="profile-phone">Телефон: Не указан</div>
-          </div>
+      <section id="tab-bookings-list" class="tab-content">
+        <div class="af-section-header">
+          <h2 class="af-section-title">Мои записи</h2>
         </div>
-
-        <!-- Stats Row -->
-        <div class="tr-grid-2" style="grid-template-columns:1fr 1fr 1fr;">
-          <div class="tr-widget" style="cursor:default;min-height:70px;align-items:center;flex-direction:column;justify-content:center;">
-            <div style="font-size:22px;font-weight:900;color:#2b7eff;" id="stat-active">0</div>
-            <div style="font-size:11px;color:var(--text-2);">Активных</div>
-          </div>
-          <div class="tr-widget" style="cursor:default;min-height:70px;align-items:center;flex-direction:column;justify-content:center;">
-            <div style="font-size:22px;font-weight:900;color:#2b7eff;" id="stat-total">0</div>
-            <div style="font-size:11px;color:var(--text-2);">Всего</div>
-          </div>
-          <div class="tr-widget" style="cursor:default;min-height:70px;align-items:center;flex-direction:column;justify-content:center;">
-            <div style="font-size:22px;font-weight:900;color:var(--red);" id="stat-cancelled">0</div>
-            <div style="font-size:11px;color:var(--text-2);">Отклонено</div>
-          </div>
-        </div>
-
-        <!-- Admin button (hidden by default) -->
-        <button id="admin-profile-btn" class="tr-claim-btn hidden" style="background:linear-gradient(135deg,#ef4444,#b91c1c);">
-          🛡 Панель модератора
-        </button>
-
-        <!-- Bookings History -->
-        <div class="tr-section-title">📋 Ваши записи</div>
-        <div class="bookings-list" id="user-bookings-list">
-          <!-- Loaded via JS -->
-        </div>
+        <div id="user-bookings-list" style="display:flex;flex-direction:column;gap:12px;"></div>
       </section>
 
       <!-- ════════════════════════════════════════
-           🛡 ADMIN TAB
+           👤 TAB 4: ПРОФИЛЬ & МОДЕРАЦИЯ (Centered Avatar + Refined Moderator Layout)
            ════════════════════════════════════════ -->
-      <section id="tab-admin" class="tab-content">
+      <section id="tab-profile" class="tab-content">
 
-        <div class="booking-header">
-          <div class="hero-badge admin-badge">🛡 Панель Модератора</div>
-          <h2>Управление заявками</h2>
-          <p>Быстрое подтверждение, отмена и удаление записей</p>
+        <!-- Centered Profile Card: Avatar on Top, Name under Avatar, Phone under Name -->
+        <div class="af-card af-profile-centered-header">
+          <div class="af-user-avatar-large">👤</div>
+          <div class="af-profile-name-large" id="profile-name">Клиент</div>
+          <div class="af-profile-phone-sub" id="profile-phone">Телефон: Не указан</div>
         </div>
 
-        <!-- Admin Stats Row -->
-        <div class="tr-grid-2" style="grid-template-columns:1fr 1fr 1fr;">
-          <div class="tr-widget" style="cursor:default;min-height:70px;align-items:center;flex-direction:column;justify-content:center;">
-            <div style="font-size:22px;font-weight:900;color:var(--yellow);" id="adm-stat-pending">0</div>
-            <div style="font-size:11px;color:var(--text-2);">Ожидают</div>
+        <div class="af-grid-3-stats">
+          <div class="af-card af-stat-box">
+            <div class="af-stat-num" id="stat-active">0</div>
+            <div class="af-stat-lbl">АКТИВНЫХ</div>
           </div>
-          <div class="tr-widget" style="cursor:default;min-height:70px;align-items:center;flex-direction:column;justify-content:center;">
-            <div style="font-size:22px;font-weight:900;color:var(--green);" id="adm-stat-approved">0</div>
-            <div style="font-size:11px;color:var(--text-2);">Одобрено</div>
+          <div class="af-card af-stat-box">
+            <div class="af-stat-num" id="stat-total">0</div>
+            <div class="af-stat-lbl">ВСЕГО</div>
           </div>
-          <div class="tr-widget" style="cursor:default;min-height:70px;align-items:center;flex-direction:column;justify-content:center;">
-            <div style="font-size:22px;font-weight:900;color:var(--red);" id="adm-stat-rejected">0</div>
-            <div style="font-size:11px;color:var(--text-2);">Отклонено</div>
+          <div class="af-card af-stat-box">
+            <div class="af-stat-num" style="color:var(--red);" id="stat-cancelled">0</div>
+            <div class="af-stat-lbl">ОТКЛОНЕНО</div>
           </div>
         </div>
 
-        <!-- Master Off-Duty Tool Card -->
-        <div class="booking-card admin-master-tool-card">
-          <div class="tool-card-title">👨‍🔧 Управление сменами мастеров (Отгул / Больничный)</div>
-          <p class="tool-card-desc">Укажите мастера и дату его отсутствия. Все записи на этот день будут сброшены с предложением клиенту выбрать другого мастера или время.</p>
+        <button id="admin-profile-btn" class="af-btn-primary hidden">
+          🛡 Панель модератора
+        </button>
 
-          <div class="form-group">
-            <label class="form-label">1. Выберите мастера:</label>
-            <div class="adm-masters-grid" id="adm-masters-selector">
-              <div class="adm-master-chip active" data-master="Алексей Смирнов">
-                <span class="chip-avatar">👨‍🔧</span>
-                <div class="chip-info">
-                  <div class="chip-name">Алексей Смирнов</div>
-                  <div class="chip-role">Старший механик</div>
-                </div>
-              </div>
-              <div class="adm-master-chip" data-master="Дмитрий Ковалев">
-                <span class="chip-avatar">⚡</span>
-                <div class="chip-info">
-                  <div class="chip-name">Дмитрий Ковалев</div>
-                  <div class="chip-role">Диагност-электрик</div>
-                </div>
-              </div>
-              <div class="adm-master-chip" data-master="Игорь Соколов">
-                <span class="chip-avatar">🛞</span>
-                <div class="chip-info">
-                  <div class="chip-name">Игорь Соколов</div>
-                  <div class="chip-role">Ходовая часть</div>
-                </div>
-              </div>
+        <!-- Refined Admin Moderation Panel -->
+        <div id="admin-panel-section" class="hidden" style="display:flex;flex-direction:column;gap:16px;">
+          <div class="af-card">
+            <div class="af-mod-header">
+              <span class="af-mod-badge">👨‍🔧 МОДЕРАЦИЯ СМЕН</span>
+              <h3 class="af-mod-title">Управление мастерами</h3>
+              <p class="af-mod-desc">Снятие мастера со смены с предложением перезаписи клиентам</p>
             </div>
+
+            <div class="af-form-group">
+              <label class="af-label">Выбор мастера:</label>
+              <select id="adm-master-select" class="af-input af-select">
+                <option value="Алексей Смирнов">Алексей Смирнов (Старший механик)</option>
+                <option value="Дмитрий Ковалев">Дмитрий Ковалев (Диагност)</option>
+                <option value="Игорь Соколов">Игорь Соколов (Ходовая)</option>
+              </select>
+            </div>
+
+            <div class="af-form-group">
+              <label class="af-label" for="adm-off-date">Дата отсутствия:</label>
+              <input type="date" id="adm-off-date" class="af-input" />
+            </div>
+
+            <div class="af-form-group">
+              <label class="af-label" for="adm-master-reason">Причина отмены:</label>
+              <input type="text" id="adm-master-reason" class="af-input" value="Больничный мастера" placeholder="Укажите причину..." />
+            </div>
+
+            <button type="button" id="adm-trigger-reschedule-btn" class="af-btn-primary" style="background:var(--red);margin-top:6px;">
+              ⚠️ Снять мастера и уведомить клиентов
+            </button>
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="adm-off-date">2. Укажите дату отсутствия:</label>
-            <input type="date" id="adm-off-date" class="form-input date-input" />
+          <div class="af-admin-filter-bar" id="admin-status-pills">
+            <button type="button" class="af-filter-chip active" data-status="all">Все заявки</button>
+            <button type="button" class="af-filter-chip" data-status="На рассмотрении">⏳ Ожидают</button>
+            <button type="button" class="af-filter-chip" data-status="Одобрена">✅ Одобрены</button>
+            <button type="button" class="af-filter-chip" data-status="В работе">🛠 В работе</button>
+            <button type="button" class="af-filter-chip" data-status="Готов">🎉 Готовы</button>
           </div>
 
-          <div class="form-group">
-            <label class="form-label" for="adm-master-reason">3. Причина (отобразится клиентам):</label>
-            <input type="text" id="adm-master-reason" class="form-input" placeholder="Например: Больничный мастера / Отгул" value="Больничный мастера" />
-          </div>
-
-          <button type="button" id="adm-trigger-reschedule-btn" class="tr-claim-btn" style="background:linear-gradient(135deg,#ef4444,#b91c1c);box-shadow:0 0 22px rgba(239,68,68,0.40);">
-            ⚠️ Снять мастера и уведомить клиентов
-          </button>
+          <div id="admin-bookings-list" style="display:flex;flex-direction:column;gap:12px;"></div>
         </div>
 
-        <!-- Filter Pills -->
-        <div class="pills-grid" id="admin-status-pills">
-          <div class="pill active" data-status="all">Все записи</div>
-          <div class="pill" data-status="На рассмотрении">⏳ На рассмотрении</div>
-          <div class="pill" data-status="Одобрена">✅ Одобренные</div>
-          <div class="pill" data-status="Отклонена">🔴 Отклоненные</div>
-        </div>
-
-        <div class="bookings-list" id="admin-bookings-list">
-          <!-- Admin bookings rendered via JS -->
-        </div>
       </section>
 
     </main>
 
     <!-- ════════════════════════════════════════
-         FLOATING NAVBAR (Triton 4-Tab + Center Circle)
+         CURVED NOTCHED BOTTOM NAVIGATION BAR (Snug Cutout & Exact Baseline Labels)
          ════════════════════════════════════════ -->
-    <nav class="floating-navbar" id="main-nav">
-      <div class="nav-blob-pill" id="nav-blob-pill"></div>
+    <nav class="af-navbar" id="main-nav">
+      <!-- SVG Snug Curved Notch Background Path -->
+      <svg class="af-navbar-svg" viewBox="0 0 400 70" preserveAspectRatio="none">
+        <path d="M 0,0 L 158,0 C 170,0 174,32 200,32 C 226,32 230,0 242,0 L 400,0 L 400,70 L 0,70 Z" fill="rgba(255, 255, 255, 0.96)"/>
+      </svg>
 
-      <!-- 1. Home -->
-      <button class="nav-item active" data-tab="home">
-        <span class="nav-icon">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 11L12 3l9 8v9a1 1 0 0 1-1 1h-5v-5H9v5H4a1 1 0 0 1-1-1v-9z" stroke="currentColor"/>
-          </svg>
+      <!-- 1. Главная -->
+      <button class="af-nav-item active" data-tab="home">
+        <span class="af-nav-icon">
+          <svg viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 12 10s-6.7.6-8.5 1.1C2.7 11.3 2 12.1 2 13v3c0 .6.4 1 1 1h2m2 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0m8 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0M5 10l1.7-4.2C7 5.1 7.7 4.5 8.5 4.5h7c.8 0 1.5.6 1.8 1.3L19 10"/></svg>
         </span>
-        <span class="nav-label">Главная</span>
+        <span class="af-nav-lbl">Главная</span>
       </button>
 
-      <!-- 2. Services -->
-      <button class="nav-item" data-tab="booking" data-step="1">
-        <span class="nav-icon">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0" stroke="currentColor"/>
-          </svg>
+      <!-- 2. Услуги (Center Elevated Floating Circle Button in Snug Notch) -->
+      <button class="af-nav-item af-nav-center-fab" data-tab="booking" data-step="1">
+        <span class="af-fab-circle">
+          <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
         </span>
-        <span class="nav-label">Услуги</span>
+        <span class="af-nav-lbl">Услуги</span>
       </button>
 
-      <!-- 3. Center Floating Blue Circle (Booking) -->
-      <button class="nav-item nav-item-main" data-tab="booking" data-step="2">
-        <div class="nav-main-circle">
-          <svg class="nav-svg-main" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 5v14M5 12h14" stroke="white"/>
-          </svg>
-        </div>
-        <span class="nav-label main-label">Запись</span>
-      </button>
-
-      <!-- 4. Bookings -->
-      <button class="nav-item" data-tab="profile">
-        <span class="nav-icon">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor"/>
-            <path d="M8 21h8M12 17v4" stroke="currentColor"/>
-          </svg>
+      <!-- 3. Записи -->
+      <button class="af-nav-item" data-tab="bookings-list">
+        <span class="af-nav-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         </span>
-        <span class="nav-label">Записи</span>
-      </button>
-
-      <!-- 5. Profile -->
-      <button class="nav-item" data-tab="profile">
-        <span class="nav-icon">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="8" r="4" stroke="currentColor"/>
-            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor"/>
-          </svg>
-        </span>
-        <span class="nav-label">Профиль</span>
+        <span class="af-nav-lbl">Записи</span>
       </button>
     </nav>
 
-    <!-- Admin Comment Modal -->
+    <!-- Modals -->
     <div id="admin-modal" class="modal-overlay hidden">
       <div class="modal-card">
         <h3 id="modal-title">Решение по заявке</h3>
-        <p id="modal-subtitle" class="form-hint">Укажите примечание клиенту (необязательно):</p>
-        <textarea id="modal-comment" class="modal-textarea" placeholder="Например: Ждем вас на посту №2..." rows="3"></textarea>
-        <div class="modal-actions">
-          <button id="modal-cancel-btn" class="modal-btn btn-secondary">Отмена</button>
-          <button id="modal-confirm-btn" class="modal-btn btn-primary">Подтвердить</button>
+        <textarea id="modal-comment" class="af-input" placeholder="Примечание клиенту..." rows="3"></textarea>
+        <div style="display:flex;gap:8px;">
+          <button id="modal-cancel-btn" class="af-btn-secondary" style="flex:1;">Отмена</button>
+          <button id="modal-confirm-btn" class="af-btn-primary" style="flex:1;">Подтвердить</button>
         </div>
       </div>
     </div>
 
-    <!-- Privacy Policy Modal -->
     <div id="privacy-modal" class="modal-overlay hidden">
       <div class="modal-card">
-        <div class="modal-header">
-          <h3>🔒 Политика конфиденциальности</h3>
-        </div>
-        <div class="modal-body privacy-modal-body">
-          <p>Настоящая Политика конфиденциальности определяет порядок обработки и защиты персональных данных клиентов автосервиса.</p><br/>
-          <p><strong>1. Сбор данных:</strong> Мы собираем ваше имя, номер телефона, марку и госномер автомобиля исключительно для оформления записи на техническое обслуживание.</p><br/>
-          <p><strong>2. Использование данных:</strong> Данные используются модераторами и мастерами автосервиса для связи с вами и подтверждения бронирования времени.</p><br/>
-          <p><strong>3. Безопасность:</strong> Ваши персональные данные хранятся в зашифрованном виде и не передаются третьим лицам.</p>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="modal-btn btn-primary" id="close-privacy-btn">Понятно, закрыть</button>
-        </div>
+        <h3>🔒 Политика конфиденциальности</h3>
+        <p style="font-size:13px;color:var(--gray-3);line-height:1.5;">
+          Мы собираем ваше имя, телефон и данные авто исключительно для оформления записи в сервисе.
+        </p>
+        <button type="button" class="af-btn-primary" id="close-privacy-btn">Понятно</button>
       </div>
     </div>
 
     <div id="toast" class="glass-toast hidden"></div>
   </div>
 
-  <script src="app.js?v=38.0"></script>
+  <script src="app.js?v=67.0"></script>
 </body>
 </html>

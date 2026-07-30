@@ -136,10 +136,11 @@ async def handle_create_booking(request: web.Request):
             )
             adm_builder = InlineKeyboardBuilder()
             adm_builder.button(text="✅ Одобрить", callback_data=f"adm_dec_{booking_id}_approve")
+            adm_builder.button(text="🛠 В работу", callback_data=f"adm_dec_{booking_id}_in_progress")
+            adm_builder.button(text="🎉 Готов", callback_data=f"adm_dec_{booking_id}_ready")
             adm_builder.button(text="❌ Отклонить", callback_data=f"adm_dec_{booking_id}_reject")
-            adm_builder.button(text="💬 Одобрить + коммент", callback_data=f"adm_comm_{booking_id}_approve")
-            adm_builder.button(text="💬 Отклонить + коммент", callback_data=f"adm_comm_{booking_id}_reject")
-            adm_builder.adjust(2, 2)
+            adm_builder.button(text="💬 Коммент", callback_data=f"adm_comm_{booking_id}_approve")
+            adm_builder.adjust(3, 2)
 
             for adm_id in admin_ids:
                 try:
@@ -179,7 +180,6 @@ async def handle_cancel_booking(request: web.Request):
             if booking.get("car_number"):
                 car_info += f" ({booking['car_number']})"
 
-            # Send Telegram notification to CLIENT
             client_msg = (
                 f"❌ <b>Ваша запись №{b_id} отменена</b>\n\n"
                 f"• <b>Услуга:</b> {booking['problem']}\n"
@@ -194,7 +194,6 @@ async def handle_cancel_booking(request: web.Request):
             except Exception as e:
                 logging.error(f"Не удалось отправить уведомление клиенту {client_id}: {e}")
 
-            # Send Telegram notification to MODERATORS
             from main import get_admin_ids
             admin_ids = get_admin_ids()
             if admin_ids:
@@ -280,7 +279,7 @@ async def handle_admin_action(request: web.Request):
 
     admin_id = data.get("admin_id")
     booking_id = data.get("booking_id")
-    action = data.get("action") # "approve", "reject", "delete", "cancel"
+    action = data.get("action") # "approve", "reject", "in_progress", "ready", "delete", "cancel"
     comment = data.get("comment", "").strip()
 
     if not admin_id or not check_is_admin(int(admin_id)):
@@ -303,8 +302,15 @@ async def handle_admin_action(request: web.Request):
             cancel_booking_by_id(booking_id, booking["user_id"])
             return web.json_response({"success": True, "message": "Запись отменена"})
         return web.json_response({"error": "Не найдена"}, status=400)
-    
-    new_status = "Одобрена" if action == "approve" else "Отклонена"
+
+    # Status Mapping
+    status_map = {
+        "approve": "Одобрена",
+        "reject": "Отклонена",
+        "in_progress": "🛠 В работе",
+        "ready": "🎉 Готов к выдаче"
+    }
+    new_status = status_map.get(action, "Одобрена")
     bot: Bot = request.app.get("bot")
     
     await process_moderator_decision(bot, booking_id, new_status, comment)

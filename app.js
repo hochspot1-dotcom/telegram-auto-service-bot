@@ -101,7 +101,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const welcomeOverlay = document.getElementById("triton-onboarding-screen");
   const welcomeArrowBtn = document.getElementById("onboarding-next-btn");
 
-  // Always display welcome screen upon opening app
   if (welcomeOverlay) {
     welcomeOverlay.classList.remove("hidden");
   }
@@ -116,7 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
     welcomeArrowBtn.addEventListener("click", () => {
       const savedPhone = localStorage.getItem("user_phone_saved");
 
-      // If user hasn't provided phone yet, request contact from Telegram
       if (!savedPhone && tg && typeof tg.requestContact === "function") {
         tg.requestContact((sent, event) => {
           if (sent && event && event.responseUnsafe && event.responseUnsafe.contact) {
@@ -130,7 +128,6 @@ document.addEventListener("DOMContentLoaded", () => {
           closeWelcomeScreen();
         });
       } else {
-        // If user already provided phone or no Telegram contact permission, proceed to main menu
         closeWelcomeScreen();
       }
     });
@@ -201,9 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
       content.classList.toggle("active", targetId);
     });
 
-    if (tabName === "profile") {
-      loadUserProfile();
-    } else if (tabName === "bookings-list") {
+    if (tabName === "profile" || tabName === "home" || tabName === "bookings-list") {
       loadUserProfile();
     } else if (tabName === "booking") {
       loadSlots();
@@ -784,6 +779,145 @@ document.addEventListener("DOMContentLoaded", () => {
     showCalendarView();
   }
 
+  // ═══════════════════════════════════════════════════════════
+  // HOME TAB ACTIVE BOOKING COUNTDOWN & REMINDER
+  // ═══════════════════════════════════════════════════════════
+  let activeCountdownInterval = null;
+
+  function parseBookingDate(slotStr) {
+    if (!slotStr) return null;
+    const months = {
+      "января": 0, "февраля": 1, "марта": 2, "апреля": 3, "мая": 4, "июня": 5,
+      "июля": 6, "августа": 7, "сентября": 8, "октября": 9, "ноября": 10, "декабря": 11
+    };
+
+    const cleanStr = slotStr.toLowerCase();
+    const parts = cleanStr.match(/(\d{1,2})\s+([а-я]+)(?:\s+(\d{4}))?\s+в\s+(\d{1,2}):(\d{2})/);
+    if (!parts) return null;
+
+    const day = parseInt(parts[1], 10);
+    const month = months[parts[2]];
+    if (month === undefined) return null;
+    const year = parts[3] ? parseInt(parts[3], 10) : new Date().getFullYear();
+    const hours = parseInt(parts[4], 10);
+    const minutes = parseInt(parts[5], 10);
+
+    return new Date(year, month, day, hours, minutes);
+  }
+
+  function startCountdownTimer(targetDate, valElement) {
+    if (activeCountdownInterval) clearInterval(activeCountdownInterval);
+
+    function update() {
+      const now = new Date();
+      const diffMs = targetDate - now;
+
+      if (diffMs <= 0) {
+        valElement.textContent = "🚗 Визит на автосервис!";
+        clearInterval(activeCountdownInterval);
+        return;
+      }
+
+      const totalSec = Math.floor(diffMs / 1000);
+      const days = Math.floor(totalSec / 86400);
+      const hours = Math.floor((totalSec % 86400) / 3600);
+      const mins = Math.floor((totalSec % 3600) / 60);
+      const secs = totalSec % 60;
+
+      if (days > 0) {
+        valElement.textContent = `${days} дн. ${hours} ч. ${mins} мин.`;
+      } else {
+        const pad = (n) => String(n).padStart(2, '0');
+        valElement.textContent = `${pad(hours)}:${pad(mins)}:${pad(secs)}`;
+      }
+    }
+
+    update();
+    activeCountdownInterval = setInterval(update, 1000);
+  }
+
+  function updateHomeActiveBookingCard(bookings) {
+    const container = document.getElementById("home-active-booking-container");
+    if (!container) return;
+
+    if (activeCountdownInterval) clearInterval(activeCountdownInterval);
+
+    const activeBooking = (bookings || []).find(b =>
+      b.status === "Одобрена" || b.status === "Активна" || b.status === "На рассмотрении"
+    );
+
+    if (!activeBooking) {
+      container.innerHTML = `
+        <div class="af-no-booking-card">
+          <div class="af-no-booking-icon">📅</div>
+          <div class="af-no-booking-text">
+            <strong>Нет ближайших записей</strong><br>
+            Запишитесь на ТО или ремонт в 2 клика!
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    const isApproved = activeBooking.status === "Одобрена" || activeBooking.status === "Активна";
+    const statusClass = isApproved ? "approved" : "pending";
+    const statusLabel = isApproved ? "✅ Подтверждена" : "⏳ На рассмотрении";
+
+    container.innerHTML = `
+      <div class="af-reminder-card">
+        <div class="af-reminder-header">
+          <span class="af-reminder-badge">📅 Запись №${activeBooking.id}</span>
+          <span class="af-reminder-status-tag ${statusClass}">${statusLabel}</span>
+        </div>
+
+        <div class="af-reminder-title">${activeBooking.problem}</div>
+
+        <div class="af-reminder-meta">
+          <div>📍 AutoFriends Service · ${activeBooking.slot}</div>
+          <div>🚘 Авто: ${activeBooking.car_model} ${activeBooking.car_number ? `(${activeBooking.car_number})` : ''}</div>
+        </div>
+
+        <div class="af-countdown-box">
+          <span class="af-countdown-label">⏳ До визита:</span>
+          <span class="af-countdown-value" id="home-countdown-val">Считаем...</span>
+        </div>
+
+        <div class="af-reminder-actions">
+          <button type="button" class="af-reminder-btn af-reminder-btn-secondary" id="home-view-bookings-btn">
+            📋 Мои записи
+          </button>
+          <button type="button" class="af-reminder-btn af-reminder-btn-primary" id="home-reschedule-btn" data-id="${activeBooking.id}">
+            🔄 Перенести
+          </button>
+        </div>
+      </div>
+    `;
+
+    const countdownValEl = document.getElementById("home-countdown-val");
+    const targetDate = parseBookingDate(activeBooking.slot);
+
+    if (targetDate && countdownValEl) {
+      startCountdownTimer(targetDate, countdownValEl);
+    } else if (countdownValEl) {
+      countdownValEl.textContent = activeBooking.slot;
+    }
+
+    const viewBtn = document.getElementById("home-view-bookings-btn");
+    if (viewBtn) {
+      viewBtn.addEventListener("click", () => switchTab("bookings-list"));
+    }
+
+    const rescheduleBtn = document.getElementById("home-reschedule-btn");
+    if (rescheduleBtn) {
+      rescheduleBtn.addEventListener("click", () => {
+        activeRescheduleBookingId = parseInt(activeBooking.id, 10);
+        switchTab("booking");
+        goToStep(2);
+        showToast(`🔄 Перенос записи №${activeBooking.id}`);
+      });
+    }
+  }
+
   async function loadUserProfile() {
     try {
       const res = await fetch(`${BACKEND_URL}/api/user/info?user_id=${userId}`);
@@ -809,10 +943,14 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       renderUserBookings(data.bookings || []);
+      updateHomeActiveBookingCard(data.bookings || []);
     } catch (e) {
       console.error(e);
     }
   }
+
+  // Load user profile on startup
+  loadUserProfile();
 
   function renderUserBookings(bookings) {
     const container = document.getElementById("user-bookings-list");

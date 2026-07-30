@@ -8,12 +8,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=64.0" />
+  <link rel="stylesheet" href="style.css?v=65.0" />
 </head>
 <body>
 
   <!-- ══════════════════════════════════════════════
-       WELCOME ONBOARDING SCREEN (Exact Reference Match)
+       WELCOME ONBOARDING SCREEN (AutoFriends Style)
        ══════════════════════════════════════════════ -->
   <div id="triton-onboarding-screen" class="af-welcome-overlay">
     
@@ -62,7 +62,7 @@
     <main class="content">
 
       <!-- ════════════════════════════════════════
-           🏠 TAB 1: ГЛАВНАЯ (Hero Slider + Big CTA + Advantages)
+           🏠 TAB 1: ГЛАВНАЯ (Promo Banner + Booking Reminder + Live Countdown + CTA)
            ════════════════════════════════════════ -->
       <section id="tab-home" class="tab-content active">
 
@@ -107,13 +107,18 @@
           </div>
         </div>
 
-        <!-- 2. Big Action CTA Button -->
+        <!-- 2. Upcoming Active Booking Reminder & Live Countdown Card -->
+        <div id="home-active-booking-container">
+          <!-- Populated dynamically via app.js -->
+        </div>
+
+        <!-- 3. Big Action CTA Button -->
         <button type="button" class="af-home-cta-btn" data-tab="booking" data-step="1">
           <span>🚀 Записаться на обслуживание</span>
           <span style="font-size:18px;">➔</span>
         </button>
 
-        <!-- 3. Service Advantages Cards -->
+        <!-- 4. Service Advantages Cards -->
         <div class="af-advantages-grid">
           <div class="af-adv-card">
             <div class="af-adv-icon">🛠️</div>
@@ -417,6 +422,6 @@
     <div id="toast" class="glass-toast hidden"></div>
   </div>
 
-  <script src="app.js?v=64.0"></script>
+  <script src="app.js?v=65.0"></script>
 </body>
 </html>

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=65.0" />
+  <link rel="stylesheet" href="style.css?v=66.0" />
 </head>
 <body>
 
@@ -62,7 +62,7 @@
     <main class="content">
 
       <!-- ════════════════════════════════════════
-           🏠 TAB 1: ГЛАВНАЯ (Promo Banner + Booking Reminder + Live Countdown + CTA)
+           🏠 TAB 1: ГЛАВНАЯ (Promo Banner + Booking Reminder + Redesigned CTA Button)
            ════════════════════════════════════════ -->
       <section id="tab-home" class="tab-content active">
 
@@ -112,32 +112,14 @@
           <!-- Populated dynamically via app.js -->
         </div>
 
-        <!-- 3. Big Action CTA Button -->
+        <!-- 3. Big Distinct Action CTA Button -->
         <button type="button" class="af-home-cta-btn" data-tab="booking" data-step="1">
-          <span>🚀 Записаться на обслуживание</span>
-          <span style="font-size:18px;">➔</span>
+          <div class="af-cta-text-group">
+            <span class="af-cta-main-title">🚀 Записаться на обслуживание</span>
+            <span class="af-cta-sub-title">Выбор мастера, даты и удобного времени</span>
+          </div>
+          <div class="af-cta-arrow-badge">➔</div>
         </button>
-
-        <!-- 4. Service Advantages Cards -->
-        <div class="af-advantages-grid">
-          <div class="af-adv-card">
-            <div class="af-adv-icon">🛠️</div>
-            <div class="af-adv-title">Официальный сервис</div>
-            <div class="af-adv-sub">Сертифицированное оборудование и гарантия на работы 12 месяцев</div>
-          </div>
-
-          <div class="af-adv-card">
-            <div class="af-adv-icon">☕</div>
-            <div class="af-adv-title">Зона ожидания и кофейня</div>
-            <div class="af-adv-sub">Комфортная лаунж-зона, свежий кофе и свободный Wi-Fi</div>
-          </div>
-
-          <div class="af-adv-card">
-            <div class="af-adv-icon">⏱️</div>
-            <div class="af-adv-title">Без очередей</div>
-            <div class="af-adv-sub">Прием автомобиля строго по времени вашей онлайн-записи</div>
-          </div>
-        </div>
 
       </section>
 
@@ -422,6 +404,6 @@
     <div id="toast" class="glass-toast hidden"></div>
   </div>
 
-  <script src="app.js?v=65.0"></script>
+  <script src="app.js?v=66.0"></script>
 </body>
 </html>

@@ -201,7 +201,6 @@ body {
   transform: scale(0.97);
 }
 
-/* Soft Frosted White Glass Panel for Promo Banner */
 .af-slide-glass-panel {
   position: relative;
   z-index: 2;
@@ -244,7 +243,6 @@ body {
   font-weight: 600;
 }
 
-/* Carousel Indicators (Dots) */
 .af-carousel-dots {
   position: absolute;
   top: 14px;
@@ -339,7 +337,6 @@ body {
   font-weight: 600;
 }
 
-/* Live Countdown Box */
 .af-countdown-box {
   background: var(--dark);
   color: #ffffff;
@@ -368,20 +365,24 @@ body {
 }
 
 .af-reminder-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .af-reminder-btn {
-  flex: 1;
-  padding: 10px 14px;
-  font-size: 13px;
+  padding: 12px 14px;
+  font-size: 14px;
   font-weight: 700;
   border-radius: var(--r-md);
   border: none;
   cursor: pointer;
   text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   transition: transform 0.15s var(--spring), background 0.15s var(--ease);
 }
 
@@ -399,11 +400,10 @@ body {
   transform: scale(0.96);
 }
 
-/* Empty State Card when no active booking */
 .af-no-booking-card {
   background: var(--bg-card);
   border-radius: var(--r-lg);
-  padding: 16px 18px;
+  padding: 18px 20px;
   box-shadow: var(--shadow-sm);
   border: 1px solid rgba(0, 0, 0, 0.04);
   display: flex;
@@ -412,19 +412,19 @@ body {
 }
 
 .af-no-booking-icon {
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: var(--bg-pill);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  color: var(--dark);
   flex-shrink: 0;
 }
 
 .af-no-booking-text {
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
   color: var(--gray-2);
   line-height: 1.4;
@@ -497,7 +497,7 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   BIG ROUNDED RECTANGLE CATEGORY CARDS (Services Step 1)
+   BIG ROUNDED RECTANGLE CATEGORY CARDS WITH SVG ICONS
    ═══════════════════════════════════════════════════════════ */
 
 .af-category-grid {
@@ -506,11 +506,10 @@ body {
   gap: 14px;
 }
 
-/* Big Rounded Rectangle Category Card */
 .af-cat-card {
   background: var(--bg-card);
   border-radius: var(--r-lg);
-  padding: 20px 22px;
+  padding: 18px 20px;
   box-shadow: var(--shadow-sm);
   border: 1px solid rgba(0, 0, 0, 0.04);
   display: flex;
@@ -539,8 +538,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  color: var(--dark);
   flex-shrink: 0;
+}
+
+.af-cat-icon svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
 }
 
 .af-cat-info {
@@ -550,7 +555,7 @@ body {
 }
 
 .af-cat-title {
-  font-size: 16px;
+  font-size: 15.5px;
   font-weight: 800;
   color: var(--dark);
   line-height: 1.25;
@@ -568,7 +573,6 @@ body {
   color: var(--gray-3);
 }
 
-/* Sub-Services Category Page List Layout */
 .af-subservices-container {
   display: flex;
   flex-direction: column;
@@ -611,7 +615,6 @@ body {
   letter-spacing: -0.3px;
 }
 
-/* Service Row Layout - Fixed Perfect Alignment & Non-wrapping Price */
 .af-service-check-row {
   display: flex;
   align-items: center;
@@ -645,7 +648,6 @@ body {
   min-width: 0;
 }
 
-/* Fixed dimensions for perfect circle checkbox */
 .af-checkbox-badge {
   width: 26px;
   height: 26px;
@@ -678,7 +680,6 @@ body {
   word-break: break-word;
 }
 
-/* Non-wrapping price badge */
 .af-service-tag-price {
   font-size: 14.5px;
   font-weight: 800;
@@ -747,15 +748,16 @@ body {
   border: none;
   border-radius: var(--r-md);
   color: #ffffff;
-  font-size: 16px;
+  font-size: 15.5px;
   font-weight: 800;
   font-family: var(--font-main);
   cursor: pointer;
   box-shadow: var(--shadow-sm);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  min-height: 48px;
   transition: transform 0.15s var(--spring), background 0.15s var(--ease);
 }
 
@@ -770,19 +772,102 @@ body {
 }
 
 .af-btn-secondary {
-  padding: 16px 20px;
+  padding: 14px 20px;
   background: var(--bg-pill);
   border: none;
   border-radius: var(--r-md);
   color: var(--dark);
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 700;
   font-family: var(--font-main);
   cursor: pointer;
-  transition: background 0.15s var(--ease);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  transition: background 0.15s var(--ease), transform 0.15s var(--spring);
 }
 
-.af-btn-secondary:active { background: var(--gray-6); }
+.af-btn-secondary:active {
+  background: var(--gray-6);
+  transform: scale(0.97);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   COMFORTABLE, PROMINENT MODERATOR & ACTION BUTTONS
+   ═══════════════════════════════════════════════════════════ */
+
+.af-mod-actions-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.af-btn-mod {
+  flex: 1;
+  min-width: 130px;
+  padding: 14px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-main);
+  border-radius: var(--r-md);
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s var(--spring), background 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+
+.af-btn-mod svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+.af-btn-mod:active {
+  transform: scale(0.96);
+}
+
+.af-btn-approve {
+  background: var(--green);
+  color: #ffffff;
+}
+
+.af-btn-approve:active {
+  background: #2cb04b;
+}
+
+.af-btn-reject {
+  background: rgba(255, 59, 48, 0.08);
+  color: var(--red);
+  border: 1.5px solid rgba(255, 59, 48, 0.25);
+}
+
+.af-btn-reject:active {
+  background: rgba(255, 59, 48, 0.16);
+}
+
+.af-btn-delete {
+  background: rgba(255, 59, 48, 0.12);
+  color: var(--red);
+  border: 1.5px solid rgba(255, 59, 48, 0.35);
+  width: 100%;
+}
+
+.af-btn-delete:active {
+  background: rgba(255, 59, 48, 0.22);
+}
 
 .af-form-group {
   display: flex;
@@ -937,13 +1022,17 @@ body {
 }
 
 .af-slot-item {
-  padding: 12px 6px;
+  padding: 14px 8px;
   border-radius: var(--r-md);
   background: var(--bg-pill);
   font-size: 14px;
   font-weight: 800;
   text-align: center;
   cursor: pointer;
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .af-slot-item.active {
@@ -1072,11 +1161,11 @@ body {
 }
 
 .af-filter-chip {
-  padding: 8px 16px;
+  padding: 10px 18px;
   background: var(--bg-card);
   border: 1px solid rgba(0,0,0,0.06);
   border-radius: var(--r-pill);
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
   color: var(--gray-2);
   cursor: pointer;

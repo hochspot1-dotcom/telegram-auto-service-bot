@@ -725,7 +725,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderSlotsForMasterAndDate();
 
     if (calendarGroup) calendarGroup.classList.add("hidden");
-    if (slotsGroup) slotsGroup.remove("hidden");
+    if (slotsGroup) slotsGroup.classList.remove("hidden");
   }
 
   function showCalendarView() {

@@ -207,7 +207,6 @@ def validate_and_format_car(text: str) -> str | None:
     return result if len(result) >= 2 else None
 
 
-# Состояния FSM для записи на ТО
 class BookingState(StatesGroup):
     select_category = State()
     custom_problem = State()
@@ -218,11 +217,8 @@ class BookingState(StatesGroup):
     enter_phone = State()
     confirm = State()
 
-# Состояния FSM для модератора
 class AdminState(StatesGroup):
     enter_comment = State()
-
-# --- Инлайн-клавиатуры без эмодзи на кнопках ---
 
 def get_main_inline_keyboard():
     builder = InlineKeyboardBuilder()
@@ -305,7 +301,6 @@ MAIN_WELCOME_TEXT = (
     "Выберите нужное действие ниже:"
 )
 
-# Функция отсылки или обновления главного меню
 async def show_main_menu(bot: Bot, chat_id: int, user_first_name: str, state: FSMContext, callback: types.CallbackQuery = None):
     data = await state.get_data()
     old_card_id = data.get("card_msg_id")
@@ -754,8 +749,6 @@ async def phone_entered_inline(message: types.Message, state: FSMContext, bot: B
             reply_markup=get_confirm_keyboard()
         )
 
-# --- 👑 ФУНКЦИОНАЛ И ПАНЕЛЬ МОДЕРАТОРА ---
-
 def get_admin_ids() -> list[int]:
     raw = os.getenv("ADMIN_IDS", "")
     return [int(x.strip()) for x in raw.split(",") if x.strip().isdigit()]
@@ -1099,6 +1092,12 @@ async def confirm_booking_inline(callback: types.CallbackQuery, state: FSMContex
             except Exception as e:
                 logging.error(f"Не удалось отправить уведомление модератору {adm_id}: {e}")
 
+async def safe_start_polling(bot: Bot):
+    try:
+        await dp.start_polling(bot)
+    except Exception as e:
+        logging.error(f"[WARN] Ошибка polling бота (возможно бот запущен на другом ПК/сервере): {e}")
+
 async def main():
     if hasattr(sys.stdout, "reconfigure"):
         try:
@@ -1145,11 +1144,10 @@ async def main():
 
     if bot:
         print("[OK] Telegram бот запущен и готов к работе!", flush=True)
-        await dp.start_polling(bot)
-    else:
-        print("⚠️ BOT_TOKEN не указан в переменных окружения Amvera!", flush=True)
-        while True:
-            await asyncio.sleep(3600)
+        asyncio.create_task(safe_start_polling(bot))
+
+    while True:
+        await asyncio.sleep(3600)
 
 if __name__ == "__main__":
     asyncio.run(main())

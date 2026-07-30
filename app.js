@@ -786,7 +786,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ═══════════════════════════════════════════════════════════
-  // RESCHEDULING FAST-TRACK LOGIC (Automatic Approval & Confirmation)
+  // RESCHEDULING FAST-TRACK LOGIC (Automatic Approval & Notification)
   // ═══════════════════════════════════════════════════════════
 
   function startRescheduleMode(bookingId) {
@@ -843,8 +843,11 @@ document.addEventListener("DOMContentLoaded", () => {
           body: JSON.stringify({
             booking_id: activeRescheduleBookingId,
             user_id: userId,
+            user_name: userName,
             new_slot: targetSlot,
-            status: "Одобрена"
+            status: "Одобрена",
+            notify_client: true,
+            notify_admin: true
           })
         });
 
@@ -1117,11 +1120,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await fetch(`${BACKEND_URL}/api/booking/cancel`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ booking_id: parseInt(bookingId), user_id: userId })
+        body: JSON.stringify({
+          booking_id: parseInt(bookingId, 10),
+          user_id: userId,
+          user_name: userName,
+          notify_client: true,
+          notify_admin: true
+        })
       });
       const data = await res.json();
       if (data.success) {
-        showToast("✅ Запись отменена");
+        showToast("✅ Запись отменена. Уведомление отправлено!");
         await loadUserProfile();
         if (isAdmin) loadAdminBookings(currentAdminFilter);
       } else {

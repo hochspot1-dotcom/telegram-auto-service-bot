@@ -242,6 +242,15 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  const CATEGORY_ICONS_SVG = {
+    cat_engine: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="4"/></svg>`,
+    cat_chassis: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/></svg>`,
+    cat_electric: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
+    cat_to: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`,
+    cat_climate: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/><line x1="19.07" y1="4.93" x2="4.93" y2="19.07"/></svg>`,
+    cat_custom: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`
+  };
+
   const SERVICE_CATEGORIES = [
     {
       id: "cat_engine",
@@ -374,10 +383,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const countSelected = cat.items.filter(i => selectedProblemsSet.has(i.title)).length;
       const badgeText = countSelected > 0 ? ` · Выбрано: ${countSelected}` : "";
+      const iconSvg = CATEGORY_ICONS_SVG[cat.id] || CATEGORY_ICONS_SVG['cat_custom'];
 
       return `
         <div class="af-cat-card" data-cat-id="${cat.id}">
           <div class="af-cat-card-left">
+            <div class="af-cat-icon">
+              ${iconSvg}
+            </div>
             <div class="af-cat-info">
               <div class="af-cat-title">${cat.title}</div>
               <div class="af-cat-count">${cat.items.length} услуг${badgeText}</div>
@@ -919,6 +932,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!activeBooking) {
       container.innerHTML = `
         <div class="af-no-booking-card">
+          <div class="af-no-booking-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
           <div class="af-no-booking-text">
             <strong>Нет ближайших записей</strong><br>
             Запишитесь на ТО или ремонт в 2 клика!
@@ -954,7 +970,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <span class="af-countdown-value" id="home-countdown-val">Считаем...</span>
         </div>
 
-        <div class="af-reminder-actions" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <div class="af-reminder-actions">
           <button type="button" class="af-reminder-btn af-reminder-btn-secondary" id="home-view-bookings-btn">
             Записи
           </button>
@@ -1073,9 +1089,9 @@ document.addEventListener("DOMContentLoaded", () => {
             ${b.comment ? `<div style="margin-top:4px;padding:6px;background:var(--bg-pill);border-radius:6px;"><strong>Примечание:</strong> ${b.comment}</div>` : ''}
           </div>
           ${!isCancelled ? `
-            <div style="display:flex;gap:6px;margin-top:6px;">
-              ${isUnavailable ? `<button class="af-btn-primary reschedule-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">Выбрать другое время</button>` : `<button class="af-btn-secondary reschedule-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">Перенести</button>`}
-              ${isCancelable ? `<button class="af-btn-secondary cancel-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;color:var(--red);">Отменить</button>` : ''}
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              ${isUnavailable ? `<button class="af-btn-primary reschedule-btn" data-id="${b.id}" style="flex:1;">Выбрать другое время</button>` : `<button class="af-btn-secondary reschedule-btn" data-id="${b.id}" style="flex:1;">Перенести</button>`}
+              ${isCancelable ? `<button class="af-btn-secondary cancel-btn" data-id="${b.id}" style="flex:1;color:var(--red);">Отменить</button>` : ''}
             </div>
           ` : ''}
         </div>
@@ -1357,7 +1373,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ═══════════════════════════════════════════════════════════
-  // MODERATOR PANEL LOGIC (Clean & Simple Approve / Reject / Delete)
+  // MODERATOR PANEL LOGIC (Clean, Large Ergonomic Buttons with SVGs)
   // ═══════════════════════════════════════════════════════════
   const statusPillsContainer = document.getElementById("admin-status-pills");
   if (statusPillsContainer) {
@@ -1399,38 +1415,52 @@ document.addEventListener("DOMContentLoaded", () => {
       let isApproved = b.status === "Одобрена" || b.status === "Активна";
 
       let statusColor = "var(--yellow)";
+      let statusBg = "rgba(255, 204, 0, 0.15)";
       let statusTag = "На рассмотрении";
 
-      if (isApproved) { statusColor = "var(--green)"; statusTag = "Одобрена"; }
-      if (isCancelled) { statusColor = "var(--red)"; statusTag = "Отменена"; }
+      if (isApproved) { statusColor = "var(--green)"; statusBg = "rgba(52, 199, 89, 0.15)"; statusTag = "Одобрена"; }
+      if (isCancelled) { statusColor = "var(--red)"; statusBg = "rgba(255, 59, 48, 0.15)"; statusTag = "Отменена"; }
 
       const phoneClean = (b.phone || "").replace(/[^\d+]/g, "");
 
       return `
         <div class="af-card" style="${isCancelled ? 'opacity:0.75;' : ''}">
           <div style="display:flex;justify-content:space-between;align-items:center;">
-            <span style="font-size:14px;font-weight:800;">Заявка №${b.id}</span>
-            <span style="font-size:12px;font-weight:700;color:${statusColor};">${statusTag}</span>
+            <span style="font-size:15px;font-weight:800;">Заявка №${b.id}</span>
+            <span style="font-size:13px;font-weight:800;padding:4px 12px;border-radius:16px;background:${statusBg};color:${statusColor};">${statusTag}</span>
           </div>
-          <div style="font-size:13px;color:var(--gray-2);margin-top:4px;line-height:1.45;">
+          <div style="font-size:14px;color:var(--gray-2);margin-top:6px;line-height:1.5;">
             <div><strong>Клиент:</strong> ${b.user_name} (ID: ${b.user_id})</div>
             <div><strong>Телефон:</strong> ${b.phone || 'Не указан'}</div>
             <div><strong>Услуга:</strong> ${b.problem}</div>
             <div><strong>Авто:</strong> ${b.car_model} ${b.car_number ? `(${b.car_number})` : ''}</div>
             <div><strong>Время:</strong> ${b.slot}</div>
-            ${b.comment ? `<div style="margin-top:4px;padding:6px;background:var(--bg-pill);border-radius:6px;"><strong>Комментарий:</strong> ${b.comment}</div>` : ''}
+            ${b.comment ? `<div style="margin-top:6px;padding:8px 12px;background:var(--bg-pill);border-radius:8px;"><strong>Комментарий:</strong> ${b.comment}</div>` : ''}
           </div>
 
-          <div style="display:flex;gap:6px;margin-top:8px;">
-            ${phoneClean ? `<a href="tel:${phoneClean}" class="af-btn-secondary" style="padding:5px 10px;font-size:12px;text-decoration:none;">Звонок</a>` : ''}
-            <a href="https://t.me/${b.user_id}" target="_blank" class="af-btn-secondary" style="padding:5px 10px;font-size:12px;text-decoration:none;">Telegram</a>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            ${phoneClean ? `<a href="tel:${phoneClean}" class="af-btn-secondary" style="flex:1;text-decoration:none;font-size:13.5px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Звонок</a>` : ''}
+            <a href="https://t.me/${b.user_id}" target="_blank" class="af-btn-secondary" style="flex:1;text-decoration:none;font-size:13.5px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg> Telegram</a>
           </div>
 
-          <!-- Clean Moderator Control Buttons without Emojis -->
-          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
-            ${!isApproved ? `<button class="af-btn-primary admin-btn-action" data-id="${b.id}" data-act="approve" style="padding:6px 12px;font-size:12px;background:var(--green);">Одобрить</button>` : ''}
-            ${!isCancelled ? `<button class="af-btn-secondary admin-btn-action" data-id="${b.id}" data-act="reject" style="padding:6px 12px;font-size:12px;color:var(--red);">Отклонить</button>` : ''}
-            <button class="af-btn-secondary admin-btn-action" data-id="${b.id}" data-act="delete" style="padding:6px 12px;font-size:12px;color:var(--red);">Удалить из базы</button>
+          <!-- Prominent, Ergonomic Moderator Buttons with Clean SVG Icons -->
+          <div class="af-mod-actions-grid">
+            ${!isApproved ? `
+              <button class="af-btn-mod af-btn-approve admin-btn-action" data-id="${b.id}" data-act="approve">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Одобрить
+              </button>
+            ` : ''}
+            ${!isCancelled ? `
+              <button class="af-btn-mod af-btn-reject admin-btn-action" data-id="${b.id}" data-act="reject">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                Отклонить
+              </button>
+            ` : ''}
+            <button class="af-btn-mod af-btn-delete admin-btn-action" data-id="${b.id}" data-act="delete">
+              <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              Удалить из базы
+            </button>
           </div>
         </div>
       `;

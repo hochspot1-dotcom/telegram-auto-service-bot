@@ -787,7 +787,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ═══════════════════════════════════════════════════════════
-  // RESCHEDULING FAST-TRACK LOGIC (Only Date & Time Change)
+  // RESCHEDULING FAST-TRACK LOGIC (Automatic Approval & Confirmation)
   // ═══════════════════════════════════════════════════════════
 
   function startRescheduleMode(bookingId) {
@@ -844,14 +844,16 @@ document.addEventListener("DOMContentLoaded", () => {
           body: JSON.stringify({
             booking_id: activeRescheduleBookingId,
             user_id: userId,
-            new_slot: targetSlot
+            new_slot: targetSlot,
+            status: "Одобрена"
           })
         });
 
         const data = await res.json();
         if (res.ok && data.success) {
-          showToast(`🎉 Запись №${activeRescheduleBookingId} перенесена на ${selectedSlot}!`);
+          showToast(`🎉 Запись №${activeRescheduleBookingId} подтверждена на ${selectedSlot}!`);
           clearRescheduleMode();
+          await loadUserProfile();
           switchTab("bookings-list");
         } else {
           showToast("⚠️ " + (data.error || "Ошибка переноса"));
@@ -945,7 +947,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const isApproved = activeBooking.status === "Одобрена" || activeBooking.status === "Активна";
+    // Rescheduled or approved bookings automatically show as confirmed
+    const isApproved = activeBooking.status === "Одобрена" || activeBooking.status === "Активна" || activeBooking.status.includes("Перенесена");
     const statusClass = isApproved ? "approved" : "pending";
     const statusLabel = isApproved ? "✅ Подтверждена" : "⏳ На рассмотрении";
 
@@ -1046,9 +1049,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     container.innerHTML = bookings.map(b => {
       let isUnavailable = b.status.includes("недоступен") || b.status.includes("Перенос");
+      let displayStatus = b.status;
       let statusColor = "var(--yellow)";
-      if (b.status === "Одобрена" || b.status === "Активна") statusColor = "var(--green)";
-      if (b.status.includes("Отменен") || b.status.includes("Отклонен")) statusColor = "var(--red)";
+      
+      if (b.status === "Одобрена" || b.status === "Активна" || b.status.includes("Перенесена")) {
+        displayStatus = "✅ Подтверждена";
+        statusColor = "var(--green)";
+      } else if (b.status.includes("Отменен") || b.status.includes("Отклонен")) {
+        statusColor = "var(--red)";
+      }
 
       const isCancelable = ["На рассмотрении", "Одобрена", "Активна"].includes(b.status) || isUnavailable;
 
@@ -1056,7 +1065,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="af-card">
           <div style="display:flex;align-items:center;justify-content:space-between;">
             <span style="font-size:14px;font-weight:800;">Запись №${b.id}</span>
-            <span style="font-size:12px;font-weight:700;color:${statusColor};">${b.status}</span>
+            <span style="font-size:12px;font-weight:700;color:${statusColor};">${displayStatus}</span>
           </div>
           <div style="font-size:13px;color:var(--gray-2);line-height:1.45;">
             <div><strong>Услуга:</strong> ${b.problem}</div>

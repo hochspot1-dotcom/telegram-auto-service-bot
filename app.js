@@ -47,6 +47,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let isAdmin = false;
   let currentAdminFilter = "all";
   let pendingAdminAction = null;
+
+  // Active Rescheduling Booking ID state
   let activeRescheduleBookingId = null;
 
   // Auto-Sliding Carousel Controller
@@ -207,6 +209,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   navItems.forEach(item => {
     item.addEventListener("click", () => {
+      // If switching away from booking, reset reschedule mode if active
+      if (item.dataset.tab !== "booking" && activeRescheduleBookingId) {
+        clearRescheduleMode();
+      }
       switchTab(item.dataset.tab);
       if (item.dataset.tab === "booking" && item.dataset.step) {
         goToStep(parseInt(item.dataset.step, 10));
@@ -217,6 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const topUserProfileBtn = document.getElementById("top-user-profile-btn");
   if (topUserProfileBtn) {
     topUserProfileBtn.addEventListener("click", () => {
+      if (activeRescheduleBookingId) clearRescheduleMode();
       switchTab("profile");
     });
   }
@@ -780,6 +787,85 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ═══════════════════════════════════════════════════════════
+  // RESCHEDULING FAST-TRACK LOGIC (Only Date & Time Change)
+  // ═══════════════════════════════════════════════════════════
+
+  function startRescheduleMode(bookingId) {
+    activeRescheduleBookingId = parseInt(bookingId, 10);
+
+    const noticeBadge = document.getElementById("reschedule-notice-badge");
+    const noticeTitle = document.getElementById("reschedule-notice-title");
+    const toStep3Btn = document.getElementById("to-step-3-btn");
+    const confirmRescheduleBtn = document.getElementById("confirm-reschedule-btn");
+    const backToStep1Btn = document.getElementById("back-to-step-1-btn");
+
+    if (noticeBadge) noticeBadge.classList.remove("hidden");
+    if (noticeTitle) noticeTitle.textContent = `🔄 Перенос записи №${activeRescheduleBookingId}`;
+    if (toStep3Btn) toStep3Btn.classList.add("hidden");
+    if (confirmRescheduleBtn) confirmRescheduleBtn.classList.remove("hidden");
+    if (backToStep1Btn) backToStep1Btn.textContent = "❌ Отмена";
+
+    switchTab("booking");
+    goToStep(2);
+    loadSlots();
+  }
+
+  function clearRescheduleMode() {
+    activeRescheduleBookingId = null;
+
+    const noticeBadge = document.getElementById("reschedule-notice-badge");
+    const toStep3Btn = document.getElementById("to-step-3-btn");
+    const confirmRescheduleBtn = document.getElementById("confirm-reschedule-btn");
+    const backToStep1Btn = document.getElementById("back-to-step-1-btn");
+
+    if (noticeBadge) noticeBadge.classList.add("hidden");
+    if (toStep3Btn) toStep3Btn.classList.remove("hidden");
+    if (confirmRescheduleBtn) confirmRescheduleBtn.classList.add("hidden");
+    if (backToStep1Btn) backToStep1Btn.textContent = "← Назад";
+  }
+
+  const confirmRescheduleBtn = document.getElementById("confirm-reschedule-btn");
+  if (confirmRescheduleBtn) {
+    confirmRescheduleBtn.addEventListener("click", async () => {
+      if (!selectedSlot) {
+        showToast("⚠️ Выберите новое время записи!");
+        return;
+      }
+      if (!activeRescheduleBookingId) return;
+
+      confirmRescheduleBtn.disabled = true;
+      confirmRescheduleBtn.textContent = "⏳ Сохранение...";
+
+      try {
+        const targetSlot = `${selectedSlot} (Мастер: ${selectedMasterName})`;
+        const res = await fetch(`${BACKEND_URL}/api/booking/reschedule`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            booking_id: activeRescheduleBookingId,
+            user_id: userId,
+            new_slot: targetSlot
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok && data.success) {
+          showToast(`🎉 Запись №${activeRescheduleBookingId} перенесена на ${selectedSlot}!`);
+          clearRescheduleMode();
+          switchTab("bookings-list");
+        } else {
+          showToast("⚠️ " + (data.error || "Ошибка переноса"));
+        }
+      } catch (e) {
+        showToast("⚠️ Ошибка соединения");
+      } finally {
+        confirmRescheduleBtn.disabled = false;
+        confirmRescheduleBtn.textContent = "🔄 Подтвердить перенос записи";
+      }
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════
   // HOME TAB ACTIVE BOOKING COUNTDOWN & REMINDER
   // ═══════════════════════════════════════════════════════════
   let activeCountdownInterval = null;
@@ -910,10 +996,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const rescheduleBtn = document.getElementById("home-reschedule-btn");
     if (rescheduleBtn) {
       rescheduleBtn.addEventListener("click", () => {
-        activeRescheduleBookingId = parseInt(activeBooking.id, 10);
-        switchTab("booking");
-        goToStep(2);
-        showToast(`🔄 Перенос записи №${activeBooking.id}`);
+        startRescheduleMode(activeBooking.id);
       });
     }
   }
@@ -982,7 +1065,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ${b.comment ? `<div style="margin-top:4px;padding:6px;background:var(--bg-pill);border-radius:6px;"><strong>Примечание:</strong> ${b.comment}</div>` : ''}
           </div>
           <div style="display:flex;gap:6px;margin-top:4px;">
-            ${isUnavailable ? `<button class="af-btn-primary reschedule-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">Выбрать другое время</button>` : ''}
+            ${isUnavailable ? `<button class="af-btn-primary reschedule-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">Выбрать другое время</button>` : `<button class="af-btn-secondary reschedule-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">🔄 Перенести</button>`}
             ${isCancelable ? `<button class="af-btn-secondary cancel-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;color:var(--red);">Отменить</button>` : ''}
           </div>
         </div>
@@ -991,10 +1074,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     container.querySelectorAll(".reschedule-btn").forEach(btn => {
       btn.addEventListener("click", () => {
-        activeRescheduleBookingId = parseInt(btn.dataset.id);
-        switchTab("booking");
-        goToStep(2);
-        showToast(`🔄 Перенос записи №${activeRescheduleBookingId}`);
+        startRescheduleMode(btn.dataset.id);
       });
     });
 
@@ -1135,7 +1215,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if (backToStep1Btn) backToStep1Btn.addEventListener("click", () => goToStep(1));
+  if (backToStep1Btn) {
+    backToStep1Btn.addEventListener("click", () => {
+      if (activeRescheduleBookingId) {
+        clearRescheduleMode();
+        switchTab("bookings-list");
+      } else {
+        goToStep(1);
+      }
+    });
+  }
+
   if (backToStep2Btn) backToStep2Btn.addEventListener("click", () => goToStep(2));
   if (backToStep3Btn) backToStep3Btn.addEventListener("click", () => goToStep(3));
 
@@ -1165,31 +1255,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const targetSlot = `${selectedSlot} (Мастер: ${selectedMasterName})`;
-
-      if (activeRescheduleBookingId) {
-        const res = await fetch(`${BACKEND_URL}/api/booking/reschedule`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            booking_id: activeRescheduleBookingId,
-            user_id: userId,
-            new_slot: targetSlot
-          })
-        });
-
-        const data = await res.json();
-        if (res.ok && data.success) {
-          showToast(`🎉 Запись №${activeRescheduleBookingId} перенесена!`);
-          activeRescheduleBookingId = null;
-          switchTab("bookings-list");
-          return;
-        } else {
-          showToast("⚠️ " + (data.error || "Ошибка переноса"));
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = `🚀 Подтвердить запись`;
-          return;
-        }
-      }
 
       const res = await fetch(`${BACKEND_URL}/api/booking/create`, {
         method: "POST",

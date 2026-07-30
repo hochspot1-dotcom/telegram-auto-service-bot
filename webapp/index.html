@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=66.0" />
+  <link rel="stylesheet" href="style.css?v=67.0" />
 </head>
 <body>
 
@@ -124,7 +124,7 @@
       </section>
 
       <!-- ════════════════════════════════════════
-           🏷 TAB 2: УСЛУГИ / БРОНИРОВАНИЕ (Clean Navigation & Pixel-Perfect Rows)
+           🏷 TAB 2: УСЛУГИ / БРОНИРОВАНИЕ (Clean Navigation & Reschedule Fast-Track)
            ════════════════════════════════════════ -->
       <section id="tab-booking" class="tab-content">
 
@@ -175,8 +175,15 @@
             </button>
           </div>
 
-          <!-- Step 2: Master & Calendar -->
+          <!-- Step 2: Master & Calendar (Supports Fast-Track Rescheduling) -->
           <div class="wizard-step-content hidden" id="form-step-2">
+
+            <!-- Reschedule Banner (Shown only when rescheduling an existing booking) -->
+            <div id="reschedule-notice-badge" class="af-card hidden" style="background: rgba(255, 204, 0, 0.14); border-color: rgba(255, 204, 0, 0.4); padding: 14px 16px;">
+              <div style="font-size:14px; font-weight:800; color: var(--dark);" id="reschedule-notice-title">🔄 Перенос записи</div>
+              <div style="font-size:12.5px; color: var(--gray-2); margin-top:2px;">Выберите новую дату и время. Марка авто, услуги и телефон будут сохранены автоматически.</div>
+            </div>
+
             <div class="af-form-group">
               <label class="af-label">Выберите мастера:</label>
               <div id="masters-container" style="display:flex;flex-direction:column;gap:10px;"></div>
@@ -200,7 +207,14 @@
 
             <div style="display:grid;grid-template-columns:auto 1fr;gap:10px;">
               <button type="button" class="af-btn-secondary" id="back-to-step-1-btn">← Назад</button>
+              
+              <!-- Normal flow button -->
               <button type="button" class="af-btn-primary" id="to-step-3-btn">Далее: Данные авто ➔</button>
+
+              <!-- Reschedule Fast-Track Confirm Button -->
+              <button type="button" class="af-btn-primary hidden" id="confirm-reschedule-btn" style="background:var(--dark);">
+                🔄 Подтвердить перенос записи
+              </button>
             </div>
           </div>
 
@@ -404,6 +418,6 @@
     <div id="toast" class="glass-toast hidden"></div>
   </div>
 
-  <script src="app.js?v=66.0"></script>
+  <script src="app.js?v=67.0"></script>
 </body>
 </html>

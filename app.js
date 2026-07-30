@@ -96,10 +96,6 @@ document.addEventListener("DOMContentLoaded", () => {
     carouselTrack.addEventListener("touchend", startAutoSlide);
   }
 
-  // ═══════════════════════════════════════════════════════════
-  // WELCOME SCREEN HANDLER (Always shows on open)
-  // Arrow button requests phone if new user, or proceeds to main menu
-  // ═══════════════════════════════════════════════════════════
   const welcomeOverlay = document.getElementById("triton-onboarding-screen");
   const welcomeArrowBtn = document.getElementById("onboarding-next-btn");
 
@@ -125,7 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem("user_phone_saved", formatted);
             const phoneInputEl = document.getElementById("phone-number");
             if (phoneInputEl) phoneInputEl.value = formatted;
-            showToast("✅ Номер телефона сохранен!");
+            showToast("Номер телефона сохранен!");
           }
           closeWelcomeScreen();
         });
@@ -187,7 +183,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   checkAdminStatus();
 
-  // Navigation Tab Switching
   const navItems = document.querySelectorAll(".af-nav-item");
   const tabContents = document.querySelectorAll(".tab-content");
 
@@ -237,7 +232,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Privacy Checkbox Handler
   const privacyAgreeCheckbox = document.getElementById("privacy-agree");
   const submitBookingBtn = document.getElementById("submit-booking-btn");
 
@@ -248,11 +242,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Services Categories Data
   const SERVICE_CATEGORIES = [
     {
       id: "cat_engine",
-      icon: "🔧",
       title: "Двигатель и выхлопная система",
       sub: "Диагностика, ГРМ, масло, выхлоп",
       items: [
@@ -266,7 +258,6 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "cat_chassis",
-      icon: "🛞",
       title: "Подвеска и тормозная система",
       sub: "Колодки, диски, амортизаторы, шиномонтаж",
       items: [
@@ -280,7 +271,6 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "cat_electric",
-      icon: "⚡",
       title: "Электрика и автоэлектроника",
       sub: "Диагностика, АКБ, стартер, сигнализация",
       items: [
@@ -293,7 +283,6 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "cat_to",
-      icon: "🛢",
       title: "Регулярное ТО и масляный сервис",
       sub: "Комплексное ТО, замена жидкостей",
       items: [
@@ -305,7 +294,6 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     {
       id: "cat_climate",
-      icon: "❄️",
       title: "Климат и кондиционер",
       sub: "Заправка, дезинфекция, радиаторы",
       items: [
@@ -318,7 +306,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const selectedProblemsSet = new Set();
   const customCategoryInputs = {};
-
   let activeCategoryId = null;
 
   const catOverviewView = document.getElementById("cat-overview-view");
@@ -366,7 +353,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     summaryEl.innerHTML = `
       <div class="af-card" style="margin-top:8px;">
-        <div style="font-size:13px;font-weight:800;color:var(--green);">✅ Выбранные услуги (${items.length}):</div>
+        <div style="font-size:13px;font-weight:800;color:var(--green);">Выбранные услуги (${items.length}):</div>
         <ul style="font-size:13px;color:var(--dark);padding-left:18px;margin-top:4px;">
           ${items.map(i => `<li style="margin-bottom:3px;">${i}</li>`).join("")}
         </ul>
@@ -391,7 +378,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return `
         <div class="af-cat-card" data-cat-id="${cat.id}">
           <div class="af-cat-card-left">
-            <div class="af-cat-icon">${cat.icon}</div>
             <div class="af-cat-info">
               <div class="af-cat-title">${cat.title}</div>
               <div class="af-cat-count">${cat.items.length} услуг${badgeText}</div>
@@ -417,7 +403,7 @@ document.addEventListener("DOMContentLoaded", () => {
     activeCategoryId = catId;
 
     if (selectedCatTitleBadge) {
-      selectedCatTitleBadge.textContent = `${cat.icon} ${cat.title}`;
+      selectedCatTitleBadge.textContent = cat.title;
     }
 
     renderSubservicesList(cat);
@@ -446,7 +432,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }).join("")}
 
       <div class="af-card" style="margin-top:4px;">
-        <label class="af-label">Или опишите проблему своими словами:</label>
+        <label class="af-label">Опишите проблему своими словами:</label>
         <input
           type="text"
           id="custom-cat-input-field"
@@ -561,27 +547,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const MASTERS_DATA = [
     {
       id: "master_any",
-      name: "🌟 Любой свободный мастер",
-      role: "Ближайшее доступное время",
-      avatar: "👨‍🔧"
+      name: "Любой свободный мастер",
+      role: "Ближайшее доступное время"
     },
     {
       id: "master_alexey",
       name: "Алексей Смирнов",
-      role: "Старший механик (Двигатель и ТО)",
-      avatar: "👨‍🔧"
+      role: "Старший механик (Двигатель и ТО)"
     },
     {
       id: "master_dmitry",
       name: "Дмитрий Ковалев",
-      role: "Диагност-автоэлектрик",
-      avatar: "⚡"
+      role: "Диагност-автоэлектрик"
     },
     {
       id: "master_igor",
       name: "Игорь Соколов",
-      role: "Мастер по ходовой части",
-      avatar: "🛞"
+      role: "Мастер по ходовой части"
     }
   ];
 
@@ -597,7 +579,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const isSelected = m.id === selectedMasterId;
       return `
         <div class="af-master-card ${isSelected ? 'selected' : ''}" data-master-id="${m.id}">
-          <div class="af-master-avatar">${m.avatar}</div>
           <div>
             <div class="af-master-name">${m.name}</div>
             <div class="af-master-role">${m.role}</div>
@@ -785,10 +766,6 @@ document.addEventListener("DOMContentLoaded", () => {
     showCalendarView();
   }
 
-  // ═══════════════════════════════════════════════════════════
-  // RESCHEDULING FAST-TRACK LOGIC (Automatic Approval & Notification)
-  // ═══════════════════════════════════════════════════════════
-
   function startRescheduleMode(bookingId) {
     activeRescheduleBookingId = parseInt(bookingId, 10);
 
@@ -799,10 +776,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const backToStep1Btn = document.getElementById("back-to-step-1-btn");
 
     if (noticeBadge) noticeBadge.classList.remove("hidden");
-    if (noticeTitle) noticeTitle.textContent = `🔄 Перенос записи №${activeRescheduleBookingId}`;
+    if (noticeTitle) noticeTitle.textContent = `Перенос записи №${activeRescheduleBookingId}`;
     if (toStep3Btn) toStep3Btn.classList.add("hidden");
     if (confirmRescheduleBtn) confirmRescheduleBtn.classList.remove("hidden");
-    if (backToStep1Btn) backToStep1Btn.textContent = "❌ Отмена";
+    if (backToStep1Btn) backToStep1Btn.textContent = "Отмена";
 
     switchTab("booking");
     goToStep(2);
@@ -827,13 +804,13 @@ document.addEventListener("DOMContentLoaded", () => {
   if (confirmRescheduleBtn) {
     confirmRescheduleBtn.addEventListener("click", async () => {
       if (!selectedSlot) {
-        showToast("⚠️ Выберите новое время записи!");
+        showToast("Выберите новое время записи!");
         return;
       }
       if (!activeRescheduleBookingId) return;
 
       confirmRescheduleBtn.disabled = true;
-      confirmRescheduleBtn.textContent = "⏳ Сохранение...";
+      confirmRescheduleBtn.textContent = "Сохранение...";
 
       try {
         const targetSlot = `${selectedSlot} (Мастер: ${selectedMasterName})`;
@@ -859,25 +836,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const data = await res.json();
         if (res.ok && data.success) {
-          showToast(`🎉 Запись №${activeRescheduleBookingId} подтверждена на ${selectedSlot}!`);
+          showToast(`Запись №${activeRescheduleBookingId} подтверждена на ${selectedSlot}!`);
           clearRescheduleMode();
           await loadUserProfile();
           switchTab("bookings-list");
         } else {
-          showToast("⚠️ " + (data.error || "Ошибка переноса"));
+          showToast(data.error || "Ошибка переноса");
         }
       } catch (e) {
-        showToast("⚠️ Ошибка соединения");
+        showToast("Ошибка соединения");
       } finally {
         confirmRescheduleBtn.disabled = false;
-        confirmRescheduleBtn.textContent = "🔄 Подтвердить перенос записи";
+        confirmRescheduleBtn.textContent = "Подтвердить перенос записи";
       }
     });
   }
 
-  // ═══════════════════════════════════════════════════════════
-  // HOME TAB ACTIVE BOOKING PROGRESS TRACKER & REMINDER
-  // ═══════════════════════════════════════════════════════════
   let activeCountdownInterval = null;
 
   function parseBookingDate(slotStr) {
@@ -909,7 +883,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const diffMs = targetDate - now;
 
       if (diffMs <= 0) {
-        valElement.textContent = "🚗 Визит на автосервис!";
+        valElement.textContent = "Визит на автосервис!";
         clearInterval(activeCountdownInterval);
         return;
       }
@@ -939,13 +913,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (activeCountdownInterval) clearInterval(activeCountdownInterval);
 
     const activeBooking = (bookings || []).find(b =>
-      ["Одобрена", "Активна", "На рассмотрении", "🛠 В работе", "🎉 Готов к выдаче"].includes(b.status)
+      ["Одобрена", "Активна", "На рассмотрении"].includes(b.status)
     );
 
     if (!activeBooking) {
       container.innerHTML = `
         <div class="af-no-booking-card">
-          <div class="af-no-booking-icon">📅</div>
           <div class="af-no-booking-text">
             <strong>Нет ближайших записей</strong><br>
             Запишитесь на ТО или ремонт в 2 клика!
@@ -956,41 +929,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     let statusClass = "pending";
-    let statusLabel = "⏳ На рассмотрении";
-    let stepIndex = 1;
-
-    if (activeBooking.status === "Одобрена" || activeBooking.status === "Активна" || activeBooking.status.includes("Перенесена")) {
+    let statusLabel = "На рассмотрении";
+    if (activeBooking.status === "Одобрена" || activeBooking.status === "Активна") {
       statusClass = "approved";
-      statusLabel = "✅ Подтверждена";
-      stepIndex = 2;
-    } else if (activeBooking.status.includes("В работе")) {
-      statusClass = "approved";
-      statusLabel = "🛠 В работе на подъёмнике";
-      stepIndex = 3;
-    } else if (activeBooking.status.includes("Готов")) {
-      statusClass = "approved";
-      statusLabel = "🎉 Готов к выдаче!";
-      stepIndex = 4;
+      statusLabel = "Подтверждена";
     }
 
     container.innerHTML = `
       <div class="af-reminder-card">
         <div class="af-reminder-header">
-          <span class="af-reminder-badge">📅 Запись №${activeBooking.id}</span>
+          <span class="af-reminder-badge">Запись №${activeBooking.id}</span>
           <span class="af-reminder-status-tag ${statusClass}">${statusLabel}</span>
-        </div>
-
-        <!-- Real-time Progress Tracker Bar -->
-        <div class="af-progress-bar-wrap" style="margin: 10px 0;">
-          <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--gray-2);margin-bottom:4px;">
-            <span style="${stepIndex>=1 ? 'color:var(--dark);font-weight:900;' : ''}">1. Создана</span>
-            <span style="${stepIndex>=2 ? 'color:var(--dark);font-weight:900;' : ''}">2. Принята</span>
-            <span style="${stepIndex>=3 ? 'color:var(--dark);font-weight:900;' : ''}">3. В работе</span>
-            <span style="${stepIndex>=4 ? 'color:var(--dark);font-weight:900;' : ''}">4. Готова</span>
-          </div>
-          <div style="height:6px;background:#e5e5ea;border-radius:4px;overflow:hidden;">
-            <div style="height:100%;background:var(--dark);width:${(stepIndex/4)*100}%;transition:width 0.4s ease;"></div>
-          </div>
         </div>
 
         <div class="af-reminder-title">${activeBooking.problem}</div>
@@ -1001,22 +950,22 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
 
         <div class="af-countdown-box">
-          <span class="af-countdown-label">⏳ До визита:</span>
+          <span class="af-countdown-label">До визита:</span>
           <span class="af-countdown-value" id="home-countdown-val">Считаем...</span>
         </div>
 
         <div class="af-reminder-actions" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
           <button type="button" class="af-reminder-btn af-reminder-btn-secondary" id="home-view-bookings-btn">
-            📋 Записи
+            Записи
           </button>
           <button type="button" class="af-reminder-btn af-reminder-btn-secondary" id="home-reschedule-btn" data-id="${activeBooking.id}">
-            🔄 Перенести
+            Перенести
           </button>
           <button type="button" class="af-reminder-btn af-reminder-btn-secondary" id="home-cancel-booking-btn" data-id="${activeBooking.id}" style="color:var(--red);">
-            ❌ Отменить
+            Отменить
           </button>
           <a href="https://t.me/autofriends_service" target="_blank" class="af-reminder-btn af-reminder-btn-secondary" style="text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;color:var(--dark);">
-            💬 Поддержка
+            Поддержка
           </a>
         </div>
       </div>
@@ -1084,7 +1033,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Load user profile on startup
   loadUserProfile();
 
   function renderUserBookings(bookings) {
@@ -1103,20 +1051,14 @@ document.addEventListener("DOMContentLoaded", () => {
       let isCancelled = b.status.includes("Отменен") || b.status.includes("Отклонен");
       
       if (b.status === "Одобрена" || b.status === "Активна" || b.status.includes("Перенесена")) {
-        displayStatus = "✅ Подтверждена";
-        statusColor = "var(--green)";
-      } else if (b.status.includes("В работе")) {
-        displayStatus = "🛠 В работе на подъёмнике";
-        statusColor = "var(--dark)";
-      } else if (b.status.includes("Готов")) {
-        displayStatus = "🎉 Готов к выдаче";
+        displayStatus = "Подтверждена";
         statusColor = "var(--green)";
       } else if (isCancelled) {
-        displayStatus = "❌ Отменена";
+        displayStatus = "Отменена";
         statusColor = "var(--red)";
       }
 
-      const isCancelable = ["На рассмотрении", "Одобрена", "Активна", "🛠 В работе"].includes(b.status) || isUnavailable;
+      const isCancelable = ["На рассмотрении", "Одобрена", "Активна"].includes(b.status) || isUnavailable;
 
       return `
         <div class="af-card" style="${isCancelled ? 'opacity:0.75;' : ''}">
@@ -1132,8 +1074,8 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
           ${!isCancelled ? `
             <div style="display:flex;gap:6px;margin-top:6px;">
-              ${isUnavailable ? `<button class="af-btn-primary reschedule-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">Выбрать другое время</button>` : `<button class="af-btn-secondary reschedule-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">🔄 Перенести</button>`}
-              ${isCancelable ? `<button class="af-btn-secondary cancel-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;color:var(--red);">❌ Отменить</button>` : ''}
+              ${isUnavailable ? `<button class="af-btn-primary reschedule-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">Выбрать другое время</button>` : `<button class="af-btn-secondary reschedule-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">Перенести</button>`}
+              ${isCancelable ? `<button class="af-btn-secondary cancel-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;color:var(--red);">Отменить</button>` : ''}
             </div>
           ` : ''}
         </div>
@@ -1202,15 +1144,15 @@ document.addEventListener("DOMContentLoaded", () => {
       try { data = await res.json(); } catch (e) {}
 
       if (res.ok || data.success) {
-        showToast("✅ Запись отменена! Уведомление отправлено.");
+        showToast("Запись отменена! Уведомление отправлено.");
         await loadUserProfile();
         if (isAdmin) loadAdminBookings(currentAdminFilter);
       } else {
-        showToast("⚠️ " + (data.error || "Ошибка отмены"));
+        showToast(data.error || "Ошибка отмены");
       }
     } catch (e) {
       console.error(e);
-      showToast("⚠️ Ошибка соединения");
+      showToast("Ошибка соединения");
     }
   }
 
@@ -1283,7 +1225,7 @@ document.addEventListener("DOMContentLoaded", () => {
       phoneInput.removeAttribute("readonly");
       phoneInput.focus();
       phoneInput.select();
-      showToast("✏️ Введите нужный номер");
+      showToast("Введите нужный номер");
     });
   }
 
@@ -1294,7 +1236,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const allProblems = [...checkedProblems, ...customProblems];
 
       if (allProblems.length === 0) {
-        showToast("⚠️ Выберите хотя бы одну услугу!");
+        showToast("Выберите хотя бы одну услугу!");
         return;
       }
       goToStep(2);
@@ -1304,7 +1246,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (toStep3Btn) {
     toStep3Btn.addEventListener("click", () => {
       if (!selectedSlot) {
-        showToast("⚠️ Выберите время записи!");
+        showToast("Выберите время записи!");
         return;
       }
       goToStep(3);
@@ -1315,7 +1257,7 @@ document.addEventListener("DOMContentLoaded", () => {
     toStep4Btn.addEventListener("click", () => {
       const carModel = document.getElementById("car-model").value.trim();
       if (!carModel || carModel.length < 2) {
-        showToast("⚠️ Укажите марку и модель авто!");
+        showToast("Укажите марку и модель авто!");
         return;
       }
       goToStep(4);
@@ -1352,13 +1294,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const phone = document.getElementById("phone-number").value.trim();
     const privacyAgree = document.getElementById("privacy-agree");
 
-    if (!problem) { showToast("⚠️ Выберите услугу!"); goToStep(1); return; }
-    if (!carModel) { showToast("⚠️ Укажите марку авто!"); goToStep(3); return; }
-    if (!phone) { showToast("⚠️ Укажите телефон!"); return; }
-    if (privacyAgree && !privacyAgree.checked) { showToast("⚠️ Примите Соглашение!"); return; }
+    if (!problem) { showToast("Выберите услугу!"); goToStep(1); return; }
+    if (!carModel) { showToast("Укажите марку авто!"); goToStep(3); return; }
+    if (!phone) { showToast("Укажите телефон!"); return; }
+    if (privacyAgree && !privacyAgree.checked) { showToast("Примите Соглашение!"); return; }
 
     submitBtn.disabled = true;
-    submitBtn.innerHTML = `<span>⏳ Отправка...</span>`;
+    submitBtn.innerHTML = `<span>Отправка...</span>`;
 
     try {
       const targetSlot = `${selectedSlot} (Мастер: ${selectedMasterName})`;
@@ -1383,7 +1325,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        showToast(`🎉 Заявка №${data.booking_id} успешно создана!`);
+        showToast(`Заявка №${data.booking_id} успешно создана!`);
         bookingForm.reset();
         selectedProblemsSet.clear();
         Object.keys(customCategoryInputs).forEach(k => delete customCategoryInputs[k]);
@@ -1393,14 +1335,14 @@ document.addEventListener("DOMContentLoaded", () => {
           switchTab("bookings-list");
         }, 1000);
       } else {
-        showToast("⚠️ " + (data.error || "Ошибка создания"));
+        showToast(data.error || "Ошибка создания");
       }
     } catch (err) {
       console.error(err);
-      showToast("⚠️ Ошибка соединения с серверным API");
+      showToast("Ошибка соединения с серверным API");
     } finally {
       submitBtn.disabled = false;
-      submitBtn.innerHTML = `🚀 Подтвердить запись`;
+      submitBtn.innerHTML = `Подтвердить запись`;
     }
   });
 
@@ -1415,7 +1357,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ═══════════════════════════════════════════════════════════
-  // MODERATOR SUPER-PANEL LOGIC (Expanded Control Actions & Statuses)
+  // MODERATOR PANEL LOGIC (Clean & Simple Approve / Reject / Delete)
   // ═══════════════════════════════════════════════════════════
   const statusPillsContainer = document.getElementById("admin-status-pills");
   if (statusPillsContainer) {
@@ -1455,21 +1397,17 @@ document.addEventListener("DOMContentLoaded", () => {
     container.innerHTML = bookings.map(b => {
       let isCancelled = b.status.includes("Отменен") || b.status.includes("Отклонен");
       let isApproved = b.status === "Одобрена" || b.status === "Активна";
-      let isInProgress = b.status.includes("В работе");
-      let isReady = b.status.includes("Готов");
 
       let statusColor = "var(--yellow)";
-      let statusTag = "⏳ На рассмотрении";
+      let statusTag = "На рассмотрении";
 
-      if (isApproved) { statusColor = "var(--green)"; statusTag = "✅ Одобрена"; }
-      if (isInProgress) { statusColor = "var(--dark)"; statusTag = "🛠 В работе"; }
-      if (isReady) { statusColor = "var(--green)"; statusTag = "🎉 Готов к выдаче"; }
-      if (isCancelled) { statusColor = "var(--red)"; statusTag = "❌ Отменена"; }
+      if (isApproved) { statusColor = "var(--green)"; statusTag = "Одобрена"; }
+      if (isCancelled) { statusColor = "var(--red)"; statusTag = "Отменена"; }
 
       const phoneClean = (b.phone || "").replace(/[^\d+]/g, "");
 
       return `
-        <div class="af-card" style="${isCancelled ? 'opacity:0.7;' : ''}">
+        <div class="af-card" style="${isCancelled ? 'opacity:0.75;' : ''}">
           <div style="display:flex;justify-content:space-between;align-items:center;">
             <span style="font-size:14px;font-weight:800;">Заявка №${b.id}</span>
             <span style="font-size:12px;font-weight:700;color:${statusColor};">${statusTag}</span>
@@ -1483,26 +1421,17 @@ document.addEventListener("DOMContentLoaded", () => {
             ${b.comment ? `<div style="margin-top:4px;padding:6px;background:var(--bg-pill);border-radius:6px;"><strong>Комментарий:</strong> ${b.comment}</div>` : ''}
           </div>
 
-          <!-- Direct Communication Quick Actions -->
           <div style="display:flex;gap:6px;margin-top:8px;">
-            ${phoneClean ? `<a href="tel:${phoneClean}" class="af-btn-secondary" style="padding:5px 10px;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">📞 Звонок</a>` : ''}
-            <a href="https://t.me/${b.user_id}" target="_blank" class="af-btn-secondary" style="padding:5px 10px;font-size:12px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">💬 Telegram</a>
+            ${phoneClean ? `<a href="tel:${phoneClean}" class="af-btn-secondary" style="padding:5px 10px;font-size:12px;text-decoration:none;">Звонок</a>` : ''}
+            <a href="https://t.me/${b.user_id}" target="_blank" class="af-btn-secondary" style="padding:5px 10px;font-size:12px;text-decoration:none;">Telegram</a>
           </div>
 
-          <!-- Extended Moderator Control Actions -->
-          ${!isCancelled ? `
-            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
-              <button class="af-btn-primary admin-btn-action" data-id="${b.id}" data-act="approve" style="padding:5px 10px;font-size:11.5px;background:var(--green);">✅ Одобрить</button>
-              <button class="af-btn-secondary admin-btn-action" data-id="${b.id}" data-act="in_progress" style="padding:5px 10px;font-size:11.5px;background:var(--dark);color:#fff;">🛠 В работу</button>
-              <button class="af-btn-secondary admin-btn-action" data-id="${b.id}" data-act="ready" style="padding:5px 10px;font-size:11.5px;background:#34c759;color:#fff;">🎉 Готов</button>
-              <button class="af-btn-secondary admin-btn-action" data-id="${b.id}" data-act="reject" style="padding:5px 10px;font-size:11.5px;color:var(--red);">❌ Отклонить</button>
-              <button class="af-btn-secondary admin-btn-action" data-id="${b.id}" data-act="cancel" style="padding:5px 10px;font-size:11.5px;color:var(--red);">⚠️ Отменить</button>
-            </div>
-          ` : `
-            <div style="margin-top:8px;">
-              <button class="af-btn-secondary admin-btn-action" data-id="${b.id}" data-act="delete" style="padding:5px 10px;font-size:11.5px;color:var(--red);">🗑 Удалить из базы</button>
-            </div>
-          `}
+          <!-- Clean Moderator Control Buttons without Emojis -->
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
+            ${!isApproved ? `<button class="af-btn-primary admin-btn-action" data-id="${b.id}" data-act="approve" style="padding:6px 12px;font-size:12px;background:var(--green);">Одобрить</button>` : ''}
+            ${!isCancelled ? `<button class="af-btn-secondary admin-btn-action" data-id="${b.id}" data-act="reject" style="padding:6px 12px;font-size:12px;color:var(--red);">Отклонить</button>` : ''}
+            <button class="af-btn-secondary admin-btn-action" data-id="${b.id}" data-act="delete" style="padding:6px 12px;font-size:12px;color:var(--red);">Удалить из базы</button>
+          </div>
         </div>
       `;
     }).join("");
@@ -1512,14 +1441,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const bId = btn.dataset.id;
         const act = btn.dataset.act;
 
-        if (act === "cancel" || act === "delete") {
-          if (!confirm(`Вы уверены, что хотите ${act === 'delete' ? 'удалить' : 'отменить'} запись №${bId}?`)) return;
-        }
-
-        if (act === "approve" || act === "reject") {
+        if (act === "delete") {
+          if (!confirm(`Вы уверены, что хотите удалить запись №${bId} из базы?`)) return;
+          await executeAdminAction(bId, "delete", "");
+        } else if (act === "approve" || act === "reject") {
           openAdminModal(bId, act);
-        } else {
-          await executeAdminAction(bId, act, "");
         }
       });
     });
@@ -1557,14 +1483,14 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        showToast("✅ Действие модератора выполнено!");
+        showToast("Действие модератора выполнено!");
         loadAdminBookings(currentAdminFilter);
         loadUserProfile();
       } else {
-        showToast("⚠️ " + (data.error || "Ошибка"));
+        showToast(data.error || "Ошибка");
       }
     } catch (e) {
-      showToast("⚠️ Ошибка вызова API");
+      showToast("Ошибка вызова API");
     }
   }
 
@@ -1579,7 +1505,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const rawDate = dateInput ? dateInput.value : "";
       const reason = reasonInput ? reasonInput.value.trim() : "";
 
-      if (!rawDate) { showToast("⚠️ Укажите дату!"); return; }
+      if (!rawDate) { showToast("Укажите дату!"); return; }
 
       const [y, m, d] = rawDate.split("-");
       const formattedDate = `${parseInt(d)} ${MONTH_NAMES_RU_GENITIVE[parseInt(m)-1]}`;
@@ -1594,11 +1520,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         const data = await res.json();
         if (res.ok && data.success) {
-          showToast(`✅ Смена мастера отменена! Клиенты уведомлены.`);
+          showToast(`Смена мастера отменена! Клиенты уведомлены.`);
           loadAdminBookings(currentAdminFilter);
         }
       } catch (e) {
-        showToast("⚠️ Ошибка соединения");
+        showToast("Ошибка соединения");
       }
     });
   }

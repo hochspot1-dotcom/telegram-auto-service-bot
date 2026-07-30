@@ -29,7 +29,6 @@ from database import (
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
-# Расширенный словарь марок автомобилей (Русский -> Английский)
 BRANDS_MAP = {
     "бмв": "BMW", "bmw": "BMW", "опель": "Opel", "opel": "Opel",
     "мерседес-бенц": "Mercedes-Benz", "мерседес бенц": "Mercedes-Benz",
@@ -223,18 +222,18 @@ class BookingState(StatesGroup):
 class AdminState(StatesGroup):
     enter_comment = State()
 
-# --- Инлайн-клавиатуры для бота ---
+# --- Инлайн-клавиатуры без эмодзи на кнопках ---
 
 def get_main_inline_keyboard():
     builder = InlineKeyboardBuilder()
     if WEBAPP_URL and WEBAPP_URL.startswith("https://"):
-        builder.button(text="📱 Открыть Mini App", web_app=types.WebAppInfo(url=WEBAPP_URL))
-    builder.button(text="🛠 Услуги и цены", callback_data="nav_services")
-    builder.button(text="📅 Записаться на ТО", callback_data="nav_booking")
-    builder.button(text="👤 Личный кабинет", callback_data="nav_profile")
-    builder.button(text="📍 Контакты и адрес", callback_data="nav_contacts")
-    builder.button(text="ℹ️ О нас", callback_data="nav_about")
-    builder.button(text="🔄 Обновить меню", callback_data="nav_main")
+        builder.button(text="Открыть Mini App", web_app=types.WebAppInfo(url=WEBAPP_URL))
+    builder.button(text="Услуги и цены", callback_data="nav_services")
+    builder.button(text="Записаться на ТО", callback_data="nav_booking")
+    builder.button(text="Личный кабинет", callback_data="nav_profile")
+    builder.button(text="Контакты и адрес", callback_data="nav_contacts")
+    builder.button(text="О нас", callback_data="nav_about")
+    builder.button(text="Обновить меню", callback_data="nav_main")
     if WEBAPP_URL and WEBAPP_URL.startswith("https://"):
         builder.adjust(1, 2, 2, 2, 1)
     else:
@@ -243,36 +242,36 @@ def get_main_inline_keyboard():
 
 def get_back_inline_keyboard():
     builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 Назад в меню", callback_data="nav_main")
+    builder.button(text="Назад в меню", callback_data="nav_main")
     return builder.as_markup()
 
 def get_categories_keyboard():
     builder = InlineKeyboardBuilder()
     categories = [
-        ("🔧 Двигатель и выхлопная система", "cat_engine"),
-        ("🛞 Подвеска и тормозная система", "cat_chassis"),
-        ("⚡ Электрика и автоэлектроника", "cat_electric"),
-        ("🛢 Регулярное ТО и масляный сервис", "cat_to"),
-        ("❄️ Климат и кондиционер", "cat_climate"),
-        ("✏️ Написать проблему своими словами", "cat_custom"),
+        ("Двигатель и выхлопная система", "cat_engine"),
+        ("Подвеска и тормозная система", "cat_chassis"),
+        ("Электрика и автоэлектроника", "cat_electric"),
+        ("Регулярное ТО и масляный сервис", "cat_to"),
+        ("Климат и кондиционер", "cat_climate"),
+        ("Написать проблему своими словами", "cat_custom"),
     ]
     for text, callback_data in categories:
         builder.button(text=text, callback_data=callback_data)
-    builder.button(text="🔙 Назад в меню", callback_data="nav_main")
+    builder.button(text="Назад в меню", callback_data="nav_main")
     builder.adjust(1)
     return builder.as_markup()
 
 def get_masters_keyboard():
     builder = InlineKeyboardBuilder()
     masters = [
-        ("🌟 Любой свободный мастер", "m_any"),
-        ("👨‍🔧 Алексей Смирнов (Двигатель/ТО)", "m_alexey"),
-        ("⚡ Дмитрий Ковалев (Диагност)", "m_dmitry"),
-        ("🛞 Игорь Соколов (Ходовая)", "m_igor"),
+        ("Любой свободный мастер", "m_any"),
+        ("Алексей Смирнов (Двигатель/ТО)", "m_alexey"),
+        ("Дмитрий Ковалев (Диагност)", "m_dmitry"),
+        ("Игорь Соколов (Ходовая)", "m_igor"),
     ]
     for text, callback_data in masters:
         builder.button(text=text, callback_data=callback_data)
-    builder.button(text="🔙 Назад в меню", callback_data="nav_main")
+    builder.button(text="Назад в меню", callback_data="nav_main")
     builder.adjust(1)
     return builder.as_markup()
 
@@ -286,22 +285,22 @@ def get_time_slots_keyboard():
         day_name = days_ru[date_obj.weekday()]
         for time_str in ["09:00", "10:30", "12:00", "13:30", "15:00", "16:30", "18:00"]:
             slot_label = f"{date_str} ({day_name}) в {time_str}"
-            builder.button(text=f"📅 {slot_label}", callback_data=f"slot_{slot_label}")
-    builder.button(text="🔙 Назад в меню", callback_data="nav_main")
+            builder.button(text=slot_label, callback_data=f"slot_{slot_label}")
+    builder.button(text="Назад в меню", callback_data="nav_main")
     builder.adjust(2)
     return builder.as_markup()
 
 def get_confirm_keyboard():
     builder = InlineKeyboardBuilder()
-    builder.button(text="🚀 Подтвердить запись", callback_data="confirm_booking")
-    builder.button(text="❌ Отменить", callback_data="nav_main")
+    builder.button(text="Подтвердить запись", callback_data="confirm_booking")
+    builder.button(text="Отменить", callback_data="nav_main")
     builder.adjust(2)
     return builder.as_markup()
 
 dp = Dispatcher(storage=MemoryStorage())
 
 MAIN_WELCOME_TEXT = (
-    "🚗 <b>Интерактивный Автосервис AutoFriends</b>\n\n"
+    "<b>Интерактивный Автосервис AutoFriends</b>\n\n"
     "Добро пожаловать! Вы можете полностью записаться на ТО или ремонт прямо здесь через Telegram бота.\n"
     "Выберите нужное действие ниже:"
 )
@@ -331,7 +330,6 @@ async def show_main_menu(bot: Bot, chat_id: int, user_first_name: str, state: FS
     msg = await bot.send_message(chat_id, text, parse_mode="HTML", reply_markup=get_main_inline_keyboard())
     await state.update_data(card_msg_id=msg.message_id)
 
-# --- Навигация по /start, /restart ---
 @dp.message(Command("start"))
 @dp.message(Command("restart"))
 async def cmd_start(message: types.Message, state: FSMContext, bot: Bot):
@@ -340,7 +338,7 @@ async def cmd_start(message: types.Message, state: FSMContext, bot: Bot):
     except Exception:
         pass
         
-    rm_msg = await bot.send_message(message.chat.id, "🔄 Обновление интерфейса...", reply_markup=ReplyKeyboardRemove())
+    rm_msg = await bot.send_message(message.chat.id, "Обновление интерфейса...", reply_markup=ReplyKeyboardRemove())
     try:
         await rm_msg.delete()
     except Exception:
@@ -350,35 +348,33 @@ async def cmd_start(message: types.Message, state: FSMContext, bot: Bot):
 
 @dp.callback_query(F.data == "nav_main")
 async def nav_main_handler(callback: types.CallbackQuery, state: FSMContext, bot: Bot):
-    await callback.answer("Главное меню 🔄")
+    await callback.answer("Главное меню")
     await show_main_menu(bot, callback.message.chat.id, callback.from_user.first_name, state, callback)
 
-# --- Раздел: 🛠 Услуги и цены ---
 @dp.callback_query(F.data == "nav_services")
 async def nav_services_handler(callback: types.CallbackQuery):
     await callback.answer()
     services_text = (
-        "<b>🛠 Прайс-лист автосервиса:</b>\n\n"
+        "<b>Прайс-лист автосервиса:</b>\n\n"
         "• Компьютерная диагностика — от 1 000 ₽\n"
         "• Замена моторного масла и фильтра — от 1 500 ₽\n"
         "• Замена тормозных колодок — от 1 500 ₽\n"
         "• Замена амортизаторов / пружин — от 3 000 ₽\n"
         "• Заправка и чистка кондиционера — от 2 000 ₽\n"
         "• Шиномонтаж и балансировка — от 2 000 ₽\n\n"
-        "<i>Нажмите «📅 Записаться на ТО», чтобы выбрать дату и мастера.</i>"
+        "<i>Нажмите «Записаться на ТО», чтобы выбрать дату и мастера.</i>"
     )
     builder = InlineKeyboardBuilder()
-    builder.button(text="📅 Записаться на ТО", callback_data="nav_booking")
-    builder.button(text="🔙 Назад в меню", callback_data="nav_main")
+    builder.button(text="Записаться на ТО", callback_data="nav_booking")
+    builder.button(text="Назад в меню", callback_data="nav_main")
     builder.adjust(1)
     await callback.message.edit_text(services_text, parse_mode="HTML", reply_markup=builder.as_markup())
 
-# --- Раздел: 📍 Контакты и адрес ---
 @dp.callback_query(F.data == "nav_contacts")
 async def nav_contacts_handler(callback: types.CallbackQuery):
     await callback.answer()
     contacts_text = (
-        "<b>📍 Контакты автосервиса AutoFriends</b>\n\n"
+        "<b>Контакты автосервиса AutoFriends</b>\n\n"
         "<b>Адрес:</b> г. Горловка, ул. Автомобильная, д. 10\n"
         "<b>Режим работы:</b> Пн-Сб с 09:00 до 19:00\n"
         "<b>Телефон:</b> +7 (949) 000-00-00\n"
@@ -386,12 +382,11 @@ async def nav_contacts_handler(callback: types.CallbackQuery):
     )
     await callback.message.edit_text(contacts_text, parse_mode="HTML", reply_markup=get_back_inline_keyboard())
 
-# --- Раздел: ℹ️ О нас ---
 @dp.callback_query(F.data == "nav_about")
 async def nav_about_handler(callback: types.CallbackQuery):
     await callback.answer()
     about_text = (
-        "<b>ℹ️ О нашем сервисе</b>\n\n"
+        "<b>О нашем сервисе</b>\n\n"
         "AutoFriends — это профессиональный сервис с гарантией качества на все работы.\n"
         "• Квалифицированные мастера\n"
         "• Современное диагностическое оборудование\n"
@@ -399,7 +394,6 @@ async def nav_about_handler(callback: types.CallbackQuery):
     )
     await callback.message.edit_text(about_text, parse_mode="HTML", reply_markup=get_back_inline_keyboard())
 
-# --- Раздел: 👤 Личный кабинет ---
 @dp.callback_query(F.data == "nav_profile")
 @dp.message(Command("profile"))
 async def profile_handler(event: types.CallbackQuery | types.Message, state: FSMContext, bot: Bot):
@@ -415,22 +409,22 @@ async def profile_handler(event: types.CallbackQuery | types.Message, state: FSM
     username_str = f" (@{user.username})" if user.username else ""
     
     profile_text = (
-        f"<b>👤 Личный кабинет клиента</b>\n\n"
+        f"<b>Личный кабинет клиента</b>\n\n"
         f"• <b>Имя:</b> {user_name}{username_str}\n"
         f"• <b>Телефон:</b> {stats['phone']}\n"
         f"• <b>Автомобиль:</b> {stats['car_model']}\n\n"
-        f"<b>📊 Ваша статистика:</b>\n"
-        f"• ✅ Активных / Подтвержденных: <b>{stats['active']}</b>\n"
-        f"• 📁 Всего записей: <b>{stats['total']}</b>\n"
-        f"• ❌ Отмененных: <b>{stats['cancelled']}</b>\n\n"
+        f"<b>Статистика:</b>\n"
+        f"• Активных / Подтвержденных: <b>{stats['active']}</b>\n"
+        f"• Всего записей: <b>{stats['total']}</b>\n"
+        f"• Отмененных: <b>{stats['cancelled']}</b>\n\n"
         "Выберите нужный раздел:"
     )
     
     builder = InlineKeyboardBuilder()
-    builder.button(text=f"📋 Ваши записи ({stats['active']})", callback_data="view_active_bookings")
-    builder.button(text="📜 История всех визитов", callback_data="view_all_bookings")
-    builder.button(text="📅 Записаться на ТО", callback_data="nav_booking")
-    builder.button(text="🔙 Назад в меню", callback_data="nav_main")
+    builder.button(text=f"Ваши записи ({stats['active']})", callback_data="view_active_bookings")
+    builder.button(text="История всех визитов", callback_data="view_all_bookings")
+    builder.button(text="Записаться на ТО", callback_data="nav_booking")
+    builder.button(text="Назад в меню", callback_data="nav_main")
     builder.adjust(1)
     
     if isinstance(event, types.CallbackQuery):
@@ -439,7 +433,6 @@ async def profile_handler(event: types.CallbackQuery | types.Message, state: FSM
     else:
         await bot.send_message(user.id, profile_text, parse_mode="HTML", reply_markup=builder.as_markup())
 
-# Просмотр активных записей клиентом
 @dp.callback_query(F.data == "view_active_bookings")
 async def view_active_bookings_handler(callback: types.CallbackQuery):
     await callback.answer()
@@ -450,17 +443,16 @@ async def view_active_bookings_handler(callback: types.CallbackQuery):
     builder = InlineKeyboardBuilder()
     if not active_bookings:
         text = (
-            "<b>🟢 У вас нет активных записей на данный момент.</b>\n\n"
+            "<b>У вас нет активных записей на данный момент.</b>\n\n"
             "Вы можете оформить новую запись в 2 клика!"
         )
-        builder.button(text="📅 Записаться на ТО", callback_data="nav_booking")
+        builder.button(text="Записаться на ТО", callback_data="nav_booking")
     else:
-        text = "<b>🟢 Ваши активные записи:</b>\n\n"
+        text = "<b>Ваши активные записи:</b>\n\n"
         for b in active_bookings:
-            status_icon = "⏳" if b["status"] == "На рассмотрении" else "✅"
-            comment_str = f"\n• 💬 <b>Примечание:</b> <i>{b['comment']}</i>" if b["comment"] else ""
+            comment_str = f"\n• <b>Примечание:</b> <i>{b['comment']}</i>" if b["comment"] else ""
             text += (
-                f"<b>Запись №{b['id']}</b> [{status_icon} <b>{b['status']}</b>]\n"
+                f"<b>Запись №{b['id']}</b> [<b>{b['status']}</b>]\n"
                 f"• <b>Услуга:</b> {b['problem']}\n"
                 f"• <b>Автомобиль:</b> {b['car_model']}\n"
                 f"• <b>Дата и время:</b> {b['slot']}\n"
@@ -468,13 +460,12 @@ async def view_active_bookings_handler(callback: types.CallbackQuery):
                 f"{comment_str}\n"
                 "-------------------------\n"
             )
-            builder.button(text=f"❌ Отменить запись №{b['id']}", callback_data=f"cancel_db_booking_{b['id']}")
+            builder.button(text=f"Отменить запись №{b['id']}", callback_data=f"cancel_db_booking_{b['id']}")
             
-    builder.button(text="🔙 Назад в кабинет", callback_data="nav_profile")
+    builder.button(text="Назад в кабинет", callback_data="nav_profile")
     builder.adjust(1)
     await callback.message.edit_text(text, parse_mode="HTML", reply_markup=builder.as_markup())
 
-# Просмотр всей истории записей
 @dp.callback_query(F.data == "view_all_bookings")
 async def view_all_bookings_handler(callback: types.CallbackQuery):
     await callback.answer()
@@ -482,14 +473,13 @@ async def view_all_bookings_handler(callback: types.CallbackQuery):
     bookings = get_user_bookings(user_id)
     
     if not bookings:
-        text = "<b>📜 История ваших записей пуста.</b>"
+        text = "<b>История ваших записей пуста.</b>"
     else:
-        text = "<b>📜 Вся история ваших записей:</b>\n\n"
+        text = "<b>Вся история ваших записей:</b>\n\n"
         for b in bookings:
-            status_icon = "⏳" if b["status"] == "На рассмотрении" else ("✅" if b["status"] == "Одобрена" else "❌")
-            comment_str = f"\n• 💬 <b>Примечание:</b> <i>{b['comment']}</i>" if b["comment"] else ""
+            comment_str = f"\n• <b>Примечание:</b> <i>{b['comment']}</i>" if b["comment"] else ""
             text += (
-                f"<b>Запись №{b['id']}</b> [{status_icon} {b['status']}]\n"
+                f"<b>Запись №{b['id']}</b> [{b['status']}]\n"
                 f"• <b>Услуга:</b> {b['problem']}\n"
                 f"• <b>Автомобиль:</b> {b['car_model']}\n"
                 f"• <b>Время:</b> {b['slot']}"
@@ -497,10 +487,9 @@ async def view_all_bookings_handler(callback: types.CallbackQuery):
                 "-------------------------\n"
             )
     builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 Назад в кабинет", callback_data="nav_profile")
+    builder.button(text="Назад в кабинет", callback_data="nav_profile")
     await callback.message.edit_text(text, parse_mode="HTML", reply_markup=builder.as_markup())
 
-# Отмена записи пользователем через бот (с отправкой уведомления и модераторам!)
 @dp.callback_query(F.data.startswith("cancel_db_booking_"))
 async def cancel_db_booking_handler(callback: types.CallbackQuery, bot: Bot):
     await callback.answer()
@@ -514,15 +503,14 @@ async def cancel_db_booking_handler(callback: types.CallbackQuery, bot: Bot):
     success = cancel_booking_by_id(booking_id, user_id)
     
     builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 Назад в кабинет", callback_data="nav_profile")
+    builder.button(text="Назад в кабинет", callback_data="nav_profile")
     if success:
         await callback.message.edit_text(
-            f"<b>❌ Запись №{booking_id} успешно отменена.</b>",
+            f"<b>Запись №{booking_id} успешно отменена.</b>",
             parse_mode="HTML",
             reply_markup=builder.as_markup()
         )
 
-        # Отправляем уведомление модераторам об отмене
         admin_ids = get_admin_ids()
         if admin_ids and booking:
             user_name = callback.from_user.full_name or callback.from_user.first_name
@@ -541,15 +529,13 @@ async def cancel_db_booking_handler(callback: types.CallbackQuery, bot: Bot):
                 try:
                     await bot.send_message(adm_id, admin_msg, parse_mode="HTML")
                 except Exception as e:
-                    logging.error(f"Не удалось отправить уведомление об отмене модератору {adm_id}: {e}")
+                    logging.error(f"Не удалось отправить уведомление модератору {adm_id}: {e}")
     else:
         await callback.message.edit_text(
-            "⚠️ Не удалось отменить запись или она уже отменена.",
+            "Не удалось отменить запись или она уже отменена.",
             parse_mode="HTML",
             reply_markup=builder.as_markup()
         )
-
-# --- 📅 Интерактивный пошаговый поток записи на ТО ---
 
 @dp.callback_query(F.data == "nav_booking")
 async def start_booking_inline(callback: types.CallbackQuery, state: FSMContext):
@@ -565,11 +551,11 @@ async def start_booking_inline(callback: types.CallbackQuery, state: FSMContext)
 async def category_selected_inline(callback: types.CallbackQuery, state: FSMContext):
     await callback.answer()
     categories_map = {
-        "cat_engine": "🔧 Двигатель и выхлопная система",
-        "cat_chassis": "🛞 Подвеска и тормозная система",
-        "cat_electric": "⚡ Электрика и автоэлектроника",
-        "cat_to": "🛢 Регулярное ТО и масляный сервис",
-        "cat_climate": "❄️ Климат и кондиционер",
+        "cat_engine": "Двигатель и выхлопная система",
+        "cat_chassis": "Подвеска и тормозная система",
+        "cat_electric": "Электрика и автоэлектроника",
+        "cat_to": "Регулярное ТО и масляный сервис",
+        "cat_climate": "Климат и кондиционер",
     }
     
     await state.update_data(card_msg_id=callback.message.message_id)
@@ -577,7 +563,7 @@ async def category_selected_inline(callback: types.CallbackQuery, state: FSMCont
     if callback.data == "cat_custom":
         await state.set_state(BookingState.custom_problem)
         builder = InlineKeyboardBuilder()
-        builder.button(text="🔙 Назад в меню", callback_data="nav_main")
+        builder.button(text="Назад в меню", callback_data="nav_main")
         await callback.message.edit_text(
             "<b>Шаг 1 из 4:</b> Напишите причиной вашего обращения или услугу сообщением:",
             parse_mode="HTML",
@@ -609,7 +595,7 @@ async def master_selected_inline(callback: types.CallbackQuery, state: FSMContex
     await state.set_state(BookingState.enter_car_model)
 
     builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 Назад в меню", callback_data="nav_main")
+    builder.button(text="Назад в меню", callback_data="nav_main")
     await callback.message.edit_text(
         f"Мастер: <b>{chosen_master}</b>\n\n"
         "<b>Шаг 3 из 5:</b> Напишите марку и модель автомобиля (например: <i>Opel Astra</i> или <i>Toyota Camry</i>):",
@@ -631,9 +617,9 @@ async def custom_problem_entered_inline(message: types.Message, state: FSMContex
     if not validate_custom_problem(text_val):
         if card_msg_id:
             builder = InlineKeyboardBuilder()
-            builder.button(text="🔙 Назад в меню", callback_data="nav_main")
+            builder.button(text="Назад в меню", callback_data="nav_main")
             await bot.edit_message_text(
-                "⚠️ <b>Некорректное описание проблемы!</b>\n\n"
+                "Некорректное описание проблемы!\n\n"
                 "Введите понятное описание поломки или нужной услуги.\n"
                 "<i>Пример: Замена передних тормозных колодок</i>",
                 chat_id=message.chat.id,
@@ -669,12 +655,12 @@ async def car_model_entered_inline(message: types.Message, state: FSMContext, bo
     card_msg_id = data.get("card_msg_id")
     
     builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 Назад в меню", callback_data="nav_main")
+    builder.button(text="Назад в меню", callback_data="nav_main")
     
     if not formatted_car:
         if card_msg_id:
             await bot.edit_message_text(
-                "⚠️ <b>Некорректное название автомобиля!</b>\n"
+                "Некорректное название автомобиля!\n"
                 "Укажите марку и модель авто (например: <i>Opel Astra, Toyota Camry, Hyundai Solaris</i>):",
                 chat_id=message.chat.id,
                 message_id=card_msg_id,
@@ -704,7 +690,7 @@ async def slot_selected_inline(callback: types.CallbackQuery, state: FSMContext)
     await state.set_state(BookingState.enter_phone)
     
     builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 Назад в меню", callback_data="nav_main")
+    builder.button(text="Назад в меню", callback_data="nav_main")
     
     await callback.message.edit_text(
         f"Выбранное время: <b>{slot_text}</b>\n\n"
@@ -732,9 +718,9 @@ async def phone_entered_inline(message: types.Message, state: FSMContext, bot: B
     if len(digits) < 7 or len(digits) > 15:
         if card_msg_id:
             builder = InlineKeyboardBuilder()
-            builder.button(text="🔙 Назад в меню", callback_data="nav_main")
+            builder.button(text="Назад в меню", callback_data="nav_main")
             await bot.edit_message_text(
-                "⚠️ <b>Некорректный номер телефона.</b>\n"
+                "Некорректный номер телефона.\n"
                 "Введите правильный номер (например: +79991234567):",
                 chat_id=message.chat.id,
                 message_id=card_msg_id,
@@ -750,7 +736,7 @@ async def phone_entered_inline(message: types.Message, state: FSMContext, bot: B
     full_slot = f"{updated_data.get('slot')}{master_str}"
 
     summary = (
-        "<b>📋 Подтверждение вашей записи:</b>\n\n"
+        "<b>Подтверждение вашей записи:</b>\n\n"
         f"• <b>Услуга:</b> {updated_data.get('problem')}\n"
         f"• <b>Автомобиль:</b> {updated_data.get('car_model')}\n"
         f"• <b>Дата и время:</b> {full_slot}\n"
@@ -789,7 +775,7 @@ async def process_moderator_decision(bot: Bot, booking_id: int, new_status: str,
                 f"• <b>Автомобиль:</b> {booking['car_model']}\n"
                 f"• <b>Услуга:</b> {booking['problem']}"
                 f"{comment_text}\n\n"
-                "Ждем вас в назначенное время в автосервисе! 🚗"
+                "Ждем вас в назначенное время в автосервисе!"
             )
         else:
             client_msg = (
@@ -801,8 +787,8 @@ async def process_moderator_decision(bot: Bot, booking_id: int, new_status: str,
             )
             
         builder = InlineKeyboardBuilder()
-        builder.button(text="👤 Мой кабинет", callback_data="nav_profile")
-        builder.button(text="📅 Новая запись", callback_data="nav_booking")
+        builder.button(text="Мой кабинет", callback_data="nav_profile")
+        builder.button(text="Новая запись", callback_data="nav_booking")
         builder.adjust(2)
         
         try:
@@ -811,11 +797,11 @@ async def process_moderator_decision(bot: Bot, booking_id: int, new_status: str,
             logging.error(f"Не удалось отправить уведомление клиенту {client_id}: {e}")
 
     if callback:
-        status_label = "✅ ОДОБРЕНА" if new_status == "Одобрена" else "❌ ОТКЛОНЕНА"
+        status_label = "ОДОБРЕНА" if new_status == "Одобрена" else "ОТКЛОНЕНА"
         comment_label = f"\n💬 Комментарий: <i>\"{comment}\"</i>" if comment else ""
         
         builder = InlineKeyboardBuilder()
-        builder.button(text="👑 Панель модерации", callback_data="adm_panel")
+        builder.button(text="Панель модерации", callback_data="adm_panel")
         
         try:
             await callback.message.edit_text(
@@ -837,7 +823,7 @@ async def admin_panel_handler(message: types.Message, state: FSMContext, bot: Bo
     admin_ids = get_admin_ids()
     if not admin_ids:
         await message.answer(
-            f"<b>⚙️ Настройка модератора</b>\n\n"
+            f"<b>Настройка модератора</b>\n\n"
             f"Ваш Telegram ID: <code>{message.from_user.id}</code>\n\n"
             "Чтобы включить панель модератора, добавьте этот ID в переменные окружения Amvera или файл <code>.env</code>:\n"
             f"<code>ADMIN_IDS={message.from_user.id}</code>",
@@ -846,7 +832,7 @@ async def admin_panel_handler(message: types.Message, state: FSMContext, bot: Bo
         return
         
     if message.from_user.id not in admin_ids:
-        await message.answer("⚠️ Доступ запрещен. Ваш ID не найден в списке модераторов.", parse_mode="HTML")
+        await message.answer("Доступ запрещен. Ваш ID не найден в списке модераторов.", parse_mode="HTML")
         return
         
     await show_admin_panel(bot, message.chat.id)
@@ -854,19 +840,19 @@ async def admin_panel_handler(message: types.Message, state: FSMContext, bot: Bo
 async def show_admin_panel(bot: Bot, chat_id: int, callback: types.CallbackQuery = None):
     stats = get_admin_stats()
     admin_text = (
-        "<b>👑 Панель Модератора Автосервиса</b>\n\n"
-        "<b>📊 Общая статистика заявок:</b>\n"
-        f"• ⏳ На рассмотрении: <b>{stats['pending']}</b>\n"
-        f"• ✅ Одобрено: <b>{stats['approved']}</b>\n"
-        f"• 🔴 Отклонено / Отменено: <b>{stats['rejected']}</b>\n"
-        f"• 📁 Всего в базе: <b>{stats['total']}</b>\n\n"
+        "<b>Панель Модератора Автосервиса</b>\n\n"
+        "<b>Статистика заявок:</b>\n"
+        f"• На рассмотрении: <b>{stats['pending']}</b>\n"
+        f"• Одобрено: <b>{stats['approved']}</b>\n"
+        f"• Отклонено / Отменено: <b>{stats['rejected']}</b>\n"
+        f"• Всего в базе: <b>{stats['total']}</b>\n\n"
         "Выберите действие:"
     )
     builder = InlineKeyboardBuilder()
-    builder.button(text=f"⏳ На рассмотрении ({stats['pending']})", callback_data="adm_view_pending")
-    builder.button(text="📁 Вся база записей", callback_data="adm_view_all")
-    builder.button(text="🔄 Обновить панель", callback_data="adm_panel")
-    builder.button(text="🏠 Главное меню", callback_data="nav_main")
+    builder.button(text=f"На рассмотрении ({stats['pending']})", callback_data="adm_view_pending")
+    builder.button(text="Вся база записей", callback_data="adm_view_all")
+    builder.button(text="Обновить панель", callback_data="adm_panel")
+    builder.button(text="Главное меню", callback_data="nav_main")
     builder.adjust(1)
     
     if callback:
@@ -879,7 +865,7 @@ async def show_admin_panel(bot: Bot, chat_id: int, callback: types.CallbackQuery
 
 @dp.callback_query(F.data == "adm_panel")
 async def adm_panel_callback(callback: types.CallbackQuery, bot: Bot):
-    await callback.answer("Панель обновлена 🔄")
+    await callback.answer("Панель обновлена")
     await show_admin_panel(bot, callback.message.chat.id, callback)
 
 @dp.callback_query(F.data == "adm_view_pending")
@@ -889,9 +875,9 @@ async def adm_view_pending_handler(callback: types.CallbackQuery):
     
     if not bookings:
         builder = InlineKeyboardBuilder()
-        builder.button(text="🔙 Назад в админку", callback_data="adm_panel")
+        builder.button(text="Назад в админку", callback_data="adm_panel")
         await callback.message.edit_text(
-            "<b>⏳ Нет новых заявок на рассмотрении.</b>",
+            "<b>Нет новых заявок на рассмотрении.</b>",
             parse_mode="HTML",
             reply_markup=builder.as_markup()
         )
@@ -899,7 +885,7 @@ async def adm_view_pending_handler(callback: types.CallbackQuery):
         
     for b in bookings:
         card = (
-            f"⏳ <b>ЗАЯВКА НА ТО №{b['id']}</b>\n\n"
+            f"<b>ЗАЯВКА НА ТО №{b['id']}</b>\n\n"
             f"• <b>Клиент:</b> {b['user_name']}\n"
             f"• <b>Телефон:</b> {b['phone']}\n"
             f"• <b>Автомобиль:</b> {b['car_model']}\n"
@@ -907,10 +893,10 @@ async def adm_view_pending_handler(callback: types.CallbackQuery):
             f"• <b>Дата и время:</b> {b['slot']}\n"
         )
         builder = InlineKeyboardBuilder()
-        builder.button(text="✅ Одобрить", callback_data=f"adm_dec_{b['id']}_approve")
-        builder.button(text="❌ Отклонить", callback_data=f"adm_dec_{b['id']}_reject")
-        builder.button(text="💬 Одобрить + коммент", callback_data=f"adm_comm_{b['id']}_approve")
-        builder.button(text="💬 Отклонить + коммент", callback_data=f"adm_comm_{b['id']}_reject")
+        builder.button(text="Одобрить", callback_data=f"adm_dec_{b['id']}_approve")
+        builder.button(text="Отклонить", callback_data=f"adm_dec_{b['id']}_reject")
+        builder.button(text="Одобрить + коммент", callback_data=f"adm_comm_{b['id']}_approve")
+        builder.button(text="Отклонить + коммент", callback_data=f"adm_comm_{b['id']}_reject")
         builder.adjust(2, 2)
         await callback.message.answer(card, parse_mode="HTML", reply_markup=builder.as_markup())
 
@@ -921,27 +907,26 @@ async def adm_view_all_handler(callback: types.CallbackQuery):
     
     if not bookings:
         builder = InlineKeyboardBuilder()
-        builder.button(text="🔙 Назад в админку", callback_data="adm_panel")
+        builder.button(text="Назад в админку", callback_data="adm_panel")
         await callback.message.edit_text(
-            "<b>📁 База записей пуста.</b>",
+            "<b>База записей пуста.</b>",
             parse_mode="HTML",
             reply_markup=builder.as_markup()
         )
         return
         
-    response = "<b>📁 Архив всех записей клиентов:</b>\n\n"
+    response = "<b>Архив всех записей клиентов:</b>\n\n"
     for b in bookings[:15]:
-        status_icon = "⏳" if b["status"] == "На рассмотрении" else ("✅" if b["status"] == "Одобрена" else "❌")
         comment_str = f" (Коммент: {b['comment']})" if b["comment"] else ""
         response += (
-            f"<b>Запись №{b['id']}</b> [{status_icon} {b['status']}]\n"
+            f"<b>Запись №{b['id']}</b> [{b['status']}]\n"
             f"• <b>Клиент:</b> {b['user_name']} ({b['phone']})\n"
             f"• <b>Автомобиль:</b> {b['car_model']}\n"
             f"• <b>Дата/время:</b> {b['slot']}{comment_str}\n"
             "-------------------------\n"
         )
     builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 Назад в админку", callback_data="adm_panel")
+    builder.button(text="Назад в админку", callback_data="adm_panel")
     await callback.message.edit_text(response, parse_mode="HTML", reply_markup=builder.as_markup())
 
 @dp.callback_query(F.data.startswith("adm_dec_"))
@@ -966,9 +951,9 @@ async def adm_comment_request_handler(callback: types.CallbackQuery, state: FSMC
     action_text = "ОДОБРЕНИЯ" if action == "approve" else "ОТКЛОНЕНИЯ"
     
     builder = InlineKeyboardBuilder()
-    builder.button(text="🔙 Отмена", callback_data="adm_panel")
+    builder.button(text="Отмена", callback_data="adm_panel")
     await callback.message.edit_text(
-        f"<b>✍️ Ввод комментария для {action_text} заявки №{booking_id}:</b>\n\n"
+        f"<b>Ввод комментария для {action_text} заявки №{booking_id}:</b>\n\n"
         "Напишите комментарий для клиента сообщением:",
         parse_mode="HTML",
         reply_markup=builder.as_markup()
@@ -1015,7 +1000,7 @@ async def client_reschedule_inline_handler(callback: types.CallbackQuery, state:
     await state.set_state(BookingState.select_time_slot)
     
     await callback.message.edit_text(
-        f"<b>🔄 Перенос записи №{booking_id}:</b>\n\n"
+        f"<b>Перенос записи №{booking_id}:</b>\n\n"
         "Выберите новое доступное время и дату:",
         parse_mode="HTML",
         reply_markup=get_time_slots_keyboard()
@@ -1031,7 +1016,7 @@ async def client_cancel_inline_handler(callback: types.CallbackQuery, bot: Bot):
     success = cancel_booking_by_id(booking_id, user_id)
     if success:
         await callback.message.edit_text(
-            f"<b>❌ Запись №{booking_id} отменена по вашему запросу.</b>\n\n"
+            f"<b>Запись №{booking_id} отменена по вашему запросу.</b>\n\n"
             "Вы всегда можете оформить новую запись в любое время!",
             parse_mode="HTML"
         )
@@ -1055,7 +1040,7 @@ async def client_cancel_inline_handler(callback: types.CallbackQuery, bot: Bot):
                 except Exception as e:
                     logging.error(f"Не удалось отправить уведомление модератору {adm_id}: {e}")
     else:
-        await callback.message.answer("⚠️ Не удалось отменить запись или она уже отменена.")
+        await callback.message.answer("Не удалось отменить запись или она уже отменена.")
 
 @dp.callback_query(F.data == "confirm_booking")
 async def confirm_booking_inline(callback: types.CallbackQuery, state: FSMContext, bot: Bot):
@@ -1076,21 +1061,20 @@ async def confirm_booking_inline(callback: types.CallbackQuery, state: FSMContex
     )
     
     final_text = (
-        f"<b>🎉 Заявка №{booking_id} успешно создана!</b>\n\n"
+        f"<b>Заявка №{booking_id} успешно создана!</b>\n\n"
         f"• <b>Дата и время:</b> {target_slot}\n"
         f"• <b>Автомобиль:</b> {data.get('car_model')}\n"
         f"• <b>Услуга:</b> {data.get('problem')}\n\n"
-        "⏳ <i>Заявка отправлена на рассмотрение. Мы пришлем вам уведомление, как только её проверят.</i>"
+        "<i>Заявка отправлена на рассмотрение. Мы пришлем вам уведомление, как только её проверят.</i>"
     )
     
     builder = InlineKeyboardBuilder()
-    builder.button(text="👤 Мой кабинет", callback_data="nav_profile")
-    builder.button(text="🏠 Главное меню", callback_data="nav_main")
+    builder.button(text="Мой кабинет", callback_data="nav_profile")
+    builder.button(text="Главное меню", callback_data="nav_main")
     builder.adjust(1)
     
     await callback.message.edit_text(final_text, parse_mode="HTML", reply_markup=builder.as_markup())
 
-    # Мгновенное уведомление модераторам
     admin_ids = get_admin_ids()
     if admin_ids:
         user_mention = f"@{callback.from_user.username}" if callback.from_user.username else callback.from_user.full_name
@@ -1103,10 +1087,10 @@ async def confirm_booking_inline(callback: types.CallbackQuery, state: FSMContex
             f"• <b>Дата и время:</b> {target_slot}\n"
         )
         adm_builder = InlineKeyboardBuilder()
-        adm_builder.button(text="✅ Одобрить", callback_data=f"adm_dec_{booking_id}_approve")
-        adm_builder.button(text="❌ Отклонить", callback_data=f"adm_dec_{booking_id}_reject")
-        adm_builder.button(text="💬 Одобрить + коммент", callback_data=f"adm_comm_{booking_id}_approve")
-        adm_builder.button(text="💬 Отклонить + коммент", callback_data=f"adm_comm_{booking_id}_reject")
+        adm_builder.button(text="Одобрить", callback_data=f"adm_dec_{booking_id}_approve")
+        adm_builder.button(text="Отклонить", callback_data=f"adm_dec_{booking_id}_reject")
+        adm_builder.button(text="Одобрить + коммент", callback_data=f"adm_comm_{booking_id}_approve")
+        adm_builder.button(text="Отклонить + коммент", callback_data=f"adm_comm_{booking_id}_reject")
         adm_builder.adjust(2, 2)
         
         for adm_id in admin_ids:
@@ -1140,7 +1124,7 @@ async def main():
                     try:
                         await bot.set_chat_menu_button(
                             menu_button=types.MenuButtonWebApp(
-                                text="🚗 Mini App",
+                                text="Mini App",
                                 web_app=types.WebAppInfo(url=WEBAPP_URL)
                             )
                         )

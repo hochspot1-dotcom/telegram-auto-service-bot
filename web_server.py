@@ -135,12 +135,11 @@ async def handle_create_booking(request: web.Request):
                 f"• <b>Дата и время:</b> {slot}\n"
             )
             adm_builder = InlineKeyboardBuilder()
-            adm_builder.button(text="✅ Одобрить", callback_data=f"adm_dec_{booking_id}_approve")
-            adm_builder.button(text="🛠 В работу", callback_data=f"adm_dec_{booking_id}_in_progress")
-            adm_builder.button(text="🎉 Готов", callback_data=f"adm_dec_{booking_id}_ready")
-            adm_builder.button(text="❌ Отклонить", callback_data=f"adm_dec_{booking_id}_reject")
-            adm_builder.button(text="💬 Коммент", callback_data=f"adm_comm_{booking_id}_approve")
-            adm_builder.adjust(3, 2)
+            adm_builder.button(text="Одобрить", callback_data=f"adm_dec_{booking_id}_approve")
+            adm_builder.button(text="Отклонить", callback_data=f"adm_dec_{booking_id}_reject")
+            adm_builder.button(text="Одобрить + коммент", callback_data=f"adm_comm_{booking_id}_approve")
+            adm_builder.button(text="Отклонить + коммент", callback_data=f"adm_comm_{booking_id}_reject")
+            adm_builder.adjust(2, 2)
 
             for adm_id in admin_ids:
                 try:
@@ -188,7 +187,7 @@ async def handle_cancel_booking(request: web.Request):
                 "Вы всегда можете записаться снова на любое удобное время!"
             )
             builder = InlineKeyboardBuilder()
-            builder.button(text="📅 Записаться снова", callback_data="nav_booking")
+            builder.button(text="Записаться снова", callback_data="nav_booking")
             try:
                 await bot.send_message(client_id, client_msg, parse_mode="HTML", reply_markup=builder.as_markup())
             except Exception as e:
@@ -279,7 +278,7 @@ async def handle_admin_action(request: web.Request):
 
     admin_id = data.get("admin_id")
     booking_id = data.get("booking_id")
-    action = data.get("action") # "approve", "reject", "in_progress", "ready", "delete", "cancel"
+    action = data.get("action") # "approve", "reject", "delete"
     comment = data.get("comment", "").strip()
 
     if not admin_id or not check_is_admin(int(admin_id)):
@@ -296,21 +295,7 @@ async def handle_admin_action(request: web.Request):
             return web.json_response({"success": True, "message": "Запись успешно удалена"})
         return web.json_response({"error": "Не удалось удалить запись"}, status=400)
 
-    if action == "cancel":
-        booking = get_booking_by_id(booking_id)
-        if booking:
-            cancel_booking_by_id(booking_id, booking["user_id"])
-            return web.json_response({"success": True, "message": "Запись отменена"})
-        return web.json_response({"error": "Не найдена"}, status=400)
-
-    # Status Mapping
-    status_map = {
-        "approve": "Одобрена",
-        "reject": "Отклонена",
-        "in_progress": "🛠 В работе",
-        "ready": "🎉 Готов к выдаче"
-    }
-    new_status = status_map.get(action, "Одобрена")
+    new_status = "Одобрена" if action == "approve" else "Отклонена"
     bot: Bot = request.app.get("bot")
     
     await process_moderator_decision(bot, booking_id, new_status, comment)
@@ -353,8 +338,8 @@ async def handle_admin_master_reschedule(request: web.Request):
             )
 
             builder = InlineKeyboardBuilder()
-            builder.button(text="🔄 Выбрать другого мастера/время", callback_data=f"reschedule_{booking_id}")
-            builder.button(text="❌ Отменить запись", callback_data=f"cancel_b_{booking_id}")
+            builder.button(text="Выбрать другого мастера/время", callback_data=f"reschedule_{booking_id}")
+            builder.button(text="Отменить запись", callback_data=f"cancel_b_{booking_id}")
             builder.adjust(1, 1)
 
             try:

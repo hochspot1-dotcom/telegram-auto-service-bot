@@ -11,15 +11,12 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.types import ReplyKeyboardRemove
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 WEBAPP_URL = os.getenv("WEBAPP_URL")
-
-from aiohttp import web
-from web_server import create_web_app
 
 from database import (
     init_db, add_booking, get_user_bookings, get_user_stats, 
@@ -1092,12 +1089,6 @@ async def confirm_booking_inline(callback: types.CallbackQuery, state: FSMContex
             except Exception as e:
                 logging.error(f"Не удалось отправить уведомление модератору {adm_id}: {e}")
 
-async def safe_start_polling(bot: Bot):
-    try:
-        await dp.start_polling(bot)
-    except Exception as e:
-        logging.error(f"[WARN] Ошибка polling бота (возможно бот запущен на другом ПК/сервере): {e}")
-
 async def main():
     if hasattr(sys.stdout, "reconfigure"):
         try:
@@ -1109,45 +1100,30 @@ async def main():
     init_db()
     print("База данных SQLite успешно инициализирована!", flush=True)
 
-    port = int(os.getenv("PORT", "8080"))
     bot_token = os.getenv("BOT_TOKEN")
-    bot = None
 
-    if bot_token and bot_token != "your_bot_token_here":
-        try:
-            bot = Bot(token=bot_token)
-            await bot.delete_webhook(drop_pending_updates=True)
+    if not bot_token or bot_token == "your_bot_token_here":
+        print("⚠️ BOT_TOKEN не указан в переменных окружения Amvera!", flush=True)
+        return
 
-            if WEBAPP_URL:
-                if WEBAPP_URL.startswith("https://"):
-                    try:
-                        await bot.set_chat_menu_button(
-                            menu_button=types.MenuButtonWebApp(
-                                text="Mini App",
-                                web_app=types.WebAppInfo(url=WEBAPP_URL)
-                            )
-                        )
-                        print(f"[OK] Кнопка меню Mini App успешно привязана к {WEBAPP_URL}", flush=True)
-                    except Exception as e:
-                        logging.warning(f"[WARN] Ошибка установки кнопки WebApp через API: {e}")
-                else:
-                    print(f"[INFO] WEBAPP_URL ({WEBAPP_URL}) использует HTTP. Telegram требует HTTPS для встроенных WebApp.", flush=True)
-        except Exception as e:
-            print(f"[WARN] Ошибка инициализации Telegram бота: {e}", flush=True)
+    bot = Bot(token=bot_token)
+    await bot.delete_webhook(drop_pending_updates=True)
 
-    web_app = create_web_app(bot)
-    runner = web.AppRunner(web_app)
-    await runner.setup()
-    site = web.TCPSite(runner, "0.0.0.0", port)
-    await site.start()
-    print(f"[OK] Mini App и API сервер слушает http://0.0.0.0:{port}", flush=True)
+    if WEBAPP_URL:
+        if WEBAPP_URL.startswith("https://"):
+            try:
+                await bot.set_chat_menu_button(
+                    menu_button=types.MenuButtonWebApp(
+                        text="Mini App",
+                        web_app=types.WebAppInfo(url=WEBAPP_URL)
+                    )
+                )
+                print(f"[OK] Кнопка меню Mini App успешно привязана к {WEBAPP_URL}", flush=True)
+            except Exception as e:
+                logging.warning(f"[WARN] Ошибка установки кнопки WebApp через API: {e}")
 
-    if bot:
-        print("[OK] Telegram бот запущен и готов к работе!", flush=True)
-        asyncio.create_task(safe_start_polling(bot))
-
-    while True:
-        await asyncio.sleep(3600)
+    print("[OK] Telegram бот запущен и готов к работе!", flush=True)
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
     asyncio.run(main())

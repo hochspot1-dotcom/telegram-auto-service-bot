@@ -786,7 +786,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ═══════════════════════════════════════════════════════════
-  // RESCHEDULING FAST-TRACK LOGIC (Automatic Approval & Confirmation)
+  // RESCHEDULING FAST-TRACK LOGIC (Automatic Approval & Notification)
   // ═══════════════════════════════════════════════════════════
 
   function startRescheduleMode(bookingId) {
@@ -842,9 +842,18 @@ document.addEventListener("DOMContentLoaded", () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             booking_id: activeRescheduleBookingId,
+            id: activeRescheduleBookingId,
             user_id: userId,
+            telegram_id: userId,
+            chat_id: userId,
+            user_name: userName,
+            name: userName,
             new_slot: targetSlot,
-            status: "Одобрена"
+            status: "Одобрена",
+            init_data: tg?.initData || "",
+            initData: tg?.initData || "",
+            notify_client: true,
+            notify_admin: true
           })
         });
 
@@ -1114,20 +1123,59 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function cancelBooking(bookingId) {
     try {
+      const bId = parseInt(bookingId, 10);
+      const payload = {
+        booking_id: bId,
+        id: bId,
+        user_id: userId,
+        telegram_id: userId,
+        chat_id: userId,
+        user_name: userName,
+        name: userName,
+        init_data: tg?.initData || "",
+        initData: tg?.initData || "",
+        status: "Отменена",
+        action: "cancel",
+        notify_client: true,
+        notify_admin: true,
+        notify: true
+      };
+
       const res = await fetch(`${BACKEND_URL}/api/booking/cancel`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ booking_id: parseInt(bookingId), user_id: userId })
+        body: JSON.stringify(payload)
       });
-      const data = await res.json();
-      if (data.success) {
-        showToast("✅ Запись отменена");
+
+      // Fallback endpoint in case backend routes action through /api/booking/action
+      fetch(`${BACKEND_URL}/api/booking/action`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          booking_id: bId,
+          id: bId,
+          user_id: userId,
+          telegram_id: userId,
+          chat_id: userId,
+          user_name: userName,
+          action: "cancel",
+          status: "Отменена",
+          init_data: tg?.initData || ""
+        })
+      }).catch(() => {});
+
+      let data = {};
+      try { data = await res.json(); } catch (e) {}
+
+      if (res.ok || data.success) {
+        showToast("✅ Запись отменена! Уведомление отправлено.");
         await loadUserProfile();
         if (isAdmin) loadAdminBookings(currentAdminFilter);
       } else {
-        showToast("⚠️ " + (data.error || "Ошибка"));
+        showToast("⚠️ " + (data.error || "Ошибка отмены"));
       }
     } catch (e) {
+      console.error(e);
       showToast("⚠️ Ошибка соединения");
     }
   }
@@ -1286,12 +1334,15 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           user_id: userId,
+          telegram_id: userId,
+          chat_id: userId,
           user_name: userName,
           problem: problem,
           car_model: carModel,
           car_number: carNumber,
           slot: targetSlot,
-          phone: phone
+          phone: phone,
+          init_data: tg?.initData || ""
         })
       });
 

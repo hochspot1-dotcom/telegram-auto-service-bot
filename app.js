@@ -209,7 +209,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   navItems.forEach(item => {
     item.addEventListener("click", () => {
-      // If switching away from booking, reset reschedule mode if active
       if (item.dataset.tab !== "booking" && activeRescheduleBookingId) {
         clearRescheduleMode();
       }
@@ -973,10 +972,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         <div class="af-reminder-actions">
           <button type="button" class="af-reminder-btn af-reminder-btn-secondary" id="home-view-bookings-btn">
-            📋 Мои записи
+            📋 Записи
           </button>
-          <button type="button" class="af-reminder-btn af-reminder-btn-primary" id="home-reschedule-btn" data-id="${activeBooking.id}">
+          <button type="button" class="af-reminder-btn af-reminder-btn-secondary" id="home-reschedule-btn" data-id="${activeBooking.id}">
             🔄 Перенести
+          </button>
+          <button type="button" class="af-reminder-btn af-reminder-btn-secondary" id="home-cancel-booking-btn" data-id="${activeBooking.id}" style="color:var(--red);">
+            ❌ Отменить
           </button>
         </div>
       </div>
@@ -1000,6 +1002,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (rescheduleBtn) {
       rescheduleBtn.addEventListener("click", () => {
         startRescheduleMode(activeBooking.id);
+      });
+    }
+
+    const cancelBtn = document.getElementById("home-cancel-booking-btn");
+    if (cancelBtn) {
+      cancelBtn.addEventListener("click", async () => {
+        if (confirm(`Отменить запись №${activeBooking.id}?`)) {
+          await cancelBooking(activeBooking.id);
+        }
       });
     }
   }
@@ -1051,18 +1062,20 @@ document.addEventListener("DOMContentLoaded", () => {
       let isUnavailable = b.status.includes("недоступен") || b.status.includes("Перенос");
       let displayStatus = b.status;
       let statusColor = "var(--yellow)";
+      let isCancelled = b.status.includes("Отменен") || b.status.includes("Отклонен");
       
       if (b.status === "Одобрена" || b.status === "Активна" || b.status.includes("Перенесена")) {
         displayStatus = "✅ Подтверждена";
         statusColor = "var(--green)";
-      } else if (b.status.includes("Отменен") || b.status.includes("Отклонен")) {
+      } else if (isCancelled) {
+        displayStatus = "❌ Отменена";
         statusColor = "var(--red)";
       }
 
       const isCancelable = ["На рассмотрении", "Одобрена", "Активна"].includes(b.status) || isUnavailable;
 
       return `
-        <div class="af-card">
+        <div class="af-card" style="${isCancelled ? 'opacity:0.75;' : ''}">
           <div style="display:flex;align-items:center;justify-content:space-between;">
             <span style="font-size:14px;font-weight:800;">Запись №${b.id}</span>
             <span style="font-size:12px;font-weight:700;color:${statusColor};">${displayStatus}</span>
@@ -1073,10 +1086,12 @@ document.addEventListener("DOMContentLoaded", () => {
             <div><strong>Время:</strong> ${b.slot}</div>
             ${b.comment ? `<div style="margin-top:4px;padding:6px;background:var(--bg-pill);border-radius:6px;"><strong>Примечание:</strong> ${b.comment}</div>` : ''}
           </div>
-          <div style="display:flex;gap:6px;margin-top:4px;">
-            ${isUnavailable ? `<button class="af-btn-primary reschedule-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">Выбрать другое время</button>` : `<button class="af-btn-secondary reschedule-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">🔄 Перенести</button>`}
-            ${isCancelable ? `<button class="af-btn-secondary cancel-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;color:var(--red);">Отменить</button>` : ''}
-          </div>
+          ${!isCancelled ? `
+            <div style="display:flex;gap:6px;margin-top:4px;">
+              ${isUnavailable ? `<button class="af-btn-primary reschedule-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">Выбрать другое время</button>` : `<button class="af-btn-secondary reschedule-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">🔄 Перенести</button>`}
+              ${isCancelable ? `<button class="af-btn-secondary cancel-btn" data-id="${b.id}" style="padding:6px 12px;font-size:12px;color:var(--red);">❌ Отменить</button>` : ''}
+            </div>
+          ` : ''}
         </div>
       `;
     }).join("");
@@ -1107,7 +1122,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
       if (data.success) {
         showToast("✅ Запись отменена");
-        loadUserProfile();
+        await loadUserProfile();
+        if (isAdmin) loadAdminBookings(currentAdminFilter);
       } else {
         showToast("⚠️ " + (data.error || "Ошибка"));
       }
@@ -1339,6 +1355,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     container.innerHTML = bookings.map(b => {
       let isPending = b.status === "На рассмотрении";
+      let isApproved = b.status === "Одобрена" || b.status === "Активна";
+      let isCancelled = b.status.includes("Отменен") || b.status.includes("Отклонен");
+
+      let statusColor = "var(--yellow)";
+      let statusTag = "⏳ Ожидает";
+      if (isApproved) { statusColor = "var(--green)"; statusTag = "✅ Одобрена"; }
+      if (isCancelled) { statusColor = "var(--red)"; statusTag = "❌ Отменена"; }
+
       let actionsHtml = isPending ? `
         <div style="display:flex;gap:6px;margin-top:6px;">
           <button class="af-btn-primary admin-btn-approve" data-id="${b.id}" style="padding:6px 12px;font-size:12px;">✅ Одобрить</button>
@@ -1347,10 +1371,10 @@ document.addEventListener("DOMContentLoaded", () => {
       ` : ``;
 
       return `
-        <div class="af-card">
+        <div class="af-card" style="${isCancelled ? 'opacity:0.7;' : ''}">
           <div style="display:flex;justify-content:space-between;">
             <span style="font-size:14px;font-weight:800;">Заявка №${b.id}</span>
-            <span style="font-size:12px;font-weight:700;">${b.status}</span>
+            <span style="font-size:12px;font-weight:700;color:${statusColor};">${statusTag}</span>
           </div>
           <div style="font-size:13px;color:var(--gray-2);">
             <div><strong>Клиент:</strong> ${b.user_name} (${b.phone})</div>

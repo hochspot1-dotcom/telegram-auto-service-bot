@@ -48,7 +48,7 @@ async def handle_get_slots(request: web.Request):
         date_obj = today + timedelta(days=day_offset)
         date_str = date_obj.strftime("%d.%m")
         day_name = days_ru[date_obj.weekday()]
-        for time_str in ["10:00", "14:00", "17:00"]:
+        for time_str in ["09:00", "10:30", "12:00", "13:30", "15:00", "16:30", "18:00"]:
             slots.append(f"{date_str} ({day_name}) в {time_str}")
     return web.json_response({"slots": slots})
 
@@ -83,7 +83,6 @@ async def handle_user_info(request: web.Request):
 
 @routes.post("/api/booking/create")
 async def handle_create_booking(request: web.Request):
-    # Import validation functions from main to prevent circular imports
     from main import validate_and_format_car, validate_custom_problem, get_admin_ids
 
     try:
@@ -104,25 +103,12 @@ async def handle_create_booking(request: web.Request):
     if not problem:
         return web.json_response({"error": "Опишите проблему или выберите услугу"}, status=400)
 
-    # Валидация авто
     formatted_car = validate_and_format_car(car_model_raw)
     if not formatted_car:
         return web.json_response({
             "error": "Некорректная марка/модель авто! Укажите реальную марку (напр. Toyota Camry, Opel Astra)"
         }, status=400)
 
-    # Валидация кастомной проблемы (если это не предустановленная категория)
-    known_cats = [
-        "🔧 Двигатель и выхлоп", "🛞 Подвеска и тормоза", 
-        "⚡ Электрика и диагностика", "🛢 Регулярное ТО", "❄️ Климат и кондиционер"
-    ]
-    if problem not in known_cats:
-        if not validate_custom_problem(problem):
-            return web.json_response({
-                "error": "Некорректное описание проблемы. Введите понятную причину обращения."
-            }, status=400)
-
-    # Запись в БД
     booking_id = add_booking(
         user_id=int(user_id),
         user_name=user_name,
@@ -173,14 +159,60 @@ async def handle_cancel_booking(request: web.Request):
     except Exception:
         return web.json_response({"error": "Invalid JSON"}, status=400)
 
-    booking_id = data.get("booking_id")
-    user_id = data.get("user_id")
+    booking_id = data.get("booking_id") or data.get("id")
+    user_id = data.get("user_id") or data.get("telegram_id") or data.get("chat_id")
 
     if not booking_id or not user_id:
         return web.json_response({"error": "Missing booking_id or user_id"}, status=400)
 
-    success = cancel_booking_by_id(int(booking_id), int(user_id))
+    b_id = int(booking_id)
+    u_id = int(user_id)
+
+    booking = get_booking_by_id(b_id)
+    success = cancel_booking_by_id(b_id, u_id)
+
     if success:
+        bot: Bot = request.app.get("bot")
+        if bot and booking:
+            client_id = booking["user_id"]
+            car_info = booking.get("car_model", "")
+            if booking.get("car_number"):
+                car_info += f" ({booking['car_number']})"
+
+            # Send Telegram notification to CLIENT
+            client_msg = (
+                f"❌ <b>Ваша запись №{b_id} отменена</b>\n\n"
+                f"• <b>Услуга:</b> {booking['problem']}\n"
+                f"• <b>Автомобиль:</b> {car_info}\n"
+                f"• <b>Была на время:</b> {booking['slot']}\n\n"
+                "Вы всегда можете записаться снова на любое удобное время!"
+            )
+            builder = InlineKeyboardBuilder()
+            builder.button(text="📅 Записаться снова", callback_data="nav_booking")
+            try:
+                await bot.send_message(client_id, client_msg, parse_mode="HTML", reply_markup=builder.as_markup())
+            except Exception as e:
+                logging.error(f"Не удалось отправить уведомление клиенту {client_id}: {e}")
+
+            # Send Telegram notification to MODERATORS
+            from main import get_admin_ids
+            admin_ids = get_admin_ids()
+            if admin_ids:
+                user_name = data.get("user_name") or booking.get("user_name") or "Клиент"
+                admin_msg = (
+                    f"🚨 <b>ОТМЕНА ЗАПИСИ №{b_id} КЛИЕНТОМ!</b>\n\n"
+                    f"• <b>Клиент:</b> {user_name} (ID: {client_id})\n"
+                    f"• <b>Телефон:</b> {booking.get('phone', 'Не указан')}\n"
+                    f"• <b>Автомобиль:</b> {car_info}\n"
+                    f"• <b>Услуга:</b> {booking['problem']}\n"
+                    f"• <b>Была на время:</b> {booking['slot']}\n"
+                )
+                for adm_id in admin_ids:
+                    try:
+                        await bot.send_message(adm_id, admin_msg, parse_mode="HTML")
+                    except Exception as e:
+                        logging.error(f"Не удалось отправить уведомление админу {adm_id}: {e}")
+
         return web.json_response({"success": True})
     else:
         return web.json_response({"error": "Запись не найдена или уже отменена"}, status=400)
@@ -232,7 +264,6 @@ async def handle_admin_bookings(request: web.Request):
             "created_at": str(b["created_at"]) if "created_at" in b.keys() else ""
         })
 
-
     return web.json_response({
         "stats": stats,
         "bookings": bookings
@@ -249,7 +280,7 @@ async def handle_admin_action(request: web.Request):
 
     admin_id = data.get("admin_id")
     booking_id = data.get("booking_id")
-    action = data.get("action") # "approve", "reject", "delete"
+    action = data.get("action") # "approve", "reject", "delete", "cancel"
     comment = data.get("comment", "").strip()
 
     if not admin_id or not check_is_admin(int(admin_id)):
@@ -265,6 +296,13 @@ async def handle_admin_action(request: web.Request):
         if success:
             return web.json_response({"success": True, "message": "Запись успешно удалена"})
         return web.json_response({"error": "Не удалось удалить запись"}, status=400)
+
+    if action == "cancel":
+        booking = get_booking_by_id(booking_id)
+        if booking:
+            cancel_booking_by_id(booking_id, booking["user_id"])
+            return web.json_response({"success": True, "message": "Запись отменена"})
+        return web.json_response({"error": "Не найдена"}, status=400)
     
     new_status = "Одобрена" if action == "approve" else "Отклонена"
     bot: Bot = request.app.get("bot")
@@ -275,7 +313,6 @@ async def handle_admin_action(request: web.Request):
 
 @routes.post("/api/admin/master/reschedule")
 async def handle_admin_master_reschedule(request: web.Request):
-    """Снять мастера со смены и отправить клиентам предложение выбрать другого мастера"""
     try:
         data = await request.json()
     except Exception:
@@ -326,7 +363,6 @@ async def handle_admin_master_reschedule(request: web.Request):
 
 @routes.post("/api/booking/reschedule")
 async def handle_client_reschedule(request: web.Request):
-    """Перенос клиентом своей записи на нового мастера / время"""
     try:
         data = await request.json()
     except Exception:
@@ -339,8 +375,26 @@ async def handle_client_reschedule(request: web.Request):
     if not booking_id or not user_id or not new_slot:
         return web.json_response({"error": "Отсутствуют обязательные параметры"}, status=400)
 
-    success = reschedule_booking(int(booking_id), int(user_id), new_slot)
+    b_id = int(booking_id)
+    u_id = int(user_id)
+    success = reschedule_booking(b_id, u_id, new_slot)
+
     if success:
+        bot: Bot = request.app.get("bot")
+        booking = get_booking_by_id(b_id)
+        if bot and booking:
+            client_msg = (
+                f"🎉 <b>Ваша запись №{b_id} обновлена!</b>\n\n"
+                f"• <b>Новое время:</b> {new_slot}\n"
+                f"• <b>Автомобиль:</b> {booking.get('car_model', '')}\n"
+                f"• <b>Статус:</b> ✅ Подтверждена\n\n"
+                "Ждем вас в назначенное время!"
+            )
+            try:
+                await bot.send_message(u_id, client_msg, parse_mode="HTML")
+            except Exception as e:
+                logging.error(f"Failed to send reschedule msg to {u_id}: {e}")
+
         return web.json_response({"success": True})
     return web.json_response({"error": "Не удалось перенести запись"}, status=400)
 
